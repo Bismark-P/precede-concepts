@@ -1,65 +1,251 @@
-import Image from "next/image";
+'use client'
+import { useEffect, useState } from 'react'
+import { supabase } from './lib/supabase'
+import { 
+  Briefcase, Calendar, MapPin, ArrowRight, ShieldCheck, 
+  Zap, Search, Users, Globe, Info 
+} from 'lucide-react'
 
 export default function Home() {
+  const [items, setItems] = useState<any[]>([])
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    fetchApproved()
+  }, [])
+
+  async function fetchApproved() {
+    const { data } = await supabase
+      .from('jobs')
+      .select('*')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+    if (data) setItems(data)
+  }
+
+  if (!mounted) return null
+
+  const jobs = items.filter(i => i.category !== 'event')
+  const events = items.filter(i => i.category === 'event')
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+    <div className="min-h-screen bg-white font-sans text-slate-900 scroll-smooth">
+      
+      {/* 1. PERSISTENT STICKY NAVIGATION */}
+      <nav className="sticky top-0 w-full z-[100] bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex flex-col">
+            <span className="text-xl font-black text-blue-900 tracking-tighter uppercase italic leading-none">
+              Precede Concepts
+            </span>
+            <span className="text-[8px] font-bold text-blue-500 tracking-[0.2em] uppercase mt-1">
+              Strategic Hub
+            </span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-10 text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <a href="#" className="hover:text-blue-600 transition-colors">Home</a>
+            <a href="#services" className="hover:text-blue-600 transition-colors">Services</a>
+            <a href="#about" className="hover:text-blue-600 transition-colors">About Us</a>
+            <a href="#opportunities" className="hover:text-blue-600 transition-colors">Opportunities</a>
+          </div>
+
+          <a href="/admin" className="text-[9px] font-black bg-slate-900 text-white px-5 py-2.5 rounded-full uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200">
+            Admin Portal
           </a>
         </div>
-      </main>
+      </nav>
+
+      {/* 2. HERO SECTION */}
+      <header className="bg-gradient-to-br from-slate-950 via-blue-950 to-blue-900 text-white py-32 px-6 text-center">
+        <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter uppercase italic">
+          Precede Concepts
+        </h1>
+        <div className="flex flex-wrap justify-center items-center gap-3 text-blue-300 font-bold tracking-widest uppercase text-[10px] md:text-xs mb-10">
+          <span>Digital Solutions</span> <span className="text-blue-800">|</span>
+          <span>Training & Events</span> <span className="text-blue-800">|</span>
+          <span>Opportunities</span> <span className="text-blue-800">|</span>
+          <span>Business Support</span> <span className="text-blue-800">|</span>
+          <span>And More</span>
+        </div>
+        <p className="text-blue-100 mt-8 max-w-3xl mx-auto font-medium text-lg md:text-xl leading-relaxed opacity-90">
+          Committed to excellence through constant learning, planning, and research, 
+          Precede Concepts is your strategic partner for today’s needs and whatever comes next.
+        </p>
+      </header>
+
+      {/* 3. ABOUT US SECTION */}
+      <section id="about" className="py-24 px-6 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">Who We Are</h2>
+            <h3 className="text-4xl font-black text-slate-900 mb-6 uppercase italic">Excellence in Motion</h3>
+            <p className="text-slate-600 leading-relaxed mb-6 font-medium">
+              Precede Concepts is a Ghana-based multi-disciplinary hub bridging the gap between 
+              operational challenges and strategic growth. Founded by a dedicated Tech Enthusiast 
+              and Digital Operations Specialist, our firm is built on a foundation of proactive innovation.
+            </p>
+            <p className="text-slate-600 leading-relaxed font-medium">
+              With certifications in <span className="text-blue-600 font-bold">Web Development, Cybersecurity, Data Analysis, and Digital Marketing</span>, 
+              we ensure every solution is secure and data-driven. We lead by constantly learning and 
+              researching the global landscape to bring the best practices home to Ghana.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-8 bg-blue-50 rounded-3xl border border-blue-100 text-center">
+              <Search className="mx-auto text-blue-600 mb-4" />
+              <p className="text-[10px] font-black uppercase text-blue-900">Research Driven</p>
+            </div>
+            <div className="p-8 bg-slate-900 rounded-3xl text-center text-white">
+              <ShieldCheck className="mx-auto text-blue-400 mb-4" />
+              <p className="text-[10px] font-black uppercase tracking-widest">Secure Ops</p>
+            </div>
+            <div className="p-8 bg-slate-50 rounded-3xl border border-slate-200 text-center col-span-2">
+              <Zap className="mx-auto text-orange-500 mb-4" />
+              <p className="text-[10px] font-black uppercase text-slate-900 tracking-[0.2em]">Continuous Learning & Planning</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. SERVICES GRID (EQUAL BOUNDING BOXES) */}
+      <section id="services" className="py-24 bg-slate-50 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">Our Services</h2>
+            <p className="text-4xl font-black text-slate-900 tracking-tight italic uppercase">Five Pillars of Support</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Box 1 */}
+            <div className="bg-white border border-slate-200 p-8 rounded-[2rem] flex flex-col h-[450px] justify-between hover:shadow-2xl transition-all group">
+              <div>
+                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  <Globe size={24} />
+                </div>
+                <h3 className="text-xl font-black mb-4 uppercase">Digital Solutions</h3>
+                <ul className="space-y-3 text-slate-500 text-sm font-bold uppercase tracking-tighter">
+                  <li>• Web & Backend Dev</li>
+                  <li>• Graphic Design</li>
+                  <li>• Digital Marketing</li>
+                  <li>• Image Enhancement</li>
+                </ul>
+              </div>
+              <button className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-600 transition-colors">View More</button>
+            </div>
+
+            {/* Box 2 */}
+            <div className="bg-white border border-slate-200 p-8 rounded-[2rem] flex flex-col h-[450px] justify-between hover:shadow-2xl transition-all group">
+              <div>
+                <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                  <Calendar size={24} />
+                </div>
+                <h3 className="text-xl font-black mb-4 uppercase">Training & Events</h3>
+                <ul className="space-y-3 text-slate-500 text-sm font-bold uppercase tracking-tighter">
+                  <li>• Hospitality Training</li>
+                  <li>• Church Media Ops</li>
+                  <li>• Event Scouting</li>
+                  <li>• Seminar Intel</li>
+                </ul>
+              </div>
+              <button className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-orange-600 transition-colors">View More</button>
+            </div>
+
+            {/* Box 3 */}
+            <div className="bg-white border border-slate-200 p-8 rounded-[2rem] flex flex-col h-[450px] justify-between hover:shadow-2xl transition-all group">
+              <div>
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                  <Briefcase size={24} />
+                </div>
+                <h3 className="text-xl font-black mb-4 uppercase">Opportunities</h3>
+                <ul className="space-y-3 text-slate-500 text-sm font-bold uppercase tracking-tighter">
+                  <li>• Verified Job Feed</li>
+                  <li>• Internships</li>
+                  <li>• Immersion Forms</li>
+                  <li>• Skills Acquisition</li>
+                </ul>
+              </div>
+              <button className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-emerald-600 transition-colors">View More</button>
+            </div>
+
+            {/* Box 4 */}
+            <div className="bg-white border border-slate-200 p-8 rounded-[2rem] flex flex-col h-[450px] justify-between hover:shadow-2xl transition-all group">
+              <div>
+                <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                  <Users size={24} />
+                </div>
+                <h3 className="text-xl font-black mb-4 uppercase">Business Support</h3>
+                <ul className="space-y-3 text-slate-500 text-sm font-bold uppercase tracking-tighter">
+                  <li>• Administration</li>
+                  <li>• Secretarial & Printing</li>
+                  <li>• Strategic Outsourcing</li>
+                  <li>• Partner Logistics</li>
+                </ul>
+              </div>
+              <button className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-purple-600 transition-colors">View More</button>
+            </div>
+
+            {/* Box 5 */}
+            <div className="bg-slate-900 border border-slate-800 p-8 rounded-[2rem] flex flex-col h-[450px] justify-between hover:shadow-2xl transition-all group text-white">
+              <div>
+                <div className="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  <Zap size={24} />
+                </div>
+                <h3 className="text-xl font-black mb-4 uppercase">And More</h3>
+                <ul className="space-y-3 text-slate-400 text-sm font-bold uppercase tracking-tighter">
+                  <li>• Custom Consultancy</li>
+                  <li>• Partner Referrals</li>
+                  <li>• Data Analysis</li>
+                  <li>• Emerging Tech Intel</li>
+                </ul>
+              </div>
+              <button className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-white hover:text-blue-600 transition-colors">View More</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. DYNAMIC FEEDS SECTION */}
+      <section id="opportunities" className="py-24 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16">
+        <div>
+          <h2 className="text-2xl font-black flex items-center gap-3 tracking-tighter uppercase italic text-blue-900 border-b-2 border-blue-900 pb-4 mb-10">
+            <Briefcase /> Opportunity Hub
+          </h2>
+          <div className="space-y-4">
+            {jobs.length === 0 ? <p className="text-slate-400 italic">No new opportunities yet...</p> : 
+              jobs.map(job => (
+                <div key={job.id} className="p-6 bg-white border border-slate-200 rounded-2xl">
+                  <h4 className="font-bold text-lg mb-2">{job.title}</h4>
+                  <a href={job.link} target="_blank" className="text-blue-600 text-[10px] font-black uppercase flex items-center gap-1">Verify Original <ArrowRight size={12}/></a>
+                </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="text-2xl font-black flex items-center gap-3 tracking-tighter uppercase italic text-orange-600 border-b-2 border-orange-600 pb-4 mb-10">
+            <Calendar /> Training & Events
+          </h2>
+          <div className="space-y-4">
+            {events.length === 0 ? <p className="text-slate-400 italic">No new events yet...</p> : 
+              events.map(event => (
+                <div key={event.id} className="p-6 bg-orange-50 border border-orange-100 rounded-2xl">
+                  <h4 className="font-bold text-lg mb-2">{event.title}</h4>
+                  <p className="text-orange-600 text-[10px] font-black uppercase mb-3 flex items-center gap-1"><MapPin size={12}/> Greater Accra</p>
+                  <a href={event.link} target="_blank" className="inline-block bg-orange-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase">View Details</a>
+                </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer id="contact" className="py-20 bg-slate-950 text-white text-center">
+        <div className="mb-8 font-black text-2xl italic tracking-tighter opacity-50 uppercase">Precede Concepts</div>
+        <p className="text-slate-500 text-[10px] tracking-[0.3em] uppercase max-w-xl mx-auto leading-loose px-6">
+          Digital Solutions | Training & Events | Opportunities | Business Support | And More
+        </p>
+        <p className="mt-10 text-slate-600 text-[8px] uppercase tracking-widest italic">© 2026 Precede Concepts &middot; Strategic Operations Hub</p>
+      </footer>
     </div>
-  );
+  )
 }
