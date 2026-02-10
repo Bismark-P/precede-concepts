@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase'
 import { 
   Briefcase, Calendar, MapPin, ArrowUpRight, ShieldCheck, 
-  Zap, Search, Users, Globe, PlayCircle, Lightbulb 
+  Zap, Search, Users, Globe, PlayCircle, Lightbulb, Star 
 } from 'lucide-react'
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
   useEffect(() => { setMounted(true); fetchApproved(); }, [])
 
   async function fetchApproved() {
-    const { data } = await supabase.from('jobs').select('*').eq('status', 'approved').order('created_at', { ascending: false })
+    const { data } = await supabase.from('jobs').select('*').eq('status', 'approved').order('is_featured', { ascending: false }).order('created_at', { ascending: false })
     if (data) setItems(data)
   }
 
@@ -23,13 +23,13 @@ export default function Home() {
   const events = items.filter(i => i.category === 'event')
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 scroll-smooth">
+    <div className="min-h-screen bg-[#FDFDFD] font-sans text-slate-950 scroll-smooth">
       
-      {/* MODERN STICKY NAV */}
-      <nav className="sticky top-0 w-full z-[100] bg-white/70 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4">
+      {/* PERSISTENT NAV - Functional Links */}
+      <nav className="sticky top-0 w-full z-[100] bg-white/60 backdrop-blur-xl border-b border-slate-200/40 px-6 py-3">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex flex-col">
-            <span className="text-xl font-black text-blue-950 tracking-tighter uppercase italic leading-none">Precede Concepts</span>
+            <span className="text-xl font-black tracking-tighter uppercase italic leading-none">Precede Concepts</span>
             <span className="text-[7px] font-bold text-blue-600 tracking-[0.3em] uppercase mt-1">Strategic Operations Hub</span>
           </div>
 
@@ -38,146 +38,109 @@ export default function Home() {
             <a href="#services" className="hover:text-blue-600 transition-colors">Services</a>
             <a href="#about" className="hover:text-blue-600 transition-colors">About</a>
             <a href="#opportunities" className="hover:text-blue-600 transition-colors">Opportunities</a>
-            <a href="/contact" className="text-blue-600 border-b-2 border-blue-600 pb-1">Contact Us</a>
-          </div>
-
-          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-            <Globe size={14} />
+            <a href="/contact" className="bg-slate-900 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-all">Contact Us</a>
           </div>
         </div>
       </nav>
 
-      {/* TRENDY HERO SECTION */}
-      <header className="bg-white py-24 md:py-32 px-6 text-center overflow-hidden relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30"></div>
+      {/* MODERN HERO */}
+      <header className="py-24 md:py-40 px-6 text-center relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(#e2e8f0_1.5px,transparent_1.5px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)] opacity-40"></div>
         <div className="relative z-10">
-          <h1 className="text-6xl md:text-9xl font-black mb-6 tracking-tight text-slate-950 uppercase italic leading-[0.85]">
-            Lead with <br/><span className="text-blue-600">Precision.</span>
+          <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-8">
+            The <span className="text-blue-600">Standard</span> <br/> of execution.
           </h1>
-          <p className="text-slate-500 mt-8 max-w-2xl mx-auto font-bold text-sm md:text-lg leading-relaxed uppercase tracking-tighter italic">
-            Excellence through constant learning, planning, and research. <br/>Your strategic partner in Ghana’s digital economy.
+          <p className="text-slate-500 max-w-xl mx-auto font-bold text-xs md:text-sm uppercase tracking-widest leading-loose italic">
+            Excellence through constant learning, planning, and research. <br/>Your strategic partner for Ghana’s digital landscape.
           </p>
         </div>
       </header>
 
-      {/* 6-PILLAR BENTO GRID */}
-      <section id="services" className="py-20 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
-          {/* Card 1: Digital */}
-          <div className="bg-white border border-slate-200 p-6 rounded-[2rem] flex flex-col h-[380px] justify-between group hover:border-blue-500 transition-all shadow-sm">
-            <div>
-              <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4"><Globe size={20} /></div>
-              <h3 className="text-lg font-black uppercase italic mb-3">Digital Solutions</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase mb-4 tracking-widest">Web • Backend • Branding</p>
-              <ul className="text-xs font-bold text-slate-600 space-y-2 uppercase opacity-80">
-                <li>• Scalable Web Systems</li>
-                <li>• Custom REST APIs</li>
-                <li>• Minimalist Branding</li>
-              </ul>
-            </div>
-            <button className="flex items-center justify-between w-full p-4 bg-slate-50 rounded-2xl group-hover:bg-blue-600 group-hover:text-white transition-all">
-              <span className="text-[10px] font-black uppercase">View Details</span>
-              <ArrowUpRight size={16} />
-            </button>
+      {/* ABOUT SECTION - Navigation Target */}
+      <section id="about" className="py-20 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600 mb-4">Core Philosophy</h2>
+          <h3 className="text-4xl font-black uppercase italic mb-6">Execution is Everything.</h3>
+          <p className="text-slate-600 font-medium leading-loose mb-6">
+            Precede Concepts is a multi-disciplinary hub bridging the gap between local challenges and global standards. We focus on high-impact results driven by deep research and tactical planning.
+          </p>
+          <div className="flex gap-4">
+            <div className="px-4 py-2 bg-slate-100 rounded-full text-[9px] font-black uppercase tracking-widest">Research First</div>
+            <div className="px-4 py-2 bg-slate-100 rounded-full text-[9px] font-black uppercase tracking-widest">Safe & Secure</div>
           </div>
-
-          {/* Card 2: Media (NEW) */}
-          <div className="bg-white border border-slate-200 p-6 rounded-[2rem] flex flex-col h-[380px] justify-between group hover:border-indigo-500 transition-all shadow-sm">
-            <div>
-              <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-4"><PlayCircle size={20} /></div>
-              <h3 className="text-lg font-black uppercase italic mb-3">Media & Production</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase mb-4 tracking-widest">Church Media • Digital Assets</p>
-              <ul className="text-xs font-bold text-slate-600 space-y-2 uppercase opacity-80">
-                <li>• Church Media Training</li>
-                <li>• Presentation Design</li>
-                <li>• Content Creation</li>
-              </ul>
-            </div>
-            <button className="flex items-center justify-between w-full p-4 bg-slate-50 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
-              <span className="text-[10px] font-black uppercase">View Details</span>
-              <ArrowUpRight size={16} />
-            </button>
-          </div>
-
-          {/* Card 3: Training */}
-          <div className="bg-white border border-slate-200 p-6 rounded-[2rem] flex flex-col h-[380px] justify-between group hover:border-orange-500 transition-all shadow-sm">
-            <div>
-              <div className="w-10 h-10 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-4"><Calendar size={20} /></div>
-              <h3 className="text-lg font-black uppercase italic mb-3">Training & Events</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase mb-4 tracking-widest">Hospitality • Intel</p>
-              <ul className="text-xs font-bold text-slate-600 space-y-2 uppercase opacity-80">
-                <li>• Hospitality Management</li>
-                <li>• Event Scouting</li>
-                <li>• Seminar Logistics</li>
-              </ul>
-            </div>
-            <button className="flex items-center justify-between w-full p-4 bg-slate-50 rounded-2xl group-hover:bg-orange-600 group-hover:text-white transition-all">
-              <span className="text-[10px] font-black uppercase">View Details</span>
-              <ArrowUpRight size={16} />
-            </button>
-          </div>
-
-          {/* Card 4: Opportunities */}
-          <div className="bg-white border border-slate-200 p-6 rounded-[2rem] flex flex-col h-[380px] justify-between group hover:border-emerald-500 transition-all shadow-sm">
-            <div>
-              <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4"><Briefcase size={20} /></div>
-              <h3 className="text-lg font-black uppercase italic mb-3">Opportunities</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase mb-4 tracking-widest">Jobs • Apprenticeships</p>
-              <ul className="text-xs font-bold text-slate-600 space-y-2 uppercase opacity-80">
-                <li>• Verified Job Feed</li>
-                <li>• Internship Matching</li>
-                <li>• Immersion Programs</li>
-              </ul>
-            </div>
-            <button className="flex items-center justify-between w-full p-4 bg-slate-50 rounded-2xl group-hover:bg-emerald-600 group-hover:text-white transition-all">
-              <span className="text-[10px] font-black uppercase">View Details</span>
-              <ArrowUpRight size={16} />
-            </button>
-          </div>
-
-          {/* Card 5: Business Support */}
-          <div className="bg-white border border-slate-200 p-6 rounded-[2rem] flex flex-col h-[380px] justify-between group hover:border-purple-500 transition-all shadow-sm">
-            <div>
-              <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-4"><Users size={20} /></div>
-              <h3 className="text-lg font-black uppercase italic mb-3">Business Support</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase mb-4 tracking-widest">Admin • Outsourcing</p>
-              <ul className="text-xs font-bold text-slate-600 space-y-2 uppercase opacity-80">
-                <li>• Secretarial Services</li>
-                <li>• Commercial Printing</li>
-                <li>• Partner Referrals</li>
-              </ul>
-            </div>
-            <button className="flex items-center justify-between w-full p-4 bg-slate-50 rounded-2xl group-hover:bg-purple-600 group-hover:text-white transition-all">
-              <span className="text-[10px] font-black uppercase">View Details</span>
-              <ArrowUpRight size={16} />
-            </button>
-          </div>
-
-          {/* Card 6: Strategy (NEW) */}
-          <div className="bg-slate-950 border border-slate-800 p-6 rounded-[2rem] flex flex-col h-[380px] justify-between group hover:bg-blue-600 transition-all shadow-2xl">
-            <div>
-              <div className="w-10 h-10 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-white group-hover:text-blue-600"><Lightbulb size={20} /></div>
-              <h3 className="text-lg font-black uppercase italic mb-3 text-white">Strategy & More</h3>
-              <p className="text-xs text-slate-500 font-bold uppercase mb-4 tracking-widest group-hover:text-blue-100">Consultancy • Research</p>
-              <ul className="text-xs font-bold text-slate-400 space-y-2 uppercase opacity-80 group-hover:text-white">
-                <li>• Operations Planning</li>
-                <li>• Data-Driven Research</li>
-                <li>• Custom Projects</li>
-              </ul>
-            </div>
-            <button className="flex items-center justify-between w-full p-4 bg-white/10 text-white rounded-2xl group-hover:bg-white group-hover:text-blue-600 transition-all">
-              <span className="text-[10px] font-black uppercase">Inquire Now</span>
-              <ArrowUpRight size={16} />
-            </button>
-          </div>
-
+        </div>
+        <div className="bg-blue-600 h-64 rounded-[3rem] shadow-2xl shadow-blue-200 flex items-center justify-center p-12 text-white">
+           <Zap size={64} className="animate-pulse" />
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-20 border-t border-slate-200 text-center">
-        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.5em]">Precede Concepts &middot; Accra Ghana &middot; 2026</p>
+      {/* 6-PILLAR SERVICES - Navigation Target */}
+      <section id="services" className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600 mb-2">Capabilities</h2>
+          <p className="text-3xl font-black uppercase italic">Our Strategic Pillars</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[
+            { title: 'Digital Solutions', icon: <Globe size={18}/>, items: ['Web & Backend Dev', 'Branding', 'API Design'] },
+            { title: 'Media Production', icon: <PlayCircle size={18}/>, items: ['Church Media', 'Content Creation', 'Digital Assets'] },
+            { title: 'Training & Events', icon: <Calendar size={18}/>, items: ['Hospitality Ops', 'Event Scouting', 'Seminars'] },
+            { title: 'Opportunities', icon: <Briefcase size={18}/>, items: ['Verified Jobs', 'Internships', 'Skills Growth'] },
+            { title: 'Business Support', icon: <Users size={18}/>, items: ['Admin Services', 'Secretarial', 'Outsourcing'] },
+            { title: 'Consultancy', icon: <Lightbulb size={18}/>, items: ['Operations Planning', 'Trend Research', 'Consulting'], dark: true },
+          ].map((s, i) => (
+            <div key={i} className={`${s.dark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900 border border-slate-200'} p-6 rounded-[2.5rem] h-[340px] flex flex-col justify-between group hover:shadow-2xl transition-all`}>
+              <div>
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center mb-5 ${s.dark ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-900 group-hover:bg-blue-600 group-hover:text-white transition-colors'}`}>
+                  {s.icon}
+                </div>
+                <h3 className="text-lg font-black uppercase italic mb-2 tracking-tight">{s.title}</h3>
+                <ul className={`text-[10px] font-bold uppercase tracking-widest space-y-2 ${s.dark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  {s.items.map(item => <li key={item}>• {item}</li>)}
+                </ul>
+              </div>
+              <button className={`flex items-center justify-between w-full p-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${s.dark ? 'bg-white/10 hover:bg-white hover:text-slate-950' : 'bg-slate-50 hover:bg-blue-600 hover:text-white'}`}>
+                Explore Pillar <ArrowUpRight size={14}/>
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FEEDS - Navigation Target */}
+      <section id="opportunities" className="py-24 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 border-t border-slate-100">
+        <div>
+          <h2 className="text-xl font-black uppercase italic text-blue-900 mb-8 border-b-2 border-blue-900 pb-2 inline-block tracking-tighter">Opportunities</h2>
+          <div className="space-y-3">
+            {jobs.map(job => (
+              <div key={job.id} className={`p-5 rounded-2xl flex justify-between items-center group transition-all border ${job.is_featured ? 'bg-blue-50 border-blue-200' : 'bg-white border-slate-100'}`}>
+                <div className="flex flex-col">
+                  {job.is_featured && <span className="text-[8px] font-black text-blue-600 uppercase mb-1 flex items-center gap-1"><Star size={8} fill="currentColor"/> Our Recommendation</span>}
+                  <h4 className="font-bold text-sm text-slate-700">{job.title}</h4>
+                </div>
+                <a href={job.link} target="_blank" className="text-blue-600"><ArrowUpRight size={16}/></a>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="text-xl font-black uppercase italic text-orange-600 mb-8 border-b-2 border-orange-600 pb-2 inline-block tracking-tighter">Events</h2>
+          <div className="space-y-3">
+            {events.map(event => (
+              <div key={event.id} className={`p-5 rounded-2xl flex justify-between items-center border ${event.is_featured ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'}`}>
+                <div className="flex flex-col">
+                  {event.is_featured && <span className="text-[8px] font-black text-orange-600 uppercase mb-1 flex items-center gap-1"><Star size={8} fill="currentColor"/> Top Pick</span>}
+                  <h4 className="font-bold text-sm text-slate-900">{event.title}</h4>
+                </div>
+                <a href={event.link} target="_blank" className="text-orange-600 uppercase text-[10px] font-black">Details</a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="py-20 text-center border-t border-slate-100">
+        <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.6em]">Precede Concepts Hub &middot; 2026</p>
       </footer>
     </div>
   )
