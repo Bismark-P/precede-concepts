@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Lock, ShieldCheck, RefreshCw, Trash2, Check, ArrowLeft, Star, Eye, EyeOff } from 'lucide-react'
+import { Lock, ShieldCheck, RefreshCw, Trash2, Check, ArrowLeft, Star, Eye, EyeOff, Activity, Clock, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { runGlobalSync } from '../lib/scraper'
 
@@ -9,69 +9,104 @@ export default function AdminPortal() {
   const [pass, setPass] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [items, setItems] = useState<any[]>([])
+  const [logs, setLogs] = useState<any[]>([])
   const [syncing, setSyncing] = useState(false)
-  const SECRET = "Precede2026"
+  
+  const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_PASSWORD
 
-  useEffect(() => { if(isAuth) fetchPending() }, [isAuth])
+  useEffect(() => { 
+    if(isAuth) { fetchPending(); fetchLogs(); } 
+  }, [isAuth])
 
   async function fetchPending() {
-    const { data } = await supabase.from('jobs').select('*').eq('status', 'pending')
+    const { data } = await supabase.from('jobs').select('*').eq('status', 'pending').order('created_at', { ascending: false })
     if (data) setItems(data)
   }
 
-  const toggleFeatured = async (id: string, current: boolean) => {
-    await supabase.from('jobs').update({ is_featured: !current }).eq('id', id)
-    fetchPending()
+  async function fetchLogs() {
+    const { data } = await supabase.from('sync_logs').select('*').order('executed_at', { ascending: false }).limit(5)
+    if (data) setLogs(data)
   }
 
   if (!isAuth) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-center">
-        <div className="bg-white p-12 rounded-[3.5rem] w-full max-w-sm shadow-2xl">
+        <div className="bg-white p-10 md:p-12 rounded-[3.5rem] w-full max-w-sm shadow-2xl border-t-8 border-blue-600">
           <Lock size={40} className="mx-auto text-blue-600 mb-6" />
-          <h2 className="text-2xl font-black uppercase italic mb-8">Secure Gate</h2>
-          <div className="relative mb-4">
-            <input type={showPass ? "text" : "password"} placeholder="Passcode" className="w-full p-5 bg-slate-50 rounded-2xl text-center font-bold" onChange={(e) => setPass(e.target.value)} />
+          <h2 className="text-2xl font-black uppercase italic mb-8 text-slate-950">Secure Gate</h2>
+          <div className="relative mb-6">
+            <input 
+              type={showPass ? "text" : "password"} 
+              placeholder="Authorization Code" 
+              className="w-full p-5 bg-slate-100 rounded-2xl text-center font-bold tracking-widest text-slate-950 outline-none focus:bg-white border-2 border-transparent focus:border-blue-600 transition-all" 
+              onChange={(e) => setPass(e.target.value)} 
+            />
             <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
               {showPass ? <EyeOff size={18}/> : <Eye size={18}/>}
             </button>
           </div>
-          <button onClick={() => pass === SECRET ? setIsAuth(true) : alert('Unauthorized')} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest">Authorize</button>
+          <button onClick={() => pass === ADMIN_SECRET ? setIsAuth(true) : alert('Unauthorized Access')} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200">Authorize Session</button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-8 md:p-16 max-w-5xl mx-auto font-sans">
-      <header className="flex justify-between items-center mb-16">
-        <div className="flex items-center gap-4">
-          <a href="/" className="text-slate-300 hover:text-blue-600"><ArrowLeft size={32}/></a>
-          <h1 className="text-3xl font-black uppercase italic italic flex items-center gap-3"><ShieldCheck className="text-blue-600" /> Control Hub</h1>
+    <div className="p-6 md:p-16 max-w-6xl mx-auto font-sans min-h-screen">
+      <header className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6 text-left">
+        <div className="flex items-center gap-4 w-full">
+          <a href="/" className="text-slate-300 hover:text-blue-600 transition-all"><ArrowLeft size={32}/></a>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black uppercase italic flex items-center gap-3"><ShieldCheck className="text-blue-600" /> Control Hub</h1>
+            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Active Operations Session</span>
+          </div>
         </div>
-        <button onClick={async () => {setSyncing(true); await runGlobalSync(); fetchPending(); setSyncing(false);}} className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
-          <RefreshCw className={syncing ? 'animate-spin' : ''} size={14}/> Sync Global
+        <button onClick={async () => {setSyncing(true); await runGlobalSync(); fetchPending(); setSyncing(false);}} className="w-full md:w-auto bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-900 transition-all shadow-lg shadow-blue-50">
+          <RefreshCw className={syncing ? 'animate-spin' : ''} size={14}/> Sync All
         </button>
       </header>
 
-      <div className="space-y-4">
-        {items.map(item => (
-          <div key={item.id} className="p-6 bg-white border border-slate-200 rounded-3xl flex justify-between items-center hover:border-blue-500 transition-all">
-            <div className="text-left flex items-center gap-4">
-               <button onClick={() => toggleFeatured(item.id, item.is_featured)} className={`${item.is_featured ? 'text-yellow-500' : 'text-slate-200'} hover:text-yellow-500 transition-colors`}>
-                  <Star fill={item.is_featured ? "currentColor" : "none"} size={24}/>
-               </button>
-               <div>
-                  <span className="text-[9px] font-black bg-slate-100 text-slate-500 px-2 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">{item.category}</span>
-                  <h3 className="font-bold text-lg leading-none">{item.title}</h3>
-               </div>
+      <div className="grid lg:grid-cols-3 gap-12 text-left">
+        <div className="lg:col-span-2 space-y-4">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-2"><Activity size={14}/> Queue</h2>
+          {items.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-[2.5rem] border border-dashed border-slate-200">
+              <Search className="mx-auto text-slate-100 mb-4" size={40} />
+              <p className="text-slate-300 text-[10px] font-black uppercase">Queue is empty</p>
             </div>
-            <div className="flex gap-2">
-              <button onClick={async () => {await supabase.from('jobs').update({status: 'approved'}).eq('id', item.id); fetchPending();}} className="p-4 bg-emerald-500 text-white rounded-2xl"><Check size={20}/></button>
-              <button onClick={async () => {await supabase.from('jobs').delete().eq('id', item.id); fetchPending();}} className="p-4 text-slate-300 hover:text-red-500"><Trash2 size={20}/></button>
+          ) : items.map(item => (
+            <div key={item.id} className="p-6 bg-white border border-slate-200 rounded-3xl flex flex-col md:flex-row justify-between items-center hover:border-blue-500 transition-all gap-4">
+              <div className="flex items-center gap-4 text-left w-full">
+                 <button onClick={async () => {await supabase.from('jobs').update({ is_featured: !item.is_featured }).eq('id', item.id); fetchPending();}} className={`${item.is_featured ? 'text-yellow-500' : 'text-slate-200'} transition-colors`}>
+                    <Star fill={item.is_featured ? "currentColor" : "none"} size={24}/>
+                 </button>
+                 <div>
+                    <span className="text-[9px] font-black bg-blue-50 text-blue-600 px-3 py-1 rounded-full uppercase tracking-widest mb-1 inline-block">{item.category}</span>
+                    <h3 className="font-bold text-lg leading-tight text-slate-800">{item.title}</h3>
+                 </div>
+              </div>
+              <div className="flex gap-2 w-full md:w-auto">
+                <button onClick={async () => {await supabase.from('jobs').update({status: 'approved'}).eq('id', item.id); fetchPending();}} className="flex-1 md:flex-none p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all flex justify-center"><Check size={20}/></button>
+                <button onClick={async () => {await supabase.from('jobs').delete().eq('id', item.id); fetchPending();}} className="flex-1 md:flex-none p-3 text-slate-300 hover:text-red-500 transition-all flex justify-center"><Trash2 size={20}/></button>
+              </div>
             </div>
+          ))}
+        </div>
+
+        <div className="bg-slate-50 p-8 rounded-[2.5rem] h-fit border border-slate-100 text-left">
+           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 flex items-center gap-2"><Clock size={14}/> Scraper Logs</h2>
+          <div className="space-y-6">
+            {logs.map((log, idx) => (
+                <div key={idx} className="flex gap-4 items-start border-l-2 border-emerald-500 pl-4 py-1">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-900 uppercase">Hourly Sync Success</p>
+                    <p className="text-[9px] font-bold text-slate-400">{new Date(log.executed_at).toLocaleString()}</p>
+                  </div>
+                </div>
+            ))}
           </div>
-        ))}
+          <p className="mt-12 text-[8px] font-black text-slate-300 uppercase tracking-widest leading-loose">Automated Status: 1-Hour Interval Active</p>
+        </div>
       </div>
     </div>
   )
