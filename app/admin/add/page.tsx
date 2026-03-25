@@ -1,8 +1,9 @@
 "use client";
 import { useState } from 'react';
 import { addManualEntry } from '@/app/lib/collector';
+import { ArrowLeft, MapPin, Tag, Star, Sparkles } from 'lucide-react';
 
-// Match this exactly to your collector.ts requirements
+// This matches your backend requirements exactly
 interface EventData {
   title: string;
   link: string;
@@ -33,17 +34,16 @@ export default function AdminAddEvent() {
     e.preventDefault();
     setLoading(true);
     
-    // Calls the logic in app/lib/collector.ts
     const res = await addManualEntry(formData);
     
     if (res.success) {
-      alert("🚀 Precede Engine: Post is Live!");
-      // Reset form
+      alert("✅ Successfully added to Precede Database!");
       setFormData({ 
         ...formData, 
         title: '', 
         link: '', 
         venue: '', 
+        price: '',
         review_text: '', 
         is_featured: false 
       });
@@ -54,17 +54,27 @@ export default function AdminAddEvent() {
     setLoading(false);
   };
 
+  const ghanaRegions = [
+    "Ahafo", "Ashanti", "Bono", "Bono East", "Central", "Eastern", 
+    "Greater Accra", "Northern", "North East", "Oti", "Savannah", 
+    "Upper East", "Upper West", "Volta", "Western", "Western North"
+  ];
+
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-xl mt-10 mb-20 font-sans">
-      <h1 className="text-2xl font-bold mb-2 text-gray-800">Precede Master Entry</h1>
-      <p className="text-sm text-gray-500 mb-6">Add events, jobs, or training from your phone.</p>
+    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-[2.5rem] mt-10 mb-20 font-sans border border-slate-100">
+      <div className="flex items-center gap-4 mb-8">
+         <a href="/admin" className="p-2 bg-slate-100 rounded-full text-slate-600"><ArrowLeft size={20}/></a>
+         <h1 className="text-2xl font-black uppercase italic text-slate-950 flex items-center gap-2">
+           <Sparkles className="text-blue-600" size={24} /> Master Entry
+         </h1>
+      </div>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Source Link</label>
+          <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Social Link (TikTok/IG)</label>
           <input 
-            className="w-full p-3 border rounded-lg bg-gray-50" 
-            placeholder="Paste TikTok/IG/FB Link" 
+            className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none transition-all font-medium text-slate-900" 
+            placeholder="Paste URL here" 
             required
             value={formData.link}
             onChange={(e) => setFormData({...formData, link: e.target.value})}
@@ -72,31 +82,54 @@ export default function AdminAddEvent() {
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Display Title</label>
+          <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Display Title</label>
           <input 
-            className="w-full p-3 border rounded-lg" 
-            placeholder="e.g. Easter Holiday Bash" 
+            className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none transition-all font-bold text-slate-950" 
+            placeholder="e.g. Afrobeat Night" 
             required
             value={formData.title}
             onChange={(e) => setFormData({...formData, title: e.target.value})}
           />
         </div>
 
-        <div className="flex gap-2">
-          <div className="w-1/2">
-            <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Venue</label>
-            <input className="w-full p-3 border rounded-lg" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Venue</label>
+            <input 
+              className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none" 
+              placeholder="e.g. Bloom Bar"
+              value={formData.venue}
+              onChange={(e) => setFormData({...formData, venue: e.target.value})} 
+            />
           </div>
-          <div className="w-1/2">
-            <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Price</label>
-            <input className="w-full p-3 border rounded-lg" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} />
+          <div className="flex-1">
+            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Price</label>
+            <input 
+              className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none font-bold" 
+              placeholder="e.g. GHS 150"
+              value={formData.price}
+              onChange={(e) => setFormData({...formData, price: e.target.value})} 
+            />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase text-gray-400 mb-1">Category</label>
+          <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Region</label>
           <select 
-            className="w-full p-3 border rounded-lg bg-white" 
+            className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none appearance-none font-bold text-slate-700 cursor-pointer"
+            value={formData.region}
+            onChange={(e) => setFormData({...formData, region: e.target.value})}
+          >
+            {ghanaRegions.map(reg => (
+              <option key={reg} value={reg}>{reg} Region</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Category</label>
+          <select 
+            className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-600 rounded-2xl outline-none appearance-none font-bold text-slate-900 cursor-pointer" 
             value={formData.category}
             onChange={(e) => setFormData({...formData, category: e.target.value as any})}
           >
@@ -106,30 +139,35 @@ export default function AdminAddEvent() {
           </select>
         </div>
 
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <label className="block text-sm font-bold text-blue-800 mb-2">Review & Rating</label>
-          <input 
-            type="number" min="1" max="5" 
-            className="w-full p-2 border rounded-lg mb-2" 
-            value={formData.rating}
-            onChange={(e) => setFormData({...formData, rating: parseInt(e.target.value)})}
-          />
+        <div className="p-5 bg-blue-50 rounded-[2rem] border border-blue-100">
+          <div className="flex justify-between items-center mb-3">
+             <label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Precede Rating</label>
+             <div className="flex items-center gap-1 bg-white px-3 py-1 rounded-full shadow-sm">
+                <Star size={12} className="text-yellow-500 fill-yellow-500"/>
+                <input 
+                  type="number" min="1" max="5" 
+                  className="w-8 text-center font-black outline-none bg-transparent"
+                  value={formData.rating}
+                  onChange={(e) => setFormData({...formData, rating: parseInt(e.target.value)})}
+                />
+             </div>
+          </div>
           <textarea 
-            className="w-full p-2 border rounded-lg text-sm" 
-            placeholder="Short vibe check or notes..."
+            className="w-full p-4 bg-white rounded-xl text-sm border-none outline-none focus:ring-2 focus:ring-blue-400 shadow-inner min-h-[80px]" 
+            placeholder="What's the vibe?..."
             value={formData.review_text}
             onChange={(e) => setFormData({...formData, review_text: e.target.value})}
           />
         </div>
 
-        <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+        <div className="flex items-center justify-between p-5 bg-slate-900 rounded-[2rem] shadow-xl shadow-slate-200">
           <div>
-            <span className="block font-bold text-yellow-800">Feature Post</span>
-            <span className="text-xs text-yellow-700">Show at the top of the site</span>
+            <span className="block font-black text-white text-[10px] uppercase tracking-widest mb-1">Feature this post</span>
+            <span className="text-[9px] text-slate-400 font-bold uppercase italic">Highlight on Homepage</span>
           </div>
           <input 
             type="checkbox" 
-            className="w-6 h-6 accent-yellow-600" 
+            className="w-6 h-6 accent-blue-500 cursor-pointer rounded" 
             checked={formData.is_featured}
             onChange={(e) => setFormData({...formData, is_featured: e.target.checked})}
           />
@@ -137,9 +175,9 @@ export default function AdminAddEvent() {
 
         <button 
           disabled={loading}
-          className="w-full bg-blue-600 text-white p-4 rounded-lg font-bold shadow-md active:scale-95 transition"
+          className="w-full bg-blue-600 text-white p-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-lg shadow-blue-200 active:scale-95 transition-all hover:bg-slate-950 mt-4 disabled:opacity-50"
         >
-          {loading ? "Syncing with Supabase..." : "🚀 Publish Live"}
+          {loading ? "Pushing Data..." : "🚀 Publish Live"}
         </button>
       </form>
     </div>
