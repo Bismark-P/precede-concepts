@@ -1,8 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Lock, ShieldCheck, RefreshCw, Trash2, Check, ArrowLeft, Star, Eye, EyeOff, Activity, Clock, Search } from 'lucide-react'
+import { Lock, ShieldCheck, Plus, Trash2, Check, ArrowLeft, Star, Eye, EyeOff, Activity, Clock, Search } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { runGlobalSync } from '../lib/scraper'
 
 export default function AdminPortal() {
   const [isAuth, setIsAuth] = useState(false)
@@ -10,7 +9,6 @@ export default function AdminPortal() {
   const [showPass, setShowPass] = useState(false)
   const [items, setItems] = useState<any[]>([])
   const [logs, setLogs] = useState<any[]>([])
-  const [syncing, setSyncing] = useState(false)
   
   const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_PASSWORD
 
@@ -45,7 +43,7 @@ export default function AdminPortal() {
               {showPass ? <EyeOff size={18}/> : <Eye size={18}/>}
             </button>
           </div>
-          <button onClick={() => pass === ADMIN_SECRET ? setIsAuth(true) : alert('Unauthorized Access')} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200">Authorize Session</button>
+          <button onClick={() => pass === ADMIN_SECRET ? setIsAuth(true) : alert('Unauthorized Access')} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-600 transition-all">Authorize Session</button>
         </div>
       </div>
     )
@@ -58,21 +56,23 @@ export default function AdminPortal() {
           <a href="/" className="text-slate-300 hover:text-blue-600 transition-all"><ArrowLeft size={32}/></a>
           <div>
             <h1 className="text-2xl md:text-3xl font-black uppercase italic flex items-center gap-3"><ShieldCheck className="text-blue-600" /> Control Hub</h1>
-            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Active Operations Session</span>
+            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Manual Mode Active</span>
           </div>
         </div>
-        <button onClick={async () => {setSyncing(true); await runGlobalSync(); fetchPending(); setSyncing(false);}} className="w-full md:w-auto bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-900 transition-all shadow-lg shadow-blue-50">
-          <RefreshCw className={syncing ? 'animate-spin' : ''} size={14}/> Sync All
-        </button>
+        
+        {/* ➕ Quick Add Button */}
+        <a href="/admin/add" className="w-full md:w-auto bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-900 transition-all shadow-lg shadow-blue-50">
+          <Plus size={14}/> Add New Listing
+        </a>
       </header>
 
       <div className="grid lg:grid-cols-3 gap-12 text-left">
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-2"><Activity size={14}/> Queue</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-2"><Activity size={14}/> Pending Queue</h2>
           {items.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-[2.5rem] border border-dashed border-slate-200">
               <Search className="mx-auto text-slate-100 mb-4" size={40} />
-              <p className="text-slate-300 text-[10px] font-black uppercase">Queue is empty</p>
+              <p className="text-slate-300 text-[10px] font-black uppercase">No items to review</p>
             </div>
           ) : items.map(item => (
             <div key={item.id} className="p-6 bg-white border border-slate-200 rounded-3xl flex flex-col md:flex-row justify-between items-center hover:border-blue-500 transition-all gap-4">
@@ -94,18 +94,18 @@ export default function AdminPortal() {
         </div>
 
         <div className="bg-slate-50 p-8 rounded-[2.5rem] h-fit border border-slate-100 text-left">
-           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 flex items-center gap-2"><Clock size={14}/> Scraper Logs</h2>
+           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 flex items-center gap-2"><Clock size={14}/> Recent Activity</h2>
           <div className="space-y-6">
-            {logs.map((log, idx) => (
-                <div key={idx} className="flex gap-4 items-start border-l-2 border-emerald-500 pl-4 py-1">
+            {logs.length === 0 ? <p className="text-[10px] text-slate-400 font-bold uppercase">No logs recorded</p> : logs.map((log, idx) => (
+                <div key={idx} className="flex gap-4 items-start border-l-2 border-blue-500 pl-4 py-1">
                   <div>
-                    <p className="text-[10px] font-black text-slate-900 uppercase">Hourly Sync Success</p>
+                    <p className="text-[10px] font-black text-slate-900 uppercase">Manual Update</p>
                     <p className="text-[9px] font-bold text-slate-400">{new Date(log.executed_at).toLocaleString()}</p>
                   </div>
                 </div>
             ))}
           </div>
-          <p className="mt-12 text-[8px] font-black text-slate-300 uppercase tracking-widest leading-loose">Automated Status: 1-Hour Interval Active</p>
+          <p className="mt-12 text-[8px] font-black text-slate-300 uppercase tracking-widest leading-loose">Status: 100% Curated Mode</p>
         </div>
       </div>
     </div>
