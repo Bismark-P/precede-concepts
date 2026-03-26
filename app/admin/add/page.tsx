@@ -4,13 +4,12 @@ import { addManualEntry } from '@/app/lib/collector';
 import { 
   ArrowLeft, Sparkles, Image as ImageIcon, 
   Plus, LayoutDashboard, CheckCircle2, Star,
-  Briefcase, GraduationCap, PartyPopper, Clock
+  Briefcase, GraduationCap, PartyPopper, Map as MapIcon, Building2, Search
 } from 'lucide-react';
 
 export default function AdminAddEvent() {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [imgError, setImgError] = useState(false);
   const [isSalaryDisclosed, setIsSalaryDisclosed] = useState(true);
 
   const [formData, setFormData] = useState<any>({
@@ -28,7 +27,10 @@ export default function AdminAddEvent() {
     link: '',
     image_url: '',
     review_text: '',
-    is_featured: false
+    is_featured: false,
+    organizer_body: '', 
+    recurring_day: '',   
+    map_query: ''       
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +38,6 @@ export default function AdminAddEvent() {
     setLoading(true);
     setShowSuccess(false);
 
-    // Handle undisclosed salary logic
     const finalData = { ...formData };
     if (formData.category === 'job' && !isSalaryDisclosed) {
       finalData.salary_range = 'Undisclosed';
@@ -48,10 +49,10 @@ export default function AdminAddEvent() {
       setFormData({
         ...formData,
         title: '', price: '', venue: '', event_date: '', 
-        link: '', image_url: '', review_text: '', salary_range: '', duration: '',
+        link: '', image_url: '', review_text: '', salary_range: '', 
+        duration: '', organizer_body: '', recurring_day: '', map_query: '',
         is_featured: false
       });
-      setImgError(false);
       window.scrollTo(0, 0);
     } else {
       alert("❌ Error: " + res.error);
@@ -63,15 +64,15 @@ export default function AdminAddEvent() {
   const labelClass = "block text-[10px] font-black uppercase text-slate-500 mb-1.5 tracking-widest ml-1";
 
   return (
-    <div className="min-h-screen bg-slate-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto p-10 bg-white shadow-2xl rounded-[3rem] border border-slate-200 text-left">
+    <div className="min-h-screen bg-slate-100 py-12 px-4 text-left">
+      <div className="max-w-2xl mx-auto p-10 bg-white shadow-2xl rounded-[3rem] border border-slate-200">
         
         {/* HEADER */}
         <div className="flex items-center justify-between mb-8">
           <a href="/admin" className="p-3 bg-slate-50 rounded-full text-slate-400 hover:text-[#0A2A5E] shadow-sm transition-all">
             <ArrowLeft size={20}/>
           </a>
-          <h1 className="text-2xl font-black uppercase italic text-[#0A2A5E] flex items-center gap-2">Publish Scout</h1>
+          <h1 className="text-2xl font-black uppercase italic text-[#0A2A5E] flex items-center gap-2 tracking-tighter">Publish Scout</h1>
           <div className="w-10 h-10" /> 
         </div>
 
@@ -89,154 +90,113 @@ export default function AdminAddEvent() {
         
         <form onSubmit={handleSubmit} className="space-y-6">
           
-          {/* CATEGORY SWITCHER */}
+          {/* CATEGORY SWITCHER (4 Tabs) */}
           <div className="p-1.5 bg-slate-100 rounded-2xl flex gap-1 border border-slate-200">
             {[
               { id: 'event', label: 'Events', icon: <PartyPopper size={14}/> },
               { id: 'job', label: 'Jobs', icon: <Briefcase size={14}/> },
-              { id: 'training', label: 'Training', icon: <GraduationCap size={14}/> }
+              { id: 'training', label: 'Training', icon: <GraduationCap size={14}/> },
+              { id: 'place', label: 'Discover', icon: <Search size={14}/> }
             ].map((cat) => (
               <button 
                 key={cat.id} 
                 type="button" 
-                onClick={() => setFormData({...formData, category: cat.id, sub_category: cat.id === 'job' ? 'Full-time' : 'Conference'})} 
-                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-2 ${formData.category === cat.id ? 'bg-[#0A2A5E] text-white shadow-lg' : 'text-slate-400'}`}
+                onClick={() => setFormData({...formData, category: cat.id, sub_category: cat.id === 'job' ? 'Full-time' : cat.id === 'place' ? 'Eatery' : 'Conference'})} 
+                className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all flex items-center justify-center gap-2 ${formData.category === cat.id ? 'bg-[#0A2A5E] text-white shadow-lg' : 'text-slate-400'}`}
               >
-                {cat.icon} {cat.label}
+                {cat.icon} {cat.id === 'place' ? 'Places' : cat.label}
               </button>
             ))}
           </div>
 
-          {/* GENERAL INFO (Common to all) */}
+          {/* BASIC SCOUT DATA */}
           <div className="space-y-4">
             <div>
               <label className={labelClass}>Main Title *</label>
-              <input required className={inputClass} placeholder="Enter a catchy headline..." value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} />
+              <input required className={inputClass} placeholder="e.g. Saturday Night Groove" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <div>
-                <label className={labelClass}>Time Slot</label>
-                <select className={inputClass} value={formData.time_category} onChange={(e) => setFormData({...formData, time_category: e.target.value})}>
-                  {['Morning', 'Afternoon', 'Evening', 'Night', 'Full-day', 'Half-day', 'All-night'].map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
+                <label className={labelClass}>Organised by</label>
+                <div className="relative">
+                  <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+                  <input className={`${inputClass} pl-12`} placeholder="e.g. AbrewaNana Pub" value={formData.organizer_body} onChange={(e) => setFormData({...formData, organizer_body: e.target.value})} />
+                </div>
               </div>
               <div>
-                <label className={labelClass}>Region</label>
-                <select className={inputClass} value={formData.region} onChange={(e) => setFormData({...formData, region: e.target.value})}>
-                  {["Greater Accra", "Ashanti", "Western", "Central", "Eastern", "Northern", "Volta"].map(r => <option key={r} value={r}>{r}</option>)}
+                <label className={labelClass}>Recurring Day (Optional)</label>
+                <select className={inputClass} value={formData.recurring_day} onChange={(e) => setFormData({...formData, recurring_day: e.target.value})}>
+                  <option value="">None (One-time)</option>
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
             </div>
           </div>
 
-          {/* --- CONDITIONAL FIELDS: EVENTS --- */}
-          {formData.category === 'event' && (
-            <div className="p-6 bg-slate-50 rounded-3xl space-y-4 border border-slate-100">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClass}>Event Type</label>
-                  <select className={inputClass} value={formData.sub_category} onChange={(e) => setFormData({...formData, sub_category: e.target.value})}>
-                    <option value="Conference">Conference</option><option value="Meetup">Meetup</option><option value="Party">Party</option><option value="Concert">Concert</option><option value="Others">Others</option>
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>Event Date *</label>
-                  <input type="date" required className={inputClass} value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
-                </div>
+          {/* DYNAMIC FIELDS */}
+          <div className="p-6 bg-slate-50 rounded-[2.5rem] space-y-4 border border-slate-100">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Type / Sub-Category</label>
+                <select className={inputClass} value={formData.sub_category} onChange={(e) => setFormData({...formData, sub_category: e.target.value})}>
+                  {formData.category === 'event' && ['Conference', 'Meetup', 'Party', 'Concert', 'Others'].map(o => <option key={o} value={o}>{o}</option>)}
+                  {formData.category === 'job' && ['Full-time', 'Part-time', 'Remote', 'Contract', 'Internship'].map(o => <option key={o} value={o}>{o}</option>)}
+                  {formData.category === 'training' && ['Seminar', 'Workshop', 'Webinar', 'Bootcamp'].map(o => <option key={o} value={o}>{o}</option>)}
+                  {formData.category === 'place' && ['Eatery', 'Restaurant', 'School', 'Lounge', 'Store', 'Clinic'].map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
               </div>
               <div>
-                <label className={labelClass}>Venue</label>
-                <input className={inputClass} placeholder="e.g. Accra Mall" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
+                <label className={labelClass}>Date / Deadline *</label>
+                <input type="date" required className={inputClass} value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
               </div>
             </div>
-          )}
 
-          {/* --- CONDITIONAL FIELDS: JOBS --- */}
-          {formData.category === 'job' && (
-            <div className="p-6 bg-slate-50 rounded-3xl space-y-4 border border-slate-100">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClass}>Employment Type</label>
-                  <select className={inputClass} value={formData.sub_category} onChange={(e) => setFormData({...formData, sub_category: e.target.value})}>
-                    <option value="Full-time">Full-time</option><option value="Part-time">Part-time</option><option value="Remote">Remote</option><option value="Contract">Contract</option><option value="Internship">Internship</option>
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>Deadline Date *</label>
-                  <input type="date" required className={inputClass} value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Venue / Area Name</label>
+                <input className={inputClass} placeholder="e.g. Darkuman" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClass}>Location</label>
-                  <input className={inputClass} placeholder="e.g. East Legon" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
-                </div>
-                <div>
-                  <div className="flex justify-between items-center mb-1.5 px-1">
-                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Salary Range</label>
-                    <label className="flex items-center gap-1 text-[8px] font-black uppercase text-[#1FC8C8] cursor-pointer">
-                      <input type="checkbox" checked={!isSalaryDisclosed} onChange={() => setIsSalaryDisclosed(!isSalaryDisclosed)} /> Undisclosed
-                    </label>
-                  </div>
-                  <input disabled={!isSalaryDisclosed} className={`${inputClass} disabled:opacity-30`} placeholder="e.g. GHS 3k - 5k" value={formData.salary_range} onChange={(e) => setFormData({...formData, salary_range: e.target.value})} />
+              <div>
+                <label className={labelClass}>GPS / Map Location Name</label>
+                <div className="relative">
+                  <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+                  <input className={`${inputClass} pl-12`} placeholder="Paste GPS or Search Name" value={formData.map_query} onChange={(e) => setFormData({...formData, map_query: e.target.value})} />
                 </div>
               </div>
             </div>
-          )}
-
-          {/* --- CONDITIONAL FIELDS: TRAINING --- */}
-          {formData.category === 'training' && (
-            <div className="p-6 bg-slate-50 rounded-3xl space-y-4 border border-slate-100">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClass}>Training Type</label>
-                  <select className={inputClass} value={formData.sub_category} onChange={(e) => setFormData({...formData, sub_category: e.target.value})}>
-                    <option value="Seminar">Seminar</option><option value="Workshop">Workshop</option><option value="Webinar">Webinar</option><option value="Bootcamp">Bootcamp</option>
-                  </select>
-                </div>
-                <div>
-                  <label className={labelClass}>Start Date *</label>
-                  <input type="date" required className={inputClass} value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClass}>Venue / Platform</label>
-                  <input className={inputClass} placeholder="e.g. Zoom or British Council" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
-                </div>
-                <div>
-                  <label className={labelClass}>Duration</label>
-                  <input className={inputClass} placeholder="e.g. 3 Weeks" value={formData.duration} onChange={(e) => setFormData({...formData, duration: e.target.value})} />
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
 
           {/* MEDIA & PROMOTION */}
           <div className="space-y-4">
-             <div>
-                <label className={labelClass}>Flyer Image URL</label>
-                <input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} />
-             </div>
-             
              <div 
                 onClick={() => setFormData({...formData, is_featured: !formData.is_featured})}
-                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.is_featured ? 'bg-[#1FC8C8]/10 border-[#1FC8C8]' : 'bg-white border-slate-100 hover:border-slate-200'}`}
+                className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.is_featured ? 'bg-[#1FC8C8]/10 border-[#1FC8C8]' : 'bg-white border-slate-100 hover:border-slate-200'}`}
               >
-                <div className="flex items-center gap-3 text-left leading-tight">
-                   <div className={`p-2 rounded-lg ${formData.is_featured ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-slate-200 text-slate-400'}`}>
-                      <Star size={16} fill={formData.is_featured ? "currentColor" : "none"} />
+                <div className="flex items-center gap-4 text-left leading-tight">
+                   <div className={`p-3 rounded-xl ${formData.is_featured ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-slate-100 text-slate-300'}`}>
+                      <Star size={18} fill={formData.is_featured ? "currentColor" : "none"} />
                    </div>
                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-[#0A2A5E]">Promote to Our Picks</p>
-                      <p className="text-[8px] font-bold text-slate-400 uppercase">Featured at top of homepage</p>
+                      <p className="text-[11px] font-black uppercase tracking-widest text-[#0A2A5E]">Promote to Our Picks</p>
+                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Will appear at the very top of the Hub</p>
                    </div>
                 </div>
               </div>
+
+             <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Flyer / Image URL</label>
+                  <input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} />
+                </div>
+                <div>
+                  <label className={labelClass}>External Link</label>
+                  <input className={inputClass} placeholder="https://..." value={formData.link} onChange={(e) => setFormData({...formData, link: e.target.value})} />
+                </div>
+             </div>
           </div>
 
-          <button disabled={loading} className="w-full bg-[#0A2A5E] text-white p-6 rounded-2xl font-black uppercase text-xs tracking-[0.3em] shadow-xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all disabled:opacity-50 mt-4 flex items-center justify-center gap-3">
+          <button disabled={loading} className="w-full bg-[#0A2A5E] text-white p-6 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-2xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all disabled:opacity-50 mt-4 flex items-center justify-center gap-3">
             {loading ? "PROCESSING..." : <><Plus size={18} /> Send to Queue</>}
           </button>
 
