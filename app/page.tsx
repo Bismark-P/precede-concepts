@@ -41,37 +41,24 @@ export default function Home() {
     window.location.href = `mailto:${BUSINESS_EMAIL}?subject=New Inquiry for Precede Concepts`;
   };
 
+  // --- RESTORED FEATURED & HUB LOGIC ---
   const filteredBySearch = items.filter(item => {
     const searchLow = searchQuery.toLowerCase();
-    const matchesSearch = 
-      item.title?.toLowerCase().includes(searchLow) || 
-      item.organizer_body?.toLowerCase().includes(searchLow) || 
-      item.venue?.toLowerCase().includes(searchLow);
+    const matchesSearch = item.title?.toLowerCase().includes(searchLow) || 
+                          item.organizer_body?.toLowerCase().includes(searchLow) || 
+                          item.venue?.toLowerCase().includes(searchLow);
     
-    // Smart Filter: Training maps to both 'training' and 'seminar'
     let matchesFilter = filter === 'all';
     if (!matchesFilter) {
-        if (filter === 'training') {
-            matchesFilter = item.category === 'training' || item.category === 'seminar';
-        } else {
-            matchesFilter = item.category === filter;
-        }
+      if (filter === 'training') matchesFilter = item.category === 'training' || item.category === 'seminar';
+      else matchesFilter = item.category === filter;
     }
-    
     return matchesSearch && matchesFilter;
   });
 
-  const featuredItems = filteredBySearch.filter(i => i.is_featured === true).slice(0, 6);
+  // Featured shows regardless of search to keep the Hub looking active
+  const featuredItems = items.filter(i => i.is_featured === true && i.status === 'approved').slice(0, 6);
   const displayItems = filteredBySearch.slice(0, visibleCount);
-
-  const categorizedServices = [
-    { title: 'Admin & Secretarial', icon: <Printer size={20}/>, subServices: ['Printing & Photocopy', 'Document Binding', 'Scanning & Laminating'] },
-    { title: 'Graphic Design', icon: <Palette size={20}/>, subServices: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Visuals'] },
-    { title: 'Digital Solutions', icon: <Code2 size={20}/>, subServices: ['Web Development', 'Backend Systems', 'API Integrations'] },
-    { title: 'Digital Marketing', icon: <Megaphone size={20}/>, subServices: ['Social Media Mgt.', 'SEO Optimization', 'Targeted Ads'] },
-    { title: 'Media Production', icon: <PlayCircle size={20}/>, subServices: ['Content Creation', 'Video Editing', 'Photo Retouching'] },
-    { title: 'Agency Outsourcing', icon: <Users size={20}/>, subServices: ['White-Label Tech', 'Remote Assistance', 'B2B Execution'] },
-  ]
 
   const hubFilters = [
     { id: 'all', label: 'All' },
@@ -92,51 +79,75 @@ export default function Home() {
             <span className="text-sm md:text-lg font-black tracking-tighter uppercase italic leading-none">Precede Concepts</span>
           </div>
           <div className="hidden xl:flex items-center gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
-            <a href="#home" className="hover:text-[#1FC8C8]">Home</a>
-            <a href="#about" className="hover:text-[#1FC8C8]">About Us</a>
-            <a href="#services" className="hover:text-[#1FC8C8]">Services</a>
-            <a href="#hub" className="hover:text-[#1FC8C8]">The Hub</a>
+            <a href="#home" className="hover:text-[#1FC8C8] transition-all">Home</a>
+            <a href="#about" className="hover:text-[#1FC8C8] transition-all">About</a>
+            <a href="#services" className="hover:text-[#1FC8C8] transition-all">Services</a>
+            <a href="#hub" className="hover:text-[#1FC8C8] transition-all">The Hub</a>
             <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2.5 rounded-full font-black ml-2 transition-all hover:bg-white">Contact Us</a>
           </div>
           <button className="xl:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>{isMenuOpen ? <X size={24} /> : <Menu size={24} />}</button>
         </div>
       </nav>
 
-      {/* Hero */}
+      {/* 🚀 RESTORED HERO WITH MOTION & SUBHEADERS */}
       <section id="home" className="min-h-screen lg:h-screen flex items-center justify-center px-6 pt-20 bg-[#0A2A5E] relative overflow-hidden text-center">
-        <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.9] text-white">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="z-10"
+        >
+          <p className="text-[#1FC8C8] text-[10px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4">Simplifying progress, delivering value.</p>
+          <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.85] text-white">
+            THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.
+          </h1>
+          <p className="text-white/40 text-[10px] md:text-[12px] font-black uppercase tracking-[0.4em] mt-6">Progress Simplified — Value Delivered</p>
+        </motion.div>
+        
+        {/* Floating Decorative Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+          <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 5, repeat: Infinity }} className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#1FC8C8] rounded-full blur-[120px]" />
+          <motion.div animate={{ y: [0, 20, 0] }} transition={{ duration: 7, repeat: Infinity }} className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#0F4C81] rounded-full blur-[150px]" />
+        </div>
       </section>
 
-      {/* About */}
+      {/* About (Design Intact) */}
       <section id="about" className="min-h-screen lg:h-screen w-full flex items-center justify-center px-6 pt-20 bg-[#1FC8C8]">
         <div className="max-w-6xl mx-auto w-full flex flex-col lg:flex-row gap-12 items-center">
           <h2 className="lg:flex-1 text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-[#0A2A5E] leading-none text-center lg:text-left">Beyond a <br/> Digital Agency.</h2>
-          <div className="lg:flex-[1.5] border-l-4 lg:border-l-8 border-[#0A2A5E] pl-6 text-center lg:text-left text-[#0A2A5E]">
+          <div className="lg:flex-[1.5] border-l-4 lg:border-l-8 border-[#0A2A5E] pl-6 text-[#0A2A5E] text-left">
              <p className="font-black text-lg md:text-2xl leading-relaxed italic mb-6">Precede Concepts bridges the gap between high-end professional services and accessible "hustle-friendly" solutions in Ghana.</p>
              <p className="text-[#0A2A5E]/70 text-xs font-black uppercase tracking-widest leading-loose">We operate a dual-purpose ecosystem: A primary business executing top-tier multimedia services, and a Hub curating vital community resources.</p>
           </div>
         </div>
       </section>
 
-      {/* Services */}
-      <section id="services" className="min-h-screen lg:h-screen flex flex-col items-center justify-center px-6 pt-28 pb-12 bg-white">
+      {/* Services (Design Intact) */}
+      <section id="services" className="min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-12 bg-white">
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-10 text-[#0A2A5E]"><h2 className="text-4xl font-black uppercase italic">Our Services.</h2><p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">Comprehensive Business Solutions</p></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categorizedServices.map((cat, i) => (
-              <div key={i} className="p-8 bg-slate-50 border border-slate-100 rounded-3xl hover:border-[#1FC8C8] transition-all flex flex-col text-left">
+            {[
+              { title: 'Admin & Secretarial', icon: <Printer size={20}/>, list: ['Printing & Photocopy', 'Document Binding', 'Scanning & Laminating'] },
+              { title: 'Graphic Design', icon: <Palette size={20}/>, list: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Visuals'] },
+              { title: 'Digital Solutions', icon: <Code2 size={20}/>, list: ['Web Development', 'Backend Systems', 'API Integrations'] },
+              { title: 'Digital Marketing', icon: <Megaphone size={20}/>, list: ['Social Media Mgt.', 'SEO Optimization', 'Targeted Ads'] },
+              { title: 'Media Production', icon: <PlayCircle size={20}/>, list: ['Content Creation', 'Video Editing', 'Photo Retouching'] },
+              { title: 'Agency Outsourcing', icon: <Users size={20}/>, list: ['White-Label Tech', 'Remote Assistance', 'B2B Execution'] },
+            ].map((cat, i) => (
+              <div key={i} className="p-8 bg-slate-50 border border-slate-100 rounded-[2.5rem] hover:border-[#1FC8C8] transition-all flex flex-col text-left group">
                 <div className="flex items-center gap-4 mb-5 pb-5 border-b border-slate-200/50">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#0F4C81]">{cat.icon}</div>
+                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#0F4C81] group-hover:scale-110 transition-transform">{cat.icon}</div>
                   <h3 className="text-sm font-black uppercase italic text-[#0A2A5E]">{cat.title}</h3>
                 </div>
-                <ul className="space-y-3">{cat.subServices.map((sub, idx) => <li key={idx} className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase"><CheckCircle2 size={12} className="text-[#1FC8C8]"/> {sub}</li>)}</ul>
+                <ul className="space-y-3">{cat.list.map((sub, idx) => <li key={idx} className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase"><CheckCircle2 size={12} className="text-[#1FC8C8]"/> {sub}</li>)}</ul>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* The Hub */}
+      {/* ⚡ THE HUB (RESTORED FEATURED PICKS) */}
       <section id="hub" className="min-h-screen w-full flex flex-col items-center px-4 md:px-6 pt-32 pb-20 bg-[#0F4C81] scroll-mt-0">
         <div className="w-full max-w-[1400px] mx-auto flex flex-col">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
@@ -159,23 +170,34 @@ export default function Home() {
               ))}
             </div>
           </div>
+
+          {/* OUR PICKS - ALWAYS VISIBLE IF DATA EXISTS */}
+          {featuredItems.length > 0 && filter === 'all' && searchQuery === '' && (
+            <div className="mb-16 text-left">
+              <div className="flex items-center gap-3 mb-6"><Sparkles size={18} className="text-[#1FC8C8]" /><h3 className="text-sm font-black uppercase tracking-[0.3em] text-[#1FC8C8] italic">Our Top Picks</h3></div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {featuredItems.map((item) => <ScoutCard key={`f-${item.id}`} item={item} isFeatured={true} />)}
+              </div>
+              <div className="h-px w-full bg-white/10 mt-16"></div>
+            </div>
+          )}
           
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {displayItems.map((item) => <ScoutCard key={item.id} item={item} />)}
+            {displayItems.length > 0 ? displayItems.map((item) => <ScoutCard key={item.id} item={item} />) : <div className="col-span-full py-20 text-white/20 font-black uppercase italic text-center">No results found in this category.</div>}
           </div>
 
           {filteredBySearch.length > visibleCount && (
-            <div className="flex justify-center mt-12"><button onClick={() => setVisibleCount(prev => prev + 18)} className="px-10 py-4 bg-white/10 border border-white/20 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#1FC8C8]">View More</button></div>
+            <div className="flex justify-center mt-12"><button onClick={() => setVisibleCount(prev => prev + 18)} className="px-10 py-4 bg-white/10 border border-white/20 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#1FC8C8] transition-all">View More</button></div>
           )}
         </div>
       </section>
 
-      {/* Contact */}
+      {/* Contact Section (Restored mailto button) */}
       <section id="contact" className="h-screen w-full flex flex-col justify-between px-6 pt-24 pb-6 bg-[#0A2A5E] relative overflow-hidden text-white">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 items-center flex-1">
-          <div className="text-left text-white"><h2 className="text-5xl lg:text-[5.5rem] font-black italic uppercase leading-none mb-4">MOVE AHEAD, <br/><span className="text-[#1FC8C8]">STAY AHEAD.</span></h2></div>
+          <div className="text-left"><h2 className="text-5xl lg:text-[5.5rem] font-black italic uppercase leading-none mb-4">MOVE AHEAD, <br/><span className="text-[#1FC8C8]">STAY AHEAD.</span></h2></div>
           <div className="bg-white/5 p-10 rounded-[3rem] border border-white/10 text-left">
-             <div className="flex flex-col gap-6 mb-8 text-white">
+             <div className="flex flex-col gap-6 mb-8">
                <div className="flex items-center gap-4"><div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8]"><Phone size={24}/></div><div><span className="text-[8px] font-black uppercase text-[#1FC8C8]">Call Us</span><p className="text-3xl font-black italic">{BUSINESS_PHONE}</p></div></div>
                <div className="flex items-center gap-4"><div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8]"><Mail size={24}/></div><div><span className="text-[8px] font-black uppercase text-[#1FC8C8]">Email Us</span><p className="text-xl font-black italic">{BUSINESS_EMAIL}</p></div></div>
              </div>
@@ -203,11 +225,11 @@ function ScoutCard({ item, isFeatured = false }: { item: any, isFeatured?: boole
   const mapUrl = item.map_query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map_query)}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.venue)}`;
 
   return (
-    <div className={`group bg-white rounded-[2rem] overflow-hidden flex flex-col shadow-2xl h-full border-2 ${isFeatured ? 'border-[#1FC8C8]' : 'border-transparent'} hover:scale-[1.02] transition-all duration-300`}>
+    <div className={`group bg-white rounded-[2rem] overflow-hidden flex flex-col shadow-2xl h-full border-2 ${isFeatured ? 'border-[#1FC8C8] ring-4 ring-[#1FC8C8]/10' : 'border-transparent'} hover:scale-[1.02] transition-all duration-300`}>
       <div className="h-28 lg:h-32 bg-slate-900 relative">
         {item.image_url && <img src={item.image_url} className="w-full h-full object-cover" />}
-        <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 rounded-full uppercase tracking-widest">{item.category}</span>
-        {isToday && <span className="absolute top-2 right-2 animate-pulse text-[6px] font-black bg-red-500 text-white px-2 py-1 rounded-full uppercase">Live Today</span>}
+        <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 rounded-full uppercase">{item.category}</span>
+        {isToday && <span className="absolute top-2 right-2 animate-pulse text-[6px] font-black bg-red-50 text-white px-2 py-1 rounded-full uppercase tracking-widest">Live Today</span>}
       </div>
       <div className="p-4 text-left flex flex-col flex-1">
         <h4 className="font-black text-[10px] lg:text-[11px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 mb-1 h-8">{item.title}</h4>
