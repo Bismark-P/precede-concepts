@@ -4,9 +4,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from './lib/supabase'
 import { 
   MapPin, ArrowUpRight, Code2, Palette, Database, 
-  CircleDollarSign, Printer, Smartphone, MessageSquare, 
-  Phone, Mail, Menu, X, Users, PlayCircle, CheckCircle2, Send, Megaphone
+  CircleDollarSign, Printer, Smartphone, Phone, Mail, 
+  Menu, X, Users, PlayCircle, CheckCircle2, Send, Megaphone
 } from 'lucide-react'
+
+// --- CUSTOM WHATSAPP SVG ICON ---
+const WhatsAppIcon = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+  </svg>
+)
 
 export default function Home() {
   const [items, setItems] = useState<any[]>([])
@@ -96,19 +103,15 @@ export default function Home() {
       {/* 🚀 1. HERO */}
       <section id="home" className="min-h-screen lg:h-screen w-full flex items-center justify-center px-6 pt-20 bg-[#0A2A5E] relative overflow-hidden">
         <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} className="max-w-7xl mx-auto text-center w-full flex flex-col items-center justify-center">
-          
           <span className="text-[8px] md:text-[10px] lg:text-xs font-black text-[#1FC8C8] uppercase tracking-[0.4em] md:tracking-[0.8em] mb-4 md:mb-6 block italic">
             Simplifying progress, delivering value.
           </span>
-          
           <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.9] mb-4 md:mb-8 text-white w-full drop-shadow-lg">
             THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.
           </h1>
-          
           <p className="text-white/60 font-black text-[8px] md:text-[10px] lg:text-xs uppercase tracking-[0.3em] md:tracking-[0.6em] italic mt-2">
             Progress Simplified — Value Delivered
           </p>
-          
         </motion.div>
       </section>
 
@@ -136,7 +139,6 @@ export default function Home() {
              <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-[#0A2A5E] mb-3">Our Services.</h2>
              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">Comprehensive Business Solutions</p>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
             {categorizedServices.map((cat, i) => (
               <div key={i} className="p-6 lg:p-8 bg-slate-50 border border-slate-100 rounded-3xl hover:border-[#1FC8C8] hover:shadow-xl transition-all flex flex-col">
@@ -158,11 +160,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ⚡ 4. OPPORTUNITY HUB */}
-      <section id="hub" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-24 pb-12 bg-[#0F4C81]">
-        <div className="w-full max-w-7xl mx-auto flex flex-col h-full justify-center">
+      {/* ⚡ 4. OPPORTUNITY HUB (6 IN A ROW ON PC) */}
+      <section id="hub" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-4 md:px-6 pt-24 pb-12 bg-[#0F4C81]">
+        <div className="w-full max-w-[1400px] mx-auto flex flex-col h-full justify-center">
           
-          <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
             <h2 className="text-3xl md:text-4xl font-black uppercase italic text-white tracking-tighter">Opportunity Hub</h2>
             <div className="flex flex-wrap justify-center gap-2 bg-black/20 p-1.5 rounded-full">
               {['all', 'job', 'event', 'training'].map((f) => (
@@ -171,22 +173,23 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+          {/* 6 Grid columns for lg screens */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
              {displayItems.length === 0 ? (
                <div className="col-span-full text-center py-10 text-white/50 text-xs font-black uppercase tracking-widest">No scouts available in this category.</div>
              ) : displayItems.map((item) => (
-               <div key={item.id} className="bg-white rounded-3xl overflow-hidden flex flex-col shadow-2xl h-full border-2 border-transparent hover:border-[#1FC8C8] transition-all">
-                  <div className="h-32 lg:h-40 bg-slate-900 relative">
+               <div key={item.id} className="bg-white rounded-2xl md:rounded-3xl overflow-hidden flex flex-col shadow-2xl h-full border-2 border-transparent hover:border-[#1FC8C8] transition-all">
+                  <div className="h-28 lg:h-32 bg-slate-900 relative">
                     {item.image_url ? <img src={item.image_url} className="w-full h-full object-cover" alt="flyer" /> : <div className="w-full h-full flex items-center justify-center font-black italic text-slate-800 text-[10px] uppercase">Precede</div>}
-                    <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2.5 py-1 rounded-full uppercase tracking-widest">{item.category}</span>
+                    <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 rounded-full uppercase tracking-widest">{item.category}</span>
                   </div>
-                  <div className="p-5 text-left flex flex-col justify-between flex-1">
-                     <h4 className="font-black text-xs md:text-sm text-[#0A2A5E] mb-4 line-clamp-2 uppercase italic leading-snug">{item.title}</h4>
-                     <div className="space-y-2 pt-3 border-t border-slate-100">
-                        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase truncate"><MapPin size={12} className="text-[#0F4C81] flex-shrink-0"/> {item.venue || 'Various Locations'}</div>
+                  <div className="p-3 lg:p-4 text-left flex flex-col justify-between flex-1">
+                     <h4 className="font-black text-[10px] lg:text-[11px] text-[#0A2A5E] mb-3 line-clamp-2 uppercase italic leading-snug">{item.title}</h4>
+                     <div className="space-y-2 pt-2 border-t border-slate-100">
+                        <div className="flex items-center gap-1.5 text-[8px] font-bold text-slate-400 uppercase truncate"><MapPin size={10} className="text-[#0F4C81] flex-shrink-0"/> {item.venue || 'Various Locations'}</div>
                         <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-2 text-[10px] font-black text-[#0F4C81] uppercase tracking-tighter"><CircleDollarSign size={12}/> {item.price || item.salary_range || 'Free'}</div>
-                           <a href={item.link} target="_blank" className="p-2 bg-slate-50 rounded-full text-[#0A2A5E] hover:bg-[#0F4C81] hover:text-white transition-all shadow-sm"><ArrowUpRight size={14}/></a>
+                           <div className="flex items-center gap-1.5 text-[9px] font-black text-[#0F4C81] uppercase tracking-tighter"><CircleDollarSign size={10}/> {item.price || item.salary_range || 'Free'}</div>
+                           <a href={item.link} target="_blank" className="p-1.5 bg-slate-50 rounded-full text-[#0A2A5E] hover:bg-[#0F4C81] hover:text-white transition-all shadow-sm"><ArrowUpRight size={12}/></a>
                         </div>
                      </div>
                   </div>
@@ -196,65 +199,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 💬 5. CONTACT */}
-      <section id="contact" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-20 pb-10 bg-[#0A2A5E] relative overflow-hidden">
+      {/* 💬 5. CONTACT & FOOTER IN ONE VIEWPORT SECTION */}
+      <section id="contact" className="h-screen w-full flex flex-col justify-between px-6 pt-24 pb-6 bg-[#0A2A5E] relative overflow-hidden">
+        
+        {/* Main Content Vertical Center */}
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-16 items-center flex-1">
           
-          {/* LEFT: Matches Home Page Typography */}
+          {/* LEFT: Re-styled Typography */}
           <div className="text-center lg:text-left text-white w-full flex flex-col items-center lg:items-start justify-center">
-            <h2 className="text-5xl md:text-8xl lg:text-[7.5rem] font-black tracking-tighter uppercase italic leading-[0.85] mb-4 md:mb-6 text-white w-full drop-shadow-lg">
-              MOVE <span className="text-[#1FC8C8]">AHEAD,</span> <br/> STAY AHEAD.
+            <h2 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter uppercase italic leading-[0.9] mb-3 md:mb-5 text-white w-full drop-shadow-lg">
+              MOVE AHEAD, <br/>
+              <span className="text-[#1FC8C8]">STAY AHEAD.</span>
             </h2>
             <p className="text-white/60 font-black text-[8px] md:text-[10px] lg:text-xs uppercase tracking-[0.3em] md:tracking-[0.6em] italic mt-2">
               Progress Simplified — Value Delivered
             </p>
           </div>
 
-          {/* RIGHT: Contact Information Stack */}
-          <div className="flex flex-col gap-6 text-left bg-white/5 p-8 lg:p-12 rounded-[3rem] border border-white/10 backdrop-blur-sm">
+          {/* RIGHT: Compact Contact Card */}
+          <div className="flex flex-col gap-5 text-left bg-white/5 p-6 lg:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-white/10 backdrop-blur-sm">
              
              {/* Vertically Stacked Phone and Email */}
-             <div className="flex flex-col gap-6 mb-4">
+             <div className="flex flex-col gap-4 md:gap-5 mb-2">
                <div className="flex items-center gap-4 text-white">
-                  <div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Phone size={24}/></div>
+                  <div className="p-3 md:p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Phone size={20}/></div>
                   <div className="flex flex-col">
-                     <span className="text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Call Us</span>
-                     <span className="text-2xl md:text-3xl font-black italic">{BUSINESS_PHONE}</span>
+                     <span className="text-[7px] md:text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Call Us</span>
+                     <span className="text-xl md:text-3xl font-black italic">{BUSINESS_PHONE}</span>
                   </div>
                </div>
                
                <div className="flex items-center gap-4 text-white">
-                  <div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Mail size={24}/></div>
+                  <div className="p-3 md:p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Mail size={20}/></div>
                   <div className="flex flex-col min-w-0">
-                     <span className="text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Email Us</span>
-                     {/* break-all prevents long emails from overflowing the card on mobile */}
-                     <span className="text-sm sm:text-lg md:text-xl font-black italic break-all">{BUSINESS_EMAIL}</span>
+                     <span className="text-[7px] md:text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Email Us</span>
+                     <span className="text-sm sm:text-base md:text-xl font-black italic break-all leading-tight">{BUSINESS_EMAIL}</span>
                   </div>
                </div>
              </div>
 
              {/* WhatsApp Buttons Grid */}
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-               <a href={WHATSAPP_DIRECT} target="_blank" className="flex items-center justify-center gap-2 p-4 md:p-5 bg-white text-[#0A2A5E] rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-[#1FC8C8] transition-all text-center">
-                  <MessageSquare size={16} className="flex-shrink-0"/> WhatsApp Message
+             <div className="flex flex-col sm:flex-row gap-3">
+               <a href={WHATSAPP_DIRECT} target="_blank" className="flex-1 flex items-center justify-center gap-2 p-4 md:p-5 bg-white text-[#0A2A5E] rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-[#1FC8C8] transition-all text-center">
+                  <WhatsAppIcon size={18} /> Send WhatsApp Message
                </a>
-               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex items-center justify-center gap-2 p-4 md:p-5 bg-white/10 text-white rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-white/20 transition-all text-center">
+               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex-1 flex items-center justify-center gap-2 p-4 md:p-5 bg-white/10 text-white rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-white/20 transition-all text-center">
                   <Smartphone size={16} className="flex-shrink-0"/> Join WhatsApp Channel
                </a>
              </div>
 
-             <button onClick={handleMailTo} className="w-full py-5 md:py-6 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl font-black uppercase text-xs tracking-[0.3em] hover:bg-white transition-all flex justify-center items-center gap-3 mt-2 shadow-[0_0_30px_rgba(31,200,200,0.3)]">
-                <Send size={18} /> Send an Email
+             <button onClick={handleMailTo} className="w-full py-4 md:py-5 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl font-black uppercase text-[10px] md:text-xs tracking-[0.3em] hover:bg-white transition-all flex justify-center items-center gap-3 shadow-[0_0_20px_rgba(31,200,200,0.2)]">
+                <Send size={16} /> Send an Email
              </button>
 
           </div>
         </div>
 
-        {/* COMPACT CENTERED FOOTER */}
-        <div className="w-full flex flex-col items-center justify-center mt-12 pt-6 border-t border-white/10 text-center gap-2">
-           <span className="text-[#1FC8C8] font-black italic uppercase text-lg tracking-tighter">Precede Concepts</span>
-           <span className="text-white/30 text-[8px] font-black uppercase tracking-[0.5em]">Accra Ghana &middot; &copy; 2026</span>
+        {/* COMPACT FOOTER - Attached strictly to the bottom */}
+        <div className="w-full flex flex-col justify-center items-center mt-auto pt-6 border-t border-white/10 text-center gap-1.5">
+           <span className="text-[#1FC8C8] font-black italic uppercase text-base tracking-tighter">Precede Concepts</span>
+           <span className="text-white/30 text-[7px] md:text-[8px] font-black uppercase tracking-[0.5em]">Accra Ghana &middot; &copy; 2026</span>
         </div>
+        
       </section>
 
     </div>
