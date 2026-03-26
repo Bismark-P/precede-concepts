@@ -5,7 +5,8 @@ import { supabase } from './lib/supabase'
 import { 
   MapPin, ArrowUpRight, Code2, Palette, Database, ChevronRight, 
   Clock, Megaphone, Send, CircleDollarSign, Printer, Smartphone, 
-  MessageSquare, Instagram, Phone, Mail, Menu, X, Users, PlayCircle
+  MessageSquare, Instagram, Phone, Mail, Menu, X, Users, PlayCircle,
+  CheckCircle2
 } from 'lucide-react'
 
 export default function Home() {
@@ -13,32 +14,75 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [filter, setFilter] = useState('all')
+  
+  // --- FORM STATE ---
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 
   // --- BUSINESS INFO ---
   const WHATSAPP_DIRECT = "https://wa.me/233591999544"
   const WHATSAPP_CHANNEL = "https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W"
-  const TELEGRAM_CHAT = "#" // Update later
-  const TELEGRAM_CHANNEL = "#" // Update later
   const BUSINESS_EMAIL = "precedeconcepts@gmail.com"
   const BUSINESS_PHONE = "0591999544"
 
-  useEffect(() => { setMounted(true); fetchApproved(); }, [])
+  useEffect(() => { 
+    setMounted(true); 
+    fetchApproved(); 
+  }, [])
 
   async function fetchApproved() {
     const { data } = await supabase.from('jobs').select('*').eq('status', 'approved').order('is_featured', { ascending: false })
     if (data) setItems(data)
   }
 
+  // --- THE DIRECT MAILTO FUNCTION ---
+  const handleMailTo = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`New Inquiry from ${formData.name}`);
+    const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`);
+    
+    // This opens the user's default email client pre-filled with your details
+    window.location.href = `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
+    
+    // Clear form after clicking
+    setFormData({ name: '', email: '', message: '' });
+  };
+
   const filteredItems = filter === 'all' 
     ? items 
     : items.filter(i => i.category.toLowerCase() === filter.toLowerCase() || (filter === 'training' && i.category === 'seminar'))
 
-  const services = [
-    { title: 'Administrative & Secretarial', icon: <Printer size={20}/>, desc: 'Professional printing, photocopy, binding, and office support.' },
-    { title: 'Graphic Design', icon: <Palette size={20}/>, desc: 'Strategic Branding, Logo Design & Visual Identity.' },
-    { title: 'Digital Solutions', icon: <Code2 size={20}/>, desc: 'Web Development, Backend & API Design.' },
-    { title: 'Digital Marketing', icon: <Megaphone size={20}/>, desc: 'SEO, Strategy & Social Campaigns.' },
-    { title: 'Agency Outsourcing', icon: <Users size={20}/>, desc: 'White-label Tech & Admin Support.' },
+  // --- CATEGORIZED SERVICES WITH SUB-SERVICES ---
+  const categorizedServices = [
+    { 
+      title: 'Administrative & Secretarial', 
+      icon: <Printer size={24}/>, 
+      subServices: ['Printing & Photocopy', 'Document Binding', 'Scanning & Lamination', 'General Office Support'] 
+    },
+    { 
+      title: 'Graphic Design', 
+      icon: <Palette size={24}/>, 
+      subServices: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Design', 'Visual Identity'] 
+    },
+    { 
+      title: 'Digital Solutions', 
+      icon: <Code2 size={24}/>, 
+      subServices: ['Custom Web Development', 'Backend Architecture', 'API Integrations', 'E-Commerce Setup'] 
+    },
+    { 
+      title: 'Digital Marketing', 
+      icon: <Megaphone size={24}/>, 
+      subServices: ['Social Media Management', 'SEO Optimization', 'Content Marketing', 'Targeted Ad Campaigns'] 
+    },
+    { 
+      title: 'Media Production', 
+      icon: <PlayCircle size={24}/>, 
+      subServices: ['Content Creation', 'Video Editing', 'Photography Editing', 'Multimedia Storytelling'] 
+    },
+    { 
+      title: 'Agency Outsourcing', 
+      icon: <Users size={24}/>, 
+      subServices: ['White-Label Tech Support', 'Remote Secretarial', 'B2B Project Execution', 'Staff Augmentation'] 
+    },
   ]
 
   if (!mounted) return null
@@ -47,16 +91,19 @@ export default function Home() {
     <div className="min-h-screen bg-white font-sans text-slate-950 scroll-smooth overflow-x-hidden">
       
       {/* 🧭 NAVIGATION */}
-      <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E] border-b border-white/5 px-4 md:px-8 py-4">
+      <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E] border-b border-white/5 px-4 md:px-8 py-5">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex flex-col text-left">
-            <span className="text-lg md:text-xl font-black tracking-tighter uppercase italic text-white leading-none">Precede Concepts</span>
-            <span className="text-[7px] font-bold text-[#1FC8C8] tracking-[0.4em] uppercase mt-1">Standard of Execution</span>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#1FC8C8] rounded-xl flex items-center justify-center font-black italic text-[#0A2A5E] text-xs shadow-lg">PC</div>
+            <div className="flex flex-col text-left">
+              <span className="text-lg font-black tracking-tighter uppercase italic text-white leading-none">Precede Concepts</span>
+              <span className="text-[7px] font-bold text-[#1FC8C8] tracking-[0.4em] uppercase mt-1">Standard of Execution</span>
+            </div>
           </div>
 
           <div className="hidden lg:flex items-center gap-7 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
-            {['home', 'about us', 'services', 'training', 'jobs', 'events'].map((l) => (
-               <a key={l} href={`#${l.replace(' ', '')}`} className="hover:text-[#1FC8C8] transition-all">{l}</a>
+            {['home', 'about', 'services', 'training', 'jobs', 'events'].map((l) => (
+               <a key={l} href={`#${l}`} className="hover:text-[#1FC8C8] transition-all">{l}</a>
             ))}
             <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-6 py-3 rounded-full font-black hover:bg-white transition-all">Contact Us</a>
           </div>
@@ -65,82 +112,89 @@ export default function Home() {
             {isMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
-
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="lg:hidden bg-[#0A2A5E] absolute left-0 w-full px-6 py-10 flex flex-col gap-6 text-[11px] font-black uppercase tracking-widest text-white border-b border-white/10 shadow-2xl">
-              <a href="#home" onClick={() => setIsMenuOpen(false)}>Home</a>
-              <a href="#about" onClick={() => setIsMenuOpen(false)}>About Us</a>
-              <a href="#services" onClick={() => setIsMenuOpen(false)}>Our Services</a>
-              <a href="#training" onClick={() => setIsMenuOpen(false)}>Training</a>
-              <a href="#jobs" onClick={() => setIsMenuOpen(false)}>Jobs</a>
-              <a href="#events" onClick={() => setIsMenuOpen(false)}>Events</a>
-              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-[#1FC8C8]">Contact Us</a>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
 
-      {/* 🚀 HERO SECTION */}
-      <header id="home" className="pt-52 pb-24 md:pt-64 md:pb-40 px-6 text-center bg-[#0A2A5E] text-white relative">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto">
-          <span className="text-[9px] md:text-[10px] font-black text-[#1FC8C8] uppercase tracking-[0.5em] mb-6 block italic">Simplifying progress, delivering value.</span>
-          <h1 className="text-5xl md:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.9] mb-10">
+      {/* 🚀 HERO */}
+      <header id="home" className="h-screen flex items-center justify-center px-6 text-center bg-[#0A2A5E] text-white">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-6xl mx-auto">
+          <span className="text-[10px] md:text-[12px] font-black text-[#1FC8C8] uppercase tracking-[0.6em] mb-8 block italic">Simplifying progress, delivering value.</span>
+          <h1 className="text-6xl md:text-[12rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-12">
             The Standard <br/> of execution.
           </h1>
-          <p className="text-white/40 max-w-xl mx-auto font-bold text-[10px] md:text-xs uppercase tracking-[0.2em] italic">
+          <p className="text-white/40 max-w-xl mx-auto font-bold text-[10px] md:text-xs uppercase tracking-[0.3em] italic">
             Progress Simplified — Value Delivered
           </p>
         </motion.div>
       </header>
 
-      {/* 🏛️ AGENCY SERVICES (Minimal Grid) */}
-      <section id="services" className="py-24 px-6 max-w-7xl mx-auto scroll-mt-24">
-        <div id="about" className="scroll-mt-32 flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4 text-left">
-           <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-[#0A2A5E]">Our <br/> Services.</h2>
-           <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.4em]">Strategic Digital Operations</p>
+      {/* 📖 ABOUT US */}
+      <section id="about" className="py-32 px-6 bg-slate-50 scroll-mt-24">
+        <div className="max-w-5xl mx-auto text-center md:text-left flex flex-col md:flex-row gap-16 items-center">
+          <h2 className="flex-1 text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-[#0A2A5E] leading-tight">Beyond a <br/> Digital Agency.</h2>
+          <div className="flex-[1.5] border-l-8 border-[#1FC8C8] pl-8">
+             <p className="text-slate-600 font-medium text-lg md:text-xl leading-relaxed italic mb-8">
+               Precede Concepts is a multifaceted digital agency and community platform designed to bridge the gap between high-end professional services and accessible "hustle-friendly" solutions in Ghana.
+             </p>
+             <p className="text-slate-400 text-sm font-bold uppercase tracking-widest leading-loose">
+               It operates as a dual-purpose ecosystem: a Primary Business providing digital/multimedia services and a Secondary/CSR Hub that drives traffic by offering community resources.
+             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 🏛️ CATEGORIZED SERVICES WITH SUB-SERVICES */}
+      <section id="services" className="py-32 px-6 max-w-7xl mx-auto scroll-mt-24">
+        <div className="text-center mb-20">
+           <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-[#0A2A5E] mb-4">Our Services.</h2>
+           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">Comprehensive Business Solutions</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {services.map((s, i) => (
-            <div key={i} className="p-8 bg-slate-50 border border-slate-100 rounded-[2.5rem] transition-all hover:bg-white hover:border-[#1FC8C8] hover:shadow-xl group">
-              <div className="text-[#0F4C81] mb-6 bg-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all">{s.icon}</div>
-              <h3 className="text-[11px] font-black uppercase italic mb-3 leading-tight text-[#0A2A5E]">{s.title}</h3>
-              <p className="text-[9px] font-bold text-slate-400 uppercase leading-relaxed">{s.desc}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {categorizedServices.map((cat, i) => (
+            <div key={i} className="p-10 bg-white border border-slate-100 rounded-[3rem] transition-all hover:border-[#1FC8C8] hover:shadow-2xl text-left flex flex-col">
+              <div className="text-[#0F4C81] mb-6 flex justify-start">{cat.icon}</div>
+              <h3 className="text-2xl font-black uppercase italic leading-tight text-[#0A2A5E] mb-6">{cat.title}</h3>
+              
+              <ul className="space-y-4 flex-1">
+                {cat.subServices.map((sub, idx) => (
+                   <li key={idx} className="flex items-start gap-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                      <CheckCircle2 size={14} className="text-[#1FC8C8] mt-0.5 flex-shrink-0"/>
+                      {sub}
+                   </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ⚡ OPPORTUNITY HUB (4-Card Row) */}
-      <section id="training" className="py-24 bg-[#0F4C81] px-6 scroll-mt-20 rounded-t-[4rem] md:rounded-t-[8rem]">
+      {/* ⚡ OPPORTUNITY HUB */}
+      <section id="training" className="py-32 bg-[#0F4C81] px-6 scroll-mt-24 rounded-t-[5rem] md:rounded-t-[10rem]">
         <div id="jobs" className="scroll-mt-32"></div>
         <div id="events" className="scroll-mt-32"></div>
-        
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
-            <h2 className="text-3xl font-black uppercase italic text-white tracking-tighter">Opportunity Hub</h2>
-            <div className="flex flex-wrap justify-center gap-2 bg-black/20 p-1.5 rounded-full">
+            <h2 className="text-4xl font-black uppercase italic text-white tracking-tighter underline decoration-[#1FC8C8] underline-offset-8">Opportunity Hub</h2>
+            <div className="flex flex-wrap justify-center gap-2 bg-black/20 p-2 rounded-full">
               {['all', 'job', 'event', 'training'].map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-6 py-2.5 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/60'}`}>{f}s</button>
+                <button key={f} onClick={() => setFilter(f)} className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/60 hover:text-white'}`}>{f}s</button>
               ))}
             </div>
           </div>
-          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
              {filteredItems.map((item) => (
                <div key={item.id} className="bg-white rounded-[2.5rem] overflow-hidden flex flex-col border border-white/5 shadow-2xl h-full">
-                  <div className="h-40 bg-slate-900 relative">
-                    {item.image_url ? <img src={item.image_url} className="w-full h-full object-cover" alt=""/> : <div className="w-full h-full flex items-center justify-center font-black italic text-slate-800 text-[10px] uppercase">Precede</div>}
-                    <span className="absolute top-4 left-4 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2.5 py-1.5 rounded-full uppercase tracking-widest">{item.category}</span>
+                  <div className="h-44 bg-slate-900 relative">
+                    {item.image_url ? <img src={item.image_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-black italic text-slate-800 text-[10px] uppercase">Precede</div>}
+                    <span className="absolute top-4 left-4 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-3 py-1.5 rounded-full uppercase tracking-widest">{item.category}</span>
                   </div>
                   <div className="p-6 text-left flex flex-col justify-between flex-1">
-                     <h4 className="font-black text-[12px] text-slate-900 mb-4 line-clamp-2 uppercase italic tracking-tight leading-snug">{item.title}</h4>
+                     <h4 className="font-black text-[13px] text-[#0A2A5E] mb-4 line-clamp-2 uppercase italic tracking-tight leading-snug">{item.title}</h4>
                      <div className="space-y-3 pt-4 border-t border-slate-50">
-                        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase"><MapPin size={12} className="text-[#0F4C81]"/> <span className="truncate">{item.venue || 'Various'}</span></div>
+                        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase truncate"><MapPin size={12} className="text-[#0F4C81] flex-shrink-0"/> {item.venue || 'Various Locations'}</div>
                         <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-2 text-[10px] font-black text-[#0F4C81] uppercase tracking-tighter"><CircleDollarSign size={13}/> {item.price || item.salary_range || 'Free Access'}</div>
-                           <a href={item.link} target="_blank" className="p-2.5 bg-slate-50 rounded-full text-[#0A2A5E] hover:bg-[#0A2A5E] hover:text-white transition-all"><ArrowUpRight size={14}/></a>
+                           <div className="flex items-center gap-2 text-[11px] font-black text-[#0F4C81] uppercase tracking-tighter"><CircleDollarSign size={13}/> {item.price || item.salary_range || 'Free'}</div>
+                           <a href={item.link} target="_blank" className="p-3 bg-slate-50 rounded-full text-[#0A2A5E] hover:bg-[#0A2A5E] hover:text-white transition-all shadow-sm"><ArrowUpRight size={16}/></a>
                         </div>
                      </div>
                   </div>
@@ -150,60 +204,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 💬 CONTACT & FORM */}
-      <section id="contact" className="py-24 px-6 bg-[#1FC8C8] scroll-mt-24">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 lg:gap-32">
-          <div className="text-left">
-            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-[#0A2A5E] mb-10">Move ahead, <br/> stay ahead.</h2>
+      {/* 💬 CONTACT FORM (DIRECT MAILTO) */}
+      <section id="contact" className="py-32 px-6 bg-[#1FC8C8] scroll-mt-24">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
+          <div className="text-left text-[#0A2A5E]">
+            <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter mb-10 leading-none">Move ahead, <br/> stay ahead.</h2>
             <div className="space-y-6 mb-12">
-               <div className="flex items-center gap-5 text-[#0A2A5E]">
-                  <div className="p-5 bg-white/20 rounded-3xl"><Phone size={24}/></div>
-                  <div className="flex flex-col"><span className="text-[8px] font-black uppercase tracking-widest opacity-60">Call Us</span><span className="text-xl font-black italic">{BUSINESS_PHONE}</span></div>
-               </div>
-               <div className="flex items-center gap-5 text-[#0A2A5E]">
-                  <div className="p-5 bg-white/20 rounded-3xl"><Mail size={24}/></div>
-                  <div className="flex flex-col"><span className="text-[8px] font-black uppercase tracking-widest opacity-60">Email Us</span><span className="text-xl font-black italic">{BUSINESS_EMAIL}</span></div>
-               </div>
+               <div className="flex items-center gap-5"><div className="p-5 bg-white/30 rounded-3xl"><Phone size={24}/></div><span className="text-2xl font-black italic">{BUSINESS_PHONE}</span></div>
+               <div className="flex items-center gap-5"><div className="p-5 bg-white/30 rounded-3xl"><Mail size={24}/></div><span className="text-2xl font-black italic truncate">{BUSINESS_EMAIL}</span></div>
             </div>
-
             <div className="flex flex-col sm:flex-row gap-4">
-               <a href={WHATSAPP_DIRECT} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-6 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl">
-                  <MessageSquare size={18}/> WhatsApp Direct
-               </a>
-               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-6 bg-white text-[#0A2A5E] rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl">
-                  <Smartphone size={18}/> WhatsApp Channel
-               </a>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 mt-4">
-               <a href={TELEGRAM_CHAT} className="flex-1 flex items-center justify-center gap-3 p-6 bg-[#0F4C81] text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl">
-                  <Send size={18}/> Telegram Chat
-               </a>
-               <a href={TELEGRAM_CHANNEL} className="flex-1 flex items-center justify-center gap-3 p-6 bg-slate-900 text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl">
-                  <Send size={18}/> Telegram Channel
-               </a>
+               <a href={WHATSAPP_DIRECT} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-7 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl">WhatsApp Direct</a>
+               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-7 bg-white text-[#0A2A5E] rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl">Join Channel</a>
             </div>
           </div>
 
           <div className="bg-white p-10 md:p-14 rounded-[4rem] shadow-3xl text-left">
-             <form className="space-y-5">
-                <div><label className="text-[9px] font-black uppercase text-slate-400 ml-4 mb-2 block">Name</label><input className="w-full p-5 bg-slate-50 rounded-3xl outline-none focus:ring-2 ring-[#0A2A5E] text-sm" placeholder="Full Name" /></div>
-                <div><label className="text-[9px] font-black uppercase text-slate-400 ml-4 mb-2 block">Email</label><input className="w-full p-5 bg-slate-50 rounded-3xl outline-none focus:ring-2 ring-[#0A2A5E] text-sm" placeholder="Email Address" /></div>
-                <div><label className="text-[9px] font-black uppercase text-slate-400 ml-4 mb-2 block">Message</label><textarea className="w-full p-6 bg-slate-50 rounded-[2.5rem] outline-none focus:ring-2 ring-[#0A2A5E] text-sm min-h-[150px]" placeholder="How can we help?" /></div>
-                <button type="button" className="w-full p-6 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-xs tracking-widest hover:bg-[#0F4C81] transition-all">Send Inquiry</button>
+             <form onSubmit={handleMailTo} className="space-y-6">
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-4 mb-2 block">Full Name</label>
+                  <input required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-6 bg-slate-50 rounded-3xl outline-none focus:ring-2 ring-[#0A2A5E] text-sm font-bold" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-4 mb-2 block">Email Address</label>
+                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full p-6 bg-slate-50 rounded-3xl outline-none focus:ring-2 ring-[#0A2A5E] text-sm font-bold" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400 ml-4 mb-2 block">Message</label>
+                  <textarea required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full p-8 bg-slate-50 rounded-[2.5rem] outline-none focus:ring-2 ring-[#0A2A5E] text-sm font-bold min-h-[180px]" />
+                </div>
+                <button type="submit" className="w-full p-7 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-xs tracking-[0.4em] shadow-2xl hover:bg-[#0F4C81] transition-all">
+                   OPEN IN EMAIL APP
+                </button>
              </form>
           </div>
         </div>
       </section>
 
       {/* 🏛️ FOOTER */}
-      <footer className="py-16 bg-[#0A2A5E] text-center px-6 border-t border-white/5">
-        <div className="flex flex-col items-center gap-4">
-            <span className="text-white font-black italic uppercase text-lg tracking-tighter leading-none">Precede Concepts</span>
-            <p className="text-white/20 text-[9px] font-black uppercase tracking-[0.5em] leading-relaxed">
-              Standard of Execution &middot; Accra Ghana <br/> 
-              &copy; Designed by Precede Concepts 2026
-            </p>
-        </div>
+      <footer className="py-20 bg-[#0A2A5E] text-center px-6">
+        <span className="text-[#1FC8C8] font-black italic uppercase text-2xl tracking-tighter">Precede Concepts</span>
+        <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.6em] mt-4">Designed by Precede Concepts 2026 &middot; Accra Ghana</p>
       </footer>
     </div>
   )
