@@ -3,10 +3,9 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from './lib/supabase'
 import { 
-  MapPin, ArrowUpRight, Code2, Palette, Database, ChevronRight, 
+  MapPin, ArrowUpRight, Code2, Palette, Database, 
   Clock, Megaphone, Send, CircleDollarSign, Printer, Smartphone, 
-  MessageSquare, Instagram, Phone, Mail, Menu, X, Users, PlayCircle,
-  CheckCircle2
+  MessageSquare, Phone, Mail, Menu, X, Users, PlayCircle, CheckCircle2
 } from 'lucide-react'
 
 export default function Home() {
@@ -14,9 +13,6 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [filter, setFilter] = useState('all')
-  
-  // --- FORM STATE ---
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 
   // --- BUSINESS INFO ---
   const WHATSAPP_DIRECT = "https://wa.me/233591999544"
@@ -34,55 +30,17 @@ export default function Home() {
     if (data) setItems(data)
   }
 
-  // --- THE DIRECT MAILTO FUNCTION ---
-  const handleMailTo = (e: React.FormEvent) => {
-    e.preventDefault();
-    const subject = encodeURIComponent(`New Inquiry from ${formData.name}`);
-    const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`);
-    
-    // This opens the user's default email client pre-filled with your details
-    window.location.href = `mailto:${BUSINESS_EMAIL}?subject=${subject}&body=${body}`;
-    
-    // Clear form after clicking
-    setFormData({ name: '', email: '', message: '' });
-  };
-
   const filteredItems = filter === 'all' 
     ? items 
     : items.filter(i => i.category.toLowerCase() === filter.toLowerCase() || (filter === 'training' && i.category === 'seminar'))
 
-  // --- CATEGORIZED SERVICES WITH SUB-SERVICES ---
   const categorizedServices = [
-    { 
-      title: 'Administrative & Secretarial', 
-      icon: <Printer size={24}/>, 
-      subServices: ['Printing & Photocopy', 'Document Binding', 'Scanning & Lamination', 'General Office Support'] 
-    },
-    { 
-      title: 'Graphic Design', 
-      icon: <Palette size={24}/>, 
-      subServices: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Design', 'Visual Identity'] 
-    },
-    { 
-      title: 'Digital Solutions', 
-      icon: <Code2 size={24}/>, 
-      subServices: ['Custom Web Development', 'Backend Architecture', 'API Integrations', 'E-Commerce Setup'] 
-    },
-    { 
-      title: 'Digital Marketing', 
-      icon: <Megaphone size={24}/>, 
-      subServices: ['Social Media Management', 'SEO Optimization', 'Content Marketing', 'Targeted Ad Campaigns'] 
-    },
-    { 
-      title: 'Media Production', 
-      icon: <PlayCircle size={24}/>, 
-      subServices: ['Content Creation', 'Video Editing', 'Photography Editing', 'Multimedia Storytelling'] 
-    },
-    { 
-      title: 'Agency Outsourcing', 
-      icon: <Users size={24}/>, 
-      subServices: ['White-Label Tech Support', 'Remote Secretarial', 'B2B Project Execution', 'Staff Augmentation'] 
-    },
+    { title: 'Administrative & Secretarial', icon: <Printer size={24}/>, subServices: ['Printing & Photocopy', 'Document Binding', 'Scanning & Lamination', 'General Office Support'] },
+    { title: 'Graphic Design', icon: <Palette size={24}/>, subServices: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Design', 'Visual Identity'] },
+    { title: 'Digital Solutions', icon: <Code2 size={24}/>, subServices: ['Custom Web Development', 'Backend Architecture', 'API Integrations', 'E-Commerce Setup'] },
+    { title: 'Digital Marketing', icon: <Megaphone size={24}/>, subServices: ['Social Media Management', 'SEO Optimization', 'Content Marketing', 'Targeted Ad Campaigns'] },
+    { title: 'Media Production', icon: <PlayCircle size={24}/>, subServices: ['Content Creation', 'Video Editing', 'Photography Editing', 'Multimedia Storytelling'] },
+    { title: 'Agency Outsourcing', icon: <Users size={24}/>, subServices: ['White-Label Tech Support', 'Remote Secretarial', 'B2B Project Execution', 'Staff Augmentation'] },
   ]
 
   if (!mounted) return null
@@ -114,13 +72,18 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* 🚀 HERO */}
-      <header id="home" className="h-screen flex items-center justify-center px-6 text-center bg-[#0A2A5E] text-white">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-6xl mx-auto">
-          <span className="text-[10px] md:text-[12px] font-black text-[#1FC8C8] uppercase tracking-[0.6em] mb-8 block italic">Simplifying progress, delivering value.</span>
-          <h1 className="text-6xl md:text-[12rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-12">
-            The Standard <br/> of execution.
+      {/* 🚀 HERO (RESTORED BEAUTY) */}
+      <header id="home" className="h-screen flex items-center justify-center px-6 text-center bg-[#0A2A5E] relative">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-6xl mx-auto w-full">
+          <span className="text-[10px] md:text-[12px] font-black text-[#1FC8C8] uppercase tracking-[0.6em] mb-8 block italic">
+            Simplifying progress, delivering value.
+          </span>
+          
+          {/* EXACTLY 2 LINES: White text, Teal "Standard" */}
+          <h1 className="text-6xl md:text-[11rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-12 text-white">
+            The <span className="text-[#1FC8C8]">Standard</span> <br/> of execution.
           </h1>
+          
           <p className="text-white/40 max-w-xl mx-auto font-bold text-[10px] md:text-xs uppercase tracking-[0.3em] italic">
             Progress Simplified — Value Delivered
           </p>
@@ -154,7 +117,6 @@ export default function Home() {
             <div key={i} className="p-10 bg-white border border-slate-100 rounded-[3rem] transition-all hover:border-[#1FC8C8] hover:shadow-2xl text-left flex flex-col">
               <div className="text-[#0F4C81] mb-6 flex justify-start">{cat.icon}</div>
               <h3 className="text-2xl font-black uppercase italic leading-tight text-[#0A2A5E] mb-6">{cat.title}</h3>
-              
               <ul className="space-y-4 flex-1">
                 {cat.subServices.map((sub, idx) => (
                    <li key={idx} className="flex items-start gap-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
@@ -204,9 +166,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 💬 CONTACT FORM (DIRECT MAILTO) */}
+      {/* 💬 CONTACT SECTION (CLEAN UI) */}
       <section id="contact" className="py-32 px-6 bg-[#1FC8C8] scroll-mt-24">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
           <div className="text-left text-[#0A2A5E]">
             <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter mb-10 leading-none">Move ahead, <br/> stay ahead.</h2>
             <div className="space-y-6 mb-12">
@@ -214,29 +176,27 @@ export default function Home() {
                <div className="flex items-center gap-5"><div className="p-5 bg-white/30 rounded-3xl"><Mail size={24}/></div><span className="text-2xl font-black italic truncate">{BUSINESS_EMAIL}</span></div>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
-               <a href={WHATSAPP_DIRECT} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-7 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl">WhatsApp Direct</a>
-               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-7 bg-white text-[#0A2A5E] rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl">Join Channel</a>
+               <a href={WHATSAPP_DIRECT} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-7 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl hover:scale-105 transition-all">
+                  <MessageSquare size={18}/> WhatsApp Direct
+               </a>
+               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-7 bg-white text-[#0A2A5E] rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl hover:scale-105 transition-all">
+                  <Smartphone size={18}/> Join Channel
+               </a>
             </div>
           </div>
 
-          <div className="bg-white p-10 md:p-14 rounded-[4rem] shadow-3xl text-left">
-             <form onSubmit={handleMailTo} className="space-y-6">
-                <div>
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-4 mb-2 block">Full Name</label>
-                  <input required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-6 bg-slate-50 rounded-3xl outline-none focus:ring-2 ring-[#0A2A5E] text-sm font-bold" />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-4 mb-2 block">Email Address</label>
-                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full p-6 bg-slate-50 rounded-3xl outline-none focus:ring-2 ring-[#0A2A5E] text-sm font-bold" />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase text-slate-400 ml-4 mb-2 block">Message</label>
-                  <textarea required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="w-full p-8 bg-slate-50 rounded-[2.5rem] outline-none focus:ring-2 ring-[#0A2A5E] text-sm font-bold min-h-[180px]" />
-                </div>
-                <button type="submit" className="w-full p-7 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-xs tracking-[0.4em] shadow-2xl hover:bg-[#0F4C81] transition-all">
-                   OPEN IN EMAIL APP
-                </button>
-             </form>
+          {/* BEAUTIFUL, SIMPLE EMAIL BUTTON */}
+          <div className="bg-white p-12 md:p-16 rounded-[4rem] shadow-3xl text-center flex flex-col justify-center items-center border border-[#0A2A5E]/5">
+             <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-8">
+               <Mail size={40} className="text-[#1FC8C8]" />
+             </div>
+             <h3 className="text-3xl font-black uppercase italic text-[#0A2A5E] mb-4">Send an Enquiry</h3>
+             <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest mb-10 leading-relaxed max-w-sm">
+               Click below to open your preferred email app and message our team directly. We respond within 24 hours.
+             </p>
+             <a href={`mailto:${BUSINESS_EMAIL}?subject=New Inquiry for Precede Concepts`} className="w-full px-8 py-7 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-xs md:text-sm tracking-[0.4em] shadow-2xl hover:bg-[#0F4C81] transition-all flex items-center justify-center gap-3">
+                <Send size={20} /> Send an Email
+             </a>
           </div>
         </div>
       </section>
