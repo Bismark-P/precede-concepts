@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-// 1. Updated Interface to exactly match the new Admin UI
+// 1. Interface matching the exact fields from the Admin Form
 export interface EventData {
   category: 'event' | 'job' | 'training';
   sub_category: string;
@@ -22,7 +22,7 @@ export interface EventData {
 
 /**
  * Pushes a manually curated scout to the Supabase 'jobs' table.
- * All entries start with 'approved' status since they come from the Admin.
+ * All entries are sent to the 'queued' status pending admin approval.
  */
 export async function addManualEntry(formData: EventData) {
   try {
@@ -31,7 +31,7 @@ export async function addManualEntry(formData: EventData) {
       .insert([
         {
           ...formData,
-          status: 'approved', // Auto-approve admin entries
+          status: 'queued', // 🛑 Routes to the queue for your approval
           created_at: new Date().toISOString(),
         },
       ])
@@ -43,7 +43,7 @@ export async function addManualEntry(formData: EventData) {
     await supabase.from('sync_logs').insert([
       { 
         status: 'success', 
-        details: `Manual Entry Added: ${formData.title}`,
+        details: `Manual Entry Queued: ${formData.title}`,
         executed_at: new Date().toISOString()
       }
     ]);

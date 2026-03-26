@@ -36,7 +36,7 @@ export default function AdminAddEvent() {
     title: '',
     price_type: 'Paid', 
     price: '',
-    time_category: 'TBD', // Default to TBD for flexibility
+    time_category: 'TBD',
     duration: '',
     venue: '',
     region: 'Greater Accra',
@@ -60,7 +60,7 @@ export default function AdminAddEvent() {
 
     const res = await addManualEntry(finalData);
     if (res.success) {
-      alert("🚀 Published to Precede Hub!");
+      alert("📥 Scout added to Queue! Awaiting your approval on the dashboard.");
       setFormData({
         ...formData,
         title: '', price: '', venue: '', image_url: '', 
@@ -267,7 +267,7 @@ export default function AdminAddEvent() {
         </div>
 
         <button disabled={loading} className="w-full bg-[#0A2A5E] text-white p-6 rounded-2xl font-black uppercase text-xs tracking-[0.3em] shadow-xl shadow-[#0A2A5E]/20 hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all disabled:opacity-50 mt-4">
-          {loading ? "SYNCING TO DATABASE..." : "🚀 PUBLISH TO HUB"}
+          {loading ? "SENDING TO QUEUE..." : "📥 SEND TO QUEUE"}
         </button>
       </form>
     </div>
