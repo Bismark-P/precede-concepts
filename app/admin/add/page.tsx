@@ -1,9 +1,8 @@
 "use client";
 import { useState } from 'react';
-import { addManualEntry } from '@/app/lib/collector';
+import { supabase } from '@/app/lib/supabase';
 import { 
-  ArrowLeft, Sparkles, Image as ImageIcon, 
-  Plus, LayoutDashboard, CheckCircle2, Star,
+  ArrowLeft, Plus, LayoutDashboard, CheckCircle2, Star,
   Briefcase, GraduationCap, PartyPopper, Map as MapIcon, Building2, Search
 } from 'lucide-react';
 
@@ -16,7 +15,6 @@ export default function AdminAddEvent() {
     category: 'event', 
     sub_category: 'Conference',
     title: '',
-    price_type: 'Paid', 
     price: '',
     time_category: 'Morning',
     duration: '',
@@ -26,11 +24,14 @@ export default function AdminAddEvent() {
     event_date: '',
     link: '',
     image_url: '',
-    review_text: '',
     is_featured: false,
     organizer_body: '', 
     recurring_day: '',   
-    map_query: ''       
+    map_query: '',
+    status: 'queued', // Default to queue for admin review
+    performance_grade: 5,
+    performance_notes: '',
+    parent_id: null // To track reposted history
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,23 +40,31 @@ export default function AdminAddEvent() {
     setShowSuccess(false);
 
     const finalData = { ...formData };
+    
+    // Handle undisclosed salary logic
     if (formData.category === 'job' && !isSalaryDisclosed) {
       finalData.salary_range = 'Undisclosed';
     }
 
-    const res = await addManualEntry(finalData);
-    if (res.success) {
+    const { error } = await supabase.from('jobs').insert([finalData]);
+
+    if (!error) {
       setShowSuccess(true);
+      // Reset form but keep category preference
       setFormData({
         ...formData,
         title: '', price: '', venue: '', event_date: '', 
-        link: '', image_url: '', review_text: '', salary_range: '', 
+        link: '', image_url: '', salary_range: '', 
         duration: '', organizer_body: '', recurring_day: '', map_query: '',
-        is_featured: false
+        is_featured: false,
+        parent_id: null
       });
       window.scrollTo(0, 0);
+      
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => setShowSuccess(false), 5000);
     } else {
-      alert("❌ Error: " + res.error);
+      alert("❌ Error: " + error.message);
     }
     setLoading(false);
   };
@@ -64,7 +73,7 @@ export default function AdminAddEvent() {
   const labelClass = "block text-[10px] font-black uppercase text-slate-500 mb-1.5 tracking-widest ml-1";
 
   return (
-    <div className="min-h-screen bg-slate-100 py-12 px-4 text-left">
+    <div className="min-h-screen bg-slate-100 py-12 px-4 text-left font-sans">
       <div className="max-w-2xl mx-auto p-10 bg-white shadow-2xl rounded-[3rem] border border-slate-200">
         
         {/* HEADER */}
@@ -77,26 +86,26 @@ export default function AdminAddEvent() {
         </div>
 
         {showSuccess && (
-          <div className="mb-8 p-4 bg-[#1FC8C8]/10 border-2 border-[#1FC8C8]/20 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+          <div className="mb-8 p-4 bg-[#1FC8C8]/10 border-2 border-[#1FC8C8] rounded-2xl flex items-center justify-between animate-bounce">
             <div className="flex items-center gap-3 text-[#0A2A5E]">
               <CheckCircle2 size={20} className="text-[#1FC8C8]" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Sent to Queue!</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Sent to Queue Successfully!</span>
             </div>
             <a href="/admin" className="flex items-center gap-2 bg-[#0A2A5E] text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-[#1FC8C8] transition-all">
-              <LayoutDashboard size={14} /> View Dashboard
+              <LayoutDashboard size={14} /> Dashboard
             </a>
           </div>
         )}
         
         <form onSubmit={handleSubmit} className="space-y-6">
           
-          {/* CATEGORY SWITCHER (4 Tabs) */}
+          {/* CATEGORY SWITCHER */}
           <div className="p-1.5 bg-slate-100 rounded-2xl flex gap-1 border border-slate-200">
             {[
               { id: 'event', label: 'Events', icon: <PartyPopper size={14}/> },
               { id: 'job', label: 'Jobs', icon: <Briefcase size={14}/> },
               { id: 'training', label: 'Training', icon: <GraduationCap size={14}/> },
-              { id: 'place', label: 'Discover', icon: <Search size={14}/> }
+              { id: 'place', label: 'Places', icon: <Search size={14}/> }
             ].map((cat) => (
               <button 
                 key={cat.id} 
@@ -134,7 +143,7 @@ export default function AdminAddEvent() {
             </div>
           </div>
 
-          {/* DYNAMIC FIELDS */}
+          {/* DYNAMIC CATEGORY FIELDS */}
           <div className="p-6 bg-slate-50 rounded-[2.5rem] space-y-4 border border-slate-100">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -158,11 +167,38 @@ export default function AdminAddEvent() {
                 <input className={inputClass} placeholder="e.g. Darkuman" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
               </div>
               <div>
-                <label className={labelClass}>GPS / Map Location Name</label>
+                <label className={labelClass}>GPS / Map Search Query</label>
                 <div className="relative">
                   <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                  <input className={`${inputClass} pl-12`} placeholder="Paste GPS or Search Name" value={formData.map_query} onChange={(e) => setFormData({...formData, map_query: e.target.value})} />
+                  <input className={`${inputClass} pl-12`} placeholder="Coordinates or Full Name" value={formData.map_query} onChange={(e) => setFormData({...formData, map_query: e.target.value})} />
                 </div>
+              </div>
+            </div>
+
+            {/* Pricing Section (Shows for all) */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Time Category</label>
+                <select className={inputClass} value={formData.time_category} onChange={(e) => setFormData({...formData, time_category: e.target.value})}>
+                  {['Morning', 'Afternoon', 'Evening', 'Night', 'Full-day', 'All-night'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                 <div className="flex justify-between items-center mb-1.5 px-1">
+                  <label className={labelClass}>{formData.category === 'job' ? 'Salary Range' : 'Entry Price'}</label>
+                  {formData.category === 'job' && (
+                    <label className="flex items-center gap-1 text-[8px] font-black uppercase text-[#1FC8C8] cursor-pointer">
+                      <input type="checkbox" checked={!isSalaryDisclosed} onChange={() => setIsSalaryDisclosed(!isSalaryDisclosed)} /> Undisclosed
+                    </label>
+                  )}
+                </div>
+                <input 
+                  disabled={formData.category === 'job' && !isSalaryDisclosed} 
+                  className={`${inputClass} disabled:opacity-30`} 
+                  placeholder={formData.category === 'job' ? "GHS..." : "Price or Free"} 
+                  value={formData.category === 'job' ? formData.salary_range : formData.price} 
+                  onChange={(e) => formData.category === 'job' ? setFormData({...formData, salary_range: e.target.value}) : setFormData({...formData, price: e.target.value})} 
+                />
               </div>
             </div>
           </div>
@@ -190,14 +226,14 @@ export default function AdminAddEvent() {
                   <input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} />
                 </div>
                 <div>
-                  <label className={labelClass}>External Link</label>
+                  <label className={labelClass}>Action Link (External)</label>
                   <input className={inputClass} placeholder="https://..." value={formData.link} onChange={(e) => setFormData({...formData, link: e.target.value})} />
                 </div>
              </div>
           </div>
 
           <button disabled={loading} className="w-full bg-[#0A2A5E] text-white p-6 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-2xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all disabled:opacity-50 mt-4 flex items-center justify-center gap-3">
-            {loading ? "PROCESSING..." : <><Plus size={18} /> Send to Queue</>}
+            {loading ? "UPLOADING TO QUEUE..." : <><Plus size={18} /> Publish Scout</>}
           </button>
 
         </form>
