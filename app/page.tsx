@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from './lib/supabase'
 import { 
   MapPin, ArrowUpRight, Code2, Palette, Database, 
-  Clock, Megaphone, Send, CircleDollarSign, Printer, Smartphone, 
-  MessageSquare, Phone, Mail, Menu, X, Users, PlayCircle, CheckCircle2
+  CircleDollarSign, Printer, Smartphone, MessageSquare, 
+  Phone, Mail, Menu, X, Users, PlayCircle, CheckCircle2, Send, Megaphone
 } from 'lucide-react'
 
 export default function Home() {
@@ -30,133 +30,163 @@ export default function Home() {
     if (data) setItems(data)
   }
 
+  // --- MAILTO FUNCTION ---
+  const handleMailTo = (e: React.FormEvent) => {
+    e.preventDefault();
+    window.location.href = `mailto:${BUSINESS_EMAIL}?subject=New Inquiry for Precede Concepts`;
+  };
+
   const filteredItems = filter === 'all' 
     ? items 
     : items.filter(i => i.category.toLowerCase() === filter.toLowerCase() || (filter === 'training' && i.category === 'seminar'))
 
+  // ⚡ Slim to 6 items maximum for perfectly fitting rows
+  const displayItems = filteredItems.slice(0, 6);
+
   const categorizedServices = [
-    { title: 'Administrative & Secretarial', icon: <Printer size={24}/>, subServices: ['Printing & Photocopy', 'Document Binding', 'Scanning & Lamination', 'General Office Support'] },
-    { title: 'Graphic Design', icon: <Palette size={24}/>, subServices: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Design', 'Visual Identity'] },
-    { title: 'Digital Solutions', icon: <Code2 size={24}/>, subServices: ['Custom Web Development', 'Backend Architecture', 'API Integrations', 'E-Commerce Setup'] },
-    { title: 'Digital Marketing', icon: <Megaphone size={24}/>, subServices: ['Social Media Management', 'SEO Optimization', 'Content Marketing', 'Targeted Ad Campaigns'] },
-    { title: 'Media Production', icon: <PlayCircle size={24}/>, subServices: ['Content Creation', 'Video Editing', 'Photography Editing', 'Multimedia Storytelling'] },
-    { title: 'Agency Outsourcing', icon: <Users size={24}/>, subServices: ['White-Label Tech Support', 'Remote Secretarial', 'B2B Project Execution', 'Staff Augmentation'] },
+    { title: 'Admin & Secretarial', icon: <Printer size={20}/>, subServices: ['Printing & Photocopy', 'Document Binding', 'Scanning & Laminating'] },
+    { title: 'Graphic Design', icon: <Palette size={20}/>, subServices: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Visuals'] },
+    { title: 'Digital Solutions', icon: <Code2 size={20}/>, subServices: ['Web Development', 'Backend Systems', 'API Integrations'] },
+    { title: 'Digital Marketing', icon: <Megaphone size={20}/>, subServices: ['Social Media Mgt.', 'SEO Optimization', 'Targeted Ads'] },
+    { title: 'Media Production', icon: <PlayCircle size={20}/>, subServices: ['Content Creation', 'Video Editing', 'Photo Retouching'] },
+    { title: 'Agency Outsourcing', icon: <Users size={20}/>, subServices: ['White-Label Tech', 'Remote Assistance', 'B2B Execution'] },
   ]
 
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-950 scroll-smooth overflow-x-hidden">
+    <div className="bg-[#0A2A5E] font-sans text-slate-950 scroll-smooth">
       
       {/* 🧭 NAVIGATION */}
-      <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E] border-b border-white/5 px-4 md:px-8 py-5">
+      <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E]/90 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#1FC8C8] rounded-xl flex items-center justify-center font-black italic text-[#0A2A5E] text-xs shadow-lg">PC</div>
+            <div className="w-8 h-8 bg-[#1FC8C8] rounded-lg flex items-center justify-center font-black italic text-[#0A2A5E] text-[10px] shadow-lg">PC</div>
             <div className="flex flex-col text-left">
-              <span className="text-lg font-black tracking-tighter uppercase italic text-white leading-none">Precede Concepts</span>
-              <span className="text-[7px] font-bold text-[#1FC8C8] tracking-[0.4em] uppercase mt-1">Standard of Execution</span>
+              <span className="text-sm md:text-lg font-black tracking-tighter uppercase italic text-white leading-none">Precede Concepts</span>
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-7 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
-            {['home', 'about', 'services', 'training', 'jobs', 'events'].map((l) => (
+          <div className="hidden lg:flex items-center gap-8 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
+            {['home', 'about', 'services', 'hub'].map((l) => (
                <a key={l} href={`#${l}`} className="hover:text-[#1FC8C8] transition-all">{l}</a>
             ))}
-            <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-6 py-3 rounded-full font-black hover:bg-white transition-all">Contact Us</a>
+            <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2.5 rounded-full font-black hover:bg-white transition-all">Contact Us</a>
           </div>
 
           <button className="lg:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X /> : <Menu />}
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
+
+        {/* MOBILE MENU */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="lg:hidden absolute left-0 top-full w-full bg-[#0A2A5E] border-b border-white/10 p-6 flex flex-col gap-6 text-xs font-black uppercase tracking-widest text-white shadow-2xl">
+              <a href="#home" onClick={() => setIsMenuOpen(false)}>Home</a>
+              <a href="#about" onClick={() => setIsMenuOpen(false)}>About Us</a>
+              <a href="#services" onClick={() => setIsMenuOpen(false)}>Services</a>
+              <a href="#hub" onClick={() => setIsMenuOpen(false)}>Opportunity Hub</a>
+              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-[#1FC8C8]">Contact Us</a>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
-      {/* 🚀 HERO (RESTORED BEAUTY) */}
-      <header id="home" className="h-screen flex items-center justify-center px-6 text-center bg-[#0A2A5E] relative">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-6xl mx-auto w-full">
-          <span className="text-[10px] md:text-[12px] font-black text-[#1FC8C8] uppercase tracking-[0.6em] mb-8 block italic">
+      {/* 🚀 1. HERO (MATCHING THE IMAGE) */}
+      <section id="home" className="min-h-screen lg:h-screen w-full flex items-center justify-center px-6 pt-20 bg-[#0A2A5E] relative overflow-hidden">
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} className="max-w-7xl mx-auto text-center w-full flex flex-col items-center justify-center">
+          
+          <span className="text-[8px] md:text-[10px] lg:text-xs font-black text-[#1FC8C8] uppercase tracking-[0.4em] md:tracking-[0.8em] mb-4 md:mb-6 block italic">
             Simplifying progress, delivering value.
           </span>
           
-          {/* EXACTLY 2 LINES: White text, Teal "Standard" */}
-          <h1 className="text-6xl md:text-[11rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-12 text-white">
-            The <span className="text-[#1FC8C8]">Standard</span> <br/> of execution.
+          <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.9] mb-4 md:mb-8 text-white w-full drop-shadow-lg">
+            THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.
           </h1>
           
-          <p className="text-white/40 max-w-xl mx-auto font-bold text-[10px] md:text-xs uppercase tracking-[0.3em] italic">
+          <p className="text-white/60 font-black text-[8px] md:text-[10px] lg:text-xs uppercase tracking-[0.3em] md:tracking-[0.6em] italic mt-2">
             Progress Simplified — Value Delivered
           </p>
+          
         </motion.div>
-      </header>
+      </section>
 
-      {/* 📖 ABOUT US */}
-      <section id="about" className="py-32 px-6 bg-slate-50 scroll-mt-24">
-        <div className="max-w-5xl mx-auto text-center md:text-left flex flex-col md:flex-row gap-16 items-center">
-          <h2 className="flex-1 text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-[#0A2A5E] leading-tight">Beyond a <br/> Digital Agency.</h2>
-          <div className="flex-[1.5] border-l-8 border-[#1FC8C8] pl-8">
-             <p className="text-slate-600 font-medium text-lg md:text-xl leading-relaxed italic mb-8">
-               Precede Concepts is a multifaceted digital agency and community platform designed to bridge the gap between high-end professional services and accessible "hustle-friendly" solutions in Ghana.
+      {/* 📖 2. ABOUT US (Teal) */}
+      <section id="about" className="min-h-screen lg:h-screen w-full flex items-center justify-center px-6 pt-20 bg-[#1FC8C8]">
+        <div className="max-w-6xl mx-auto w-full flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+          <h2 className="lg:flex-1 text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-[#0A2A5E] leading-none text-center lg:text-left">
+            Beyond a <br/> Digital Agency.
+          </h2>
+          <div className="lg:flex-[1.5] border-l-4 lg:border-l-8 border-[#0A2A5E] pl-6 lg:pl-10 text-center lg:text-left">
+             <p className="text-[#0A2A5E] font-black text-lg md:text-2xl leading-relaxed italic mb-6">
+               Precede Concepts bridges the gap between high-end professional services and accessible "hustle-friendly" solutions in Ghana.
              </p>
-             <p className="text-slate-400 text-sm font-bold uppercase tracking-widest leading-loose">
-               It operates as a dual-purpose ecosystem: a Primary Business providing digital/multimedia services and a Secondary/CSR Hub that drives traffic by offering community resources.
+             <p className="text-[#0A2A5E]/70 text-xs md:text-sm font-black uppercase tracking-[0.2em] leading-loose">
+               We operate a dual-purpose ecosystem: A primary business executing top-tier digital & multimedia services, and a CSR Hub driving traffic by curating vital community resources.
              </p>
           </div>
         </div>
       </section>
 
-      {/* 🏛️ CATEGORIZED SERVICES WITH SUB-SERVICES */}
-      <section id="services" className="py-32 px-6 max-w-7xl mx-auto scroll-mt-24">
-        <div className="text-center mb-20">
-           <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-[#0A2A5E] mb-4">Our Services.</h2>
-           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">Comprehensive Business Solutions</p>
-        </div>
+      {/* 🏛️ 3. SERVICES (White) */}
+      <section id="services" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-24 pb-12 bg-white">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="text-center mb-10 lg:mb-16">
+             <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-[#0A2A5E] mb-3">Our Services.</h2>
+             <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">Comprehensive Business Solutions</p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categorizedServices.map((cat, i) => (
-            <div key={i} className="p-10 bg-white border border-slate-100 rounded-[3rem] transition-all hover:border-[#1FC8C8] hover:shadow-2xl text-left flex flex-col">
-              <div className="text-[#0F4C81] mb-6 flex justify-start">{cat.icon}</div>
-              <h3 className="text-2xl font-black uppercase italic leading-tight text-[#0A2A5E] mb-6">{cat.title}</h3>
-              <ul className="space-y-4 flex-1">
-                {cat.subServices.map((sub, idx) => (
-                   <li key={idx} className="flex items-start gap-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-                      <CheckCircle2 size={14} className="text-[#1FC8C8] mt-0.5 flex-shrink-0"/>
-                      {sub}
-                   </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            {categorizedServices.map((cat, i) => (
+              <div key={i} className="p-6 lg:p-8 bg-slate-50 border border-slate-100 rounded-3xl hover:border-[#1FC8C8] hover:shadow-xl transition-all flex flex-col">
+                <div className="flex items-center gap-4 mb-5 pb-5 border-b border-slate-200/50">
+                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#0F4C81] shadow-sm flex-shrink-0">{cat.icon}</div>
+                  <h3 className="text-sm md:text-base font-black uppercase italic leading-tight text-[#0A2A5E]">{cat.title}</h3>
+                </div>
+                <ul className="space-y-3 flex-1">
+                  {cat.subServices.map((sub, idx) => (
+                     <li key={idx} className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                        <CheckCircle2 size={12} className="text-[#1FC8C8] flex-shrink-0"/>
+                        {sub}
+                     </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ⚡ OPPORTUNITY HUB */}
-      <section id="training" className="py-32 bg-[#0F4C81] px-6 scroll-mt-24 rounded-t-[5rem] md:rounded-t-[10rem]">
-        <div id="jobs" className="scroll-mt-32"></div>
-        <div id="events" className="scroll-mt-32"></div>
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
-            <h2 className="text-4xl font-black uppercase italic text-white tracking-tighter underline decoration-[#1FC8C8] underline-offset-8">Opportunity Hub</h2>
-            <div className="flex flex-wrap justify-center gap-2 bg-black/20 p-2 rounded-full">
+      {/* ⚡ 4. OPPORTUNITY HUB (Mid Blue) */}
+      <section id="hub" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-24 pb-12 bg-[#0F4C81]">
+        <div className="w-full max-w-7xl mx-auto flex flex-col h-full justify-center">
+          
+          <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+            <h2 className="text-3xl md:text-4xl font-black uppercase italic text-white tracking-tighter">Opportunity Hub</h2>
+            <div className="flex flex-wrap justify-center gap-2 bg-black/20 p-1.5 rounded-full">
               {['all', 'job', 'event', 'training'].map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/60 hover:text-white'}`}>{f}s</button>
+                <button key={f} onClick={() => setFilter(f)} className={`px-5 py-2 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/60 hover:text-white'}`}>{f}s</button>
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-             {filteredItems.map((item) => (
-               <div key={item.id} className="bg-white rounded-[2.5rem] overflow-hidden flex flex-col border border-white/5 shadow-2xl h-full">
-                  <div className="h-44 bg-slate-900 relative">
-                    {item.image_url ? <img src={item.image_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-black italic text-slate-800 text-[10px] uppercase">Precede</div>}
-                    <span className="absolute top-4 left-4 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-3 py-1.5 rounded-full uppercase tracking-widest">{item.category}</span>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+             {displayItems.length === 0 ? (
+               <div className="col-span-full text-center py-10 text-white/50 text-xs font-black uppercase tracking-widest">No scouts available in this category.</div>
+             ) : displayItems.map((item) => (
+               <div key={item.id} className="bg-white rounded-3xl overflow-hidden flex flex-col shadow-2xl h-full border-2 border-transparent hover:border-[#1FC8C8] transition-all">
+                  <div className="h-32 lg:h-40 bg-slate-900 relative">
+                    {item.image_url ? <img src={item.image_url} className="w-full h-full object-cover" alt="flyer" /> : <div className="w-full h-full flex items-center justify-center font-black italic text-slate-800 text-[10px] uppercase">Precede</div>}
+                    <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2.5 py-1 rounded-full uppercase tracking-widest">{item.category}</span>
                   </div>
-                  <div className="p-6 text-left flex flex-col justify-between flex-1">
-                     <h4 className="font-black text-[13px] text-[#0A2A5E] mb-4 line-clamp-2 uppercase italic tracking-tight leading-snug">{item.title}</h4>
-                     <div className="space-y-3 pt-4 border-t border-slate-50">
+                  <div className="p-5 text-left flex flex-col justify-between flex-1">
+                     <h4 className="font-black text-xs md:text-sm text-[#0A2A5E] mb-4 line-clamp-2 uppercase italic leading-snug">{item.title}</h4>
+                     <div className="space-y-2 pt-3 border-t border-slate-100">
                         <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase truncate"><MapPin size={12} className="text-[#0F4C81] flex-shrink-0"/> {item.venue || 'Various Locations'}</div>
                         <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-2 text-[11px] font-black text-[#0F4C81] uppercase tracking-tighter"><CircleDollarSign size={13}/> {item.price || item.salary_range || 'Free'}</div>
-                           <a href={item.link} target="_blank" className="p-3 bg-slate-50 rounded-full text-[#0A2A5E] hover:bg-[#0A2A5E] hover:text-white transition-all shadow-sm"><ArrowUpRight size={16}/></a>
+                           <div className="flex items-center gap-2 text-[10px] font-black text-[#0F4C81] uppercase tracking-tighter"><CircleDollarSign size={12}/> {item.price || item.salary_range || 'Free'}</div>
+                           <a href={item.link} target="_blank" className="p-2 bg-slate-50 rounded-full text-[#0A2A5E] hover:bg-[#0F4C81] hover:text-white transition-all shadow-sm"><ArrowUpRight size={14}/></a>
                         </div>
                      </div>
                   </div>
@@ -166,46 +196,54 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 💬 CONTACT SECTION (CLEAN UI) */}
-      <section id="contact" className="py-32 px-6 bg-[#1FC8C8] scroll-mt-24">
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-          <div className="text-left text-[#0A2A5E]">
-            <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter mb-10 leading-none">Move ahead, <br/> stay ahead.</h2>
-            <div className="space-y-6 mb-12">
-               <div className="flex items-center gap-5"><div className="p-5 bg-white/30 rounded-3xl"><Phone size={24}/></div><span className="text-2xl font-black italic">{BUSINESS_PHONE}</span></div>
-               <div className="flex items-center gap-5"><div className="p-5 bg-white/30 rounded-3xl"><Mail size={24}/></div><span className="text-2xl font-black italic truncate">{BUSINESS_EMAIL}</span></div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-               <a href={WHATSAPP_DIRECT} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-7 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl hover:scale-105 transition-all">
-                  <MessageSquare size={18}/> WhatsApp Direct
-               </a>
-               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex-1 flex items-center justify-center gap-3 p-7 bg-white text-[#0A2A5E] rounded-[2rem] font-black uppercase text-[10px] tracking-widest shadow-2xl hover:scale-105 transition-all">
-                  <Smartphone size={18}/> Join Channel
-               </a>
-            </div>
+      {/* 💬 5. CONTACT (Deep Blue) */}
+      <section id="contact" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-20 pb-10 bg-[#0A2A5E] relative">
+        <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center flex-1">
+          
+          <div className="text-center lg:text-left text-white">
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-tighter mb-6 leading-none">
+              Move ahead, <br/> stay ahead.
+            </h2>
+            <p className="text-[#1FC8C8] font-bold text-[10px] md:text-xs uppercase tracking-[0.3em] italic">
+              Progress Simplified — Value Delivered
+            </p>
           </div>
 
-          {/* BEAUTIFUL, SIMPLE EMAIL BUTTON */}
-          <div className="bg-white p-12 md:p-16 rounded-[4rem] shadow-3xl text-center flex flex-col justify-center items-center border border-[#0A2A5E]/5">
-             <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-8">
-               <Mail size={40} className="text-[#1FC8C8]" />
+          <div className="flex flex-col gap-6 lg:gap-8 text-left bg-white/5 p-8 lg:p-12 rounded-[3rem] border border-white/10 backdrop-blur-sm">
+             
+             <div className="flex flex-col sm:flex-row gap-6 lg:gap-8 mb-2">
+               <div className="flex items-center gap-4 text-white">
+                  <div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8]"><Phone size={24}/></div>
+                  <div className="flex flex-col"><span className="text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Call Us</span><span className="text-lg font-black italic">{BUSINESS_PHONE}</span></div>
+               </div>
+               <div className="flex items-center gap-4 text-white">
+                  <div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8]"><Mail size={24}/></div>
+                  <div className="flex flex-col"><span className="text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Email Us</span><span className="text-lg font-black italic truncate">{BUSINESS_EMAIL}</span></div>
+               </div>
              </div>
-             <h3 className="text-3xl font-black uppercase italic text-[#0A2A5E] mb-4">Send an Enquiry</h3>
-             <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest mb-10 leading-relaxed max-w-sm">
-               Click below to open your preferred email app and message our team directly. We respond within 24 hours.
-             </p>
-             <a href={`mailto:${BUSINESS_EMAIL}?subject=New Inquiry for Precede Concepts`} className="w-full px-8 py-7 bg-[#0A2A5E] text-white rounded-[2rem] font-black uppercase text-xs md:text-sm tracking-[0.4em] shadow-2xl hover:bg-[#0F4C81] transition-all flex items-center justify-center gap-3">
-                <Send size={20} /> Send an Email
-             </a>
+
+             <div className="grid grid-cols-2 gap-4">
+               <a href={WHATSAPP_DIRECT} target="_blank" className="flex items-center justify-center gap-2 p-4 md:p-5 bg-white text-[#0A2A5E] rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-[#1FC8C8] transition-all">
+                  <MessageSquare size={16}/> WhatsApp
+               </a>
+               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex items-center justify-center gap-2 p-4 md:p-5 bg-white/10 text-white rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-white/20 transition-all">
+                  <Smartphone size={16}/> Channel
+               </a>
+             </div>
+
+             <button onClick={handleMailTo} className="w-full py-5 md:py-6 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl font-black uppercase text-xs tracking-[0.3em] hover:bg-white transition-all flex justify-center items-center gap-3 mt-2 shadow-[0_0_30px_rgba(31,200,200,0.3)]">
+                <Send size={18} /> Send an Email
+             </button>
+
           </div>
+        </div>
+
+        <div className="w-full flex flex-col md:flex-row justify-between items-center mt-12 pt-6 border-t border-white/10 text-center gap-4">
+           <span className="text-[#1FC8C8] font-black italic uppercase text-lg tracking-tighter">Precede Concepts</span>
+           <span className="text-white/30 text-[8px] font-black uppercase tracking-[0.5em]">Accra Ghana &middot; &copy; 2026</span>
         </div>
       </section>
 
-      {/* 🏛️ FOOTER */}
-      <footer className="py-20 bg-[#0A2A5E] text-center px-6">
-        <span className="text-[#1FC8C8] font-black italic uppercase text-2xl tracking-tighter">Precede Concepts</span>
-        <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.6em] mt-4">Designed by Precede Concepts 2026 &middot; Accra Ghana</p>
-      </footer>
     </div>
   )
 }
