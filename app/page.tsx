@@ -5,7 +5,7 @@ import { supabase } from './lib/supabase'
 import { 
   MapPin, ArrowUpRight, Code2, Palette, Database, 
   CircleDollarSign, Printer, Smartphone, Phone, Mail, 
-  Menu, X, Users, PlayCircle, CheckCircle2, Send, Megaphone
+  Menu, X, Users, PlayCircle, CheckCircle2, Send, Megaphone, Sparkles
 } from 'lucide-react'
 
 // --- CUSTOM WHATSAPP SVG ICON ---
@@ -20,6 +20,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [filter, setFilter] = useState('all')
+  const [visibleCount, setVisibleCount] = useState(18) // Desktop rows: 6 cols * 3 rows
 
   // --- BUSINESS INFO ---
   const WHATSAPP_DIRECT = "https://wa.me/233591999544"
@@ -33,7 +34,7 @@ export default function Home() {
   }, [])
 
   async function fetchApproved() {
-    const { data } = await supabase.from('jobs').select('*').eq('status', 'approved').order('is_featured', { ascending: false })
+    const { data } = await supabase.from('jobs').select('*').eq('status', 'approved').order('created_at', { ascending: false })
     if (data) setItems(data)
   }
 
@@ -42,11 +43,14 @@ export default function Home() {
     window.location.href = `mailto:${BUSINESS_EMAIL}?subject=New Inquiry for Precede Concepts`;
   };
 
+  // Logic for Featured "Our Picks" (limited to top 6)
+  const featuredItems = items.filter(i => i.is_featured === true).slice(0, 6);
+
   const filteredItems = filter === 'all' 
     ? items 
     : items.filter(i => i.category.toLowerCase() === filter.toLowerCase() || (filter === 'training' && i.category === 'seminar'))
 
-  const displayItems = filteredItems.slice(0, 6);
+  const displayItems = filteredItems.slice(0, visibleCount);
 
   const categorizedServices = [
     { title: 'Admin & Secretarial', icon: <Printer size={20}/>, subServices: ['Printing & Photocopy', 'Document Binding', 'Scanning & Laminating'] },
@@ -96,7 +100,6 @@ export default function Home() {
             {standardLinks.map((link) => (
                <a key={link.name} href={link.href} className="hover:text-[#1FC8C8] transition-all">{link.name}</a>
             ))}
-            {/* Auto-filtering Hub Links */}
             {hubLinks.map((link) => (
                <a 
                  key={link.name} 
@@ -115,7 +118,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* MOBILE MENU */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="xl:hidden absolute left-0 top-full w-full bg-[#0A2A5E] border-b border-white/10 p-6 flex flex-col gap-6 text-xs font-black uppercase tracking-widest text-white shadow-2xl">
@@ -169,7 +171,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🏛️ 3. SERVICES (Scroll Fixed) */}
+      {/* 🏛️ 3. SERVICES */}
       <section id="services" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-28 pb-12 bg-white scroll-mt-10 lg:scroll-mt-0">
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-10 lg:mb-16">
@@ -197,17 +199,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ⚡ 4. OPPORTUNITY HUB (Fixed Filters) */}
-      <section id="hub" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-4 md:px-6 pt-24 pb-12 bg-[#0F4C81] scroll-mt-0">
-        <div className="w-full max-w-[1400px] mx-auto flex flex-col h-full justify-center">
+      {/* ⚡ 4. OPPORTUNITY HUB */}
+      <section id="hub" className="min-h-screen w-full flex flex-col items-center px-4 md:px-6 pt-24 pb-20 bg-[#0F4C81] scroll-mt-0">
+        <div className="w-full max-w-[1400px] mx-auto flex flex-col">
           
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
             <h2 className="text-3xl md:text-4xl font-black uppercase italic text-white tracking-tighter">Opportunity Hub</h2>
             <div className="flex flex-wrap justify-center gap-2 bg-black/20 p-1.5 rounded-full">
               {hubFilters.map((f) => (
                 <button 
                   key={f.id} 
-                  onClick={() => setFilter(f.id)} 
+                  onClick={() => {setFilter(f.id); setVisibleCount(18);}} 
                   className={`px-5 py-2 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${filter === f.id ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/60 hover:text-white'}`}
                 >
                   {f.label}
@@ -215,37 +217,54 @@ export default function Home() {
               ))}
             </div>
           </div>
+
+          {/* 🔥 SECTION: OUR PICKS (Featured Items) */}
+          {featuredItems.length > 0 && filter === 'all' && (
+            <div className="mb-16">
+              <div className="flex items-center gap-3 mb-6">
+                <Sparkles size={18} className="text-[#1FC8C8]" />
+                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-[#1FC8C8] italic">Our Top Picks</h3>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
+                {featuredItems.map((item) => (
+                   <ScoutCard key={`featured-${item.id}`} item={item} isFeatured={true} />
+                ))}
+              </div>
+              <div className="h-px w-full bg-white/10 mt-16"></div>
+            </div>
+          )}
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
-             {displayItems.length === 0 ? (
-               <div className="col-span-full text-center py-10 text-white/50 text-xs font-black uppercase tracking-widest">No listings available in this category.</div>
-             ) : displayItems.map((item) => (
-               <div key={item.id} className="bg-white rounded-2xl md:rounded-3xl overflow-hidden flex flex-col shadow-2xl h-full border-2 border-transparent hover:border-[#1FC8C8] transition-all">
-                  <div className="h-28 lg:h-32 bg-slate-900 relative">
-                    {item.image_url ? <img src={item.image_url} className="w-full h-full object-cover" alt="flyer" /> : <div className="w-full h-full flex items-center justify-center font-black italic text-slate-800 text-[10px] uppercase">Precede</div>}
-                    <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 rounded-full uppercase tracking-widest">{item.category}</span>
-                  </div>
-                  <div className="p-3 lg:p-4 text-left flex flex-col justify-between flex-1">
-                     <h4 className="font-black text-[10px] lg:text-[11px] text-[#0A2A5E] mb-3 line-clamp-2 uppercase italic leading-snug">{item.title}</h4>
-                     <div className="space-y-2 pt-2 border-t border-slate-100">
-                        <div className="flex items-center gap-1.5 text-[8px] font-bold text-slate-400 uppercase truncate"><MapPin size={10} className="text-[#0F4C81] flex-shrink-0"/> {item.venue || 'Various Locations'}</div>
-                        <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-1.5 text-[9px] font-black text-[#0F4C81] uppercase tracking-tighter"><CircleDollarSign size={10}/> {item.price || item.salary_range || 'Free'}</div>
-                           <a href={item.link} target="_blank" className="p-1.5 bg-slate-50 rounded-full text-[#0A2A5E] hover:bg-[#0F4C81] hover:text-white transition-all shadow-sm"><ArrowUpRight size={12}/></a>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-             ))}
+          {/* 🧩 SECTION: LATEST DISCOVERIES (Grid of 18) */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-6">
+               <h3 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 italic">Latest Discoveries</h3>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
+               {displayItems.length === 0 ? (
+                 <div className="col-span-full text-center py-10 text-white/50 text-xs font-black uppercase tracking-widest">No listings available in this category.</div>
+               ) : displayItems.map((item) => (
+                 <ScoutCard key={item.id} item={item} />
+               ))}
+            </div>
           </div>
+
+          {/* VIEW MORE BUTTON */}
+          {filteredItems.length > visibleCount && (
+            <div className="flex justify-center mt-12">
+              <button 
+                onClick={() => setVisibleCount(prev => prev + 18)}
+                className="px-10 py-4 bg-white/10 border border-white/20 text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.4em] hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all"
+              >
+                View More Opportunities
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
       {/* 💬 5. CONTACT & FOOTER */}
       <section id="contact" className="h-screen w-full flex flex-col justify-between px-6 pt-24 pb-6 bg-[#0A2A5E] relative overflow-hidden">
-        
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-16 items-center flex-1">
-          
           <div className="text-center lg:text-left text-white w-full flex flex-col items-center lg:items-start justify-center">
             <h2 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter uppercase italic leading-[0.9] mb-3 md:mb-5 text-white w-full drop-shadow-lg">
               MOVE AHEAD, <br/>
@@ -257,7 +276,6 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col gap-5 text-left bg-white/5 p-6 lg:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-white/10 backdrop-blur-sm">
-             
              <div className="flex flex-col gap-4 md:gap-5 mb-2">
                <div className="flex items-center gap-4 text-white">
                   <div className="p-3 md:p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Phone size={20}/></div>
@@ -266,7 +284,6 @@ export default function Home() {
                      <span className="text-xl md:text-3xl font-black italic">{BUSINESS_PHONE}</span>
                   </div>
                </div>
-               
                <div className="flex items-center gap-4 text-white">
                   <div className="p-3 md:p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Mail size={20}/></div>
                   <div className="flex flex-col min-w-0">
@@ -288,7 +305,6 @@ export default function Home() {
              <button onClick={handleMailTo} className="w-full py-4 md:py-5 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl font-black uppercase text-[10px] md:text-xs tracking-[0.3em] hover:bg-white transition-all flex justify-center items-center gap-3 shadow-[0_0_20px_rgba(31,200,200,0.2)]">
                 <Send size={16} /> Send an Email
              </button>
-
           </div>
         </div>
 
@@ -296,9 +312,40 @@ export default function Home() {
            <span className="text-[#1FC8C8] font-black italic uppercase text-base tracking-tighter">Precede Concepts</span>
            <span className="text-white/30 text-[7px] md:text-[8px] font-black uppercase tracking-[0.5em]">Accra Ghana &middot; &copy; 2026</span>
         </div>
-        
       </section>
+    </div>
+  )
+}
 
+// --- REUSABLE SCOUT CARD COMPONENT ---
+function ScoutCard({ item, isFeatured = false }: { item: any, isFeatured?: boolean }) {
+  return (
+    <div className={`group bg-white rounded-2xl md:rounded-3xl overflow-hidden flex flex-col shadow-2xl h-full border-2 ${isFeatured ? 'border-[#1FC8C8] ring-4 ring-[#1FC8C8]/10' : 'border-transparent'} hover:scale-[1.02] transition-all duration-300`}>
+      <div className="h-28 lg:h-32 bg-slate-900 relative overflow-hidden">
+        {item.image_url ? (
+          <img src={item.image_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="flyer" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center font-black italic text-slate-800 text-[10px] uppercase">Precede</div>
+        )}
+        <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 rounded-full uppercase tracking-widest">{item.category}</span>
+        {isFeatured && <div className="absolute top-2 right-2 text-[#1FC8C8] drop-shadow-md"><Sparkles size={12} fill="currentColor"/></div>}
+      </div>
+      <div className="p-3 lg:p-4 text-left flex flex-col justify-between flex-1">
+        <h4 className="font-black text-[10px] lg:text-[11px] text-[#0A2A5E] mb-3 line-clamp-2 uppercase italic leading-snug">{item.title}</h4>
+        <div className="space-y-2 pt-2 border-t border-slate-100">
+          <div className="flex items-center gap-1.5 text-[8px] font-bold text-slate-400 uppercase truncate">
+            <MapPin size={10} className="text-[#0F4C81] flex-shrink-0"/> {item.venue || 'Various Locations'}
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-[9px] font-black text-[#0F4C81] uppercase tracking-tighter">
+              <CircleDollarSign size={10}/> {item.price || item.salary_range || 'Free Access'}
+            </div>
+            <a href={item.link} target="_blank" className="p-1.5 bg-slate-50 rounded-full text-[#0A2A5E] hover:bg-[#0F4C81] hover:text-white transition-all shadow-sm">
+              <ArrowUpRight size={12}/>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
