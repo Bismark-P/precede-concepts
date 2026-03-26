@@ -93,7 +93,7 @@ export default function Home() {
         </AnimatePresence>
       </nav>
 
-      {/* 🚀 1. HERO (MATCHING THE IMAGE) */}
+      {/* 🚀 1. HERO */}
       <section id="home" className="min-h-screen lg:h-screen w-full flex items-center justify-center px-6 pt-20 bg-[#0A2A5E] relative overflow-hidden">
         <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} className="max-w-7xl mx-auto text-center w-full flex flex-col items-center justify-center">
           
@@ -112,7 +112,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* 📖 2. ABOUT US (Teal) */}
+      {/* 📖 2. ABOUT US */}
       <section id="about" className="min-h-screen lg:h-screen w-full flex items-center justify-center px-6 pt-20 bg-[#1FC8C8]">
         <div className="max-w-6xl mx-auto w-full flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
           <h2 className="lg:flex-1 text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-[#0A2A5E] leading-none text-center lg:text-left">
@@ -129,7 +129,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🏛️ 3. SERVICES (White) */}
+      {/* 🏛️ 3. SERVICES */}
       <section id="services" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-24 pb-12 bg-white">
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-10 lg:mb-16">
@@ -158,7 +158,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ⚡ 4. OPPORTUNITY HUB (Mid Blue) */}
+      {/* ⚡ 4. OPPORTUNITY HUB */}
       <section id="hub" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-24 pb-12 bg-[#0F4C81]">
         <div className="w-full max-w-7xl mx-auto flex flex-col h-full justify-center">
           
@@ -196,38 +196,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 💬 5. CONTACT (Deep Blue) */}
-      <section id="contact" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-20 pb-10 bg-[#0A2A5E] relative">
-        <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center flex-1">
+      {/* 💬 5. CONTACT */}
+      <section id="contact" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-20 pb-10 bg-[#0A2A5E] relative overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-16 items-center flex-1">
           
-          <div className="text-center lg:text-left text-white">
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase italic tracking-tighter mb-6 leading-none">
-              Move ahead, <br/> stay ahead.
+          {/* LEFT: Matches Home Page Typography */}
+          <div className="text-center lg:text-left text-white w-full flex flex-col items-center lg:items-start justify-center">
+            <h2 className="text-5xl md:text-8xl lg:text-[7.5rem] font-black tracking-tighter uppercase italic leading-[0.85] mb-4 md:mb-6 text-white w-full drop-shadow-lg">
+              MOVE <span className="text-[#1FC8C8]">AHEAD,</span> <br/> STAY AHEAD.
             </h2>
-            <p className="text-[#1FC8C8] font-bold text-[10px] md:text-xs uppercase tracking-[0.3em] italic">
+            <p className="text-white/60 font-black text-[8px] md:text-[10px] lg:text-xs uppercase tracking-[0.3em] md:tracking-[0.6em] italic mt-2">
               Progress Simplified — Value Delivered
             </p>
           </div>
 
-          <div className="flex flex-col gap-6 lg:gap-8 text-left bg-white/5 p-8 lg:p-12 rounded-[3rem] border border-white/10 backdrop-blur-sm">
+          {/* RIGHT: Contact Information Stack */}
+          <div className="flex flex-col gap-6 text-left bg-white/5 p-8 lg:p-12 rounded-[3rem] border border-white/10 backdrop-blur-sm">
              
-             <div className="flex flex-col sm:flex-row gap-6 lg:gap-8 mb-2">
+             {/* Vertically Stacked Phone and Email */}
+             <div className="flex flex-col gap-6 mb-4">
                <div className="flex items-center gap-4 text-white">
-                  <div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8]"><Phone size={24}/></div>
-                  <div className="flex flex-col"><span className="text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Call Us</span><span className="text-lg font-black italic">{BUSINESS_PHONE}</span></div>
+                  <div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Phone size={24}/></div>
+                  <div className="flex flex-col">
+                     <span className="text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Call Us</span>
+                     <span className="text-2xl md:text-3xl font-black italic">{BUSINESS_PHONE}</span>
+                  </div>
                </div>
+               
                <div className="flex items-center gap-4 text-white">
-                  <div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8]"><Mail size={24}/></div>
-                  <div className="flex flex-col"><span className="text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Email Us</span><span className="text-lg font-black italic truncate">{BUSINESS_EMAIL}</span></div>
+                  <div className="p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Mail size={24}/></div>
+                  <div className="flex flex-col min-w-0">
+                     <span className="text-[8px] font-black uppercase tracking-widest text-[#1FC8C8]">Email Us</span>
+                     {/* break-all prevents long emails from overflowing the card on mobile */}
+                     <span className="text-sm sm:text-lg md:text-xl font-black italic break-all">{BUSINESS_EMAIL}</span>
+                  </div>
                </div>
              </div>
 
-             <div className="grid grid-cols-2 gap-4">
-               <a href={WHATSAPP_DIRECT} target="_blank" className="flex items-center justify-center gap-2 p-4 md:p-5 bg-white text-[#0A2A5E] rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-[#1FC8C8] transition-all">
-                  <MessageSquare size={16}/> WhatsApp
+             {/* WhatsApp Buttons Grid */}
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <a href={WHATSAPP_DIRECT} target="_blank" className="flex items-center justify-center gap-2 p-4 md:p-5 bg-white text-[#0A2A5E] rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-[#1FC8C8] transition-all text-center">
+                  <MessageSquare size={16} className="flex-shrink-0"/> WhatsApp Message
                </a>
-               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex items-center justify-center gap-2 p-4 md:p-5 bg-white/10 text-white rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-white/20 transition-all">
-                  <Smartphone size={16}/> Channel
+               <a href={WHATSAPP_CHANNEL} target="_blank" className="flex items-center justify-center gap-2 p-4 md:p-5 bg-white/10 text-white rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-white/20 transition-all text-center">
+                  <Smartphone size={16} className="flex-shrink-0"/> Join WhatsApp Channel
                </a>
              </div>
 
@@ -238,7 +250,8 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full flex flex-col md:flex-row justify-between items-center mt-12 pt-6 border-t border-white/10 text-center gap-4">
+        {/* COMPACT CENTERED FOOTER */}
+        <div className="w-full flex flex-col items-center justify-center mt-12 pt-6 border-t border-white/10 text-center gap-2">
            <span className="text-[#1FC8C8] font-black italic uppercase text-lg tracking-tighter">Precede Concepts</span>
            <span className="text-white/30 text-[8px] font-black uppercase tracking-[0.5em]">Accra Ghana &middot; &copy; 2026</span>
         </div>
