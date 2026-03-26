@@ -37,7 +37,6 @@ export default function Home() {
     if (data) setItems(data)
   }
 
-  // --- MAILTO FUNCTION ---
   const handleMailTo = (e: React.FormEvent) => {
     e.preventDefault();
     window.location.href = `mailto:${BUSINESS_EMAIL}?subject=New Inquiry for Precede Concepts`;
@@ -47,7 +46,6 @@ export default function Home() {
     ? items 
     : items.filter(i => i.category.toLowerCase() === filter.toLowerCase() || (filter === 'training' && i.category === 'seminar'))
 
-  // ⚡ Slim to 6 items maximum for perfectly fitting rows
   const displayItems = filteredItems.slice(0, 6);
 
   const categorizedServices = [
@@ -58,6 +56,26 @@ export default function Home() {
     { title: 'Media Production', icon: <PlayCircle size={20}/>, subServices: ['Content Creation', 'Video Editing', 'Photo Retouching'] },
     { title: 'Agency Outsourcing', icon: <Users size={20}/>, subServices: ['White-Label Tech', 'Remote Assistance', 'B2B Execution'] },
   ]
+
+  // --- NAVIGATION LINKS SETUP ---
+  const standardLinks = [
+    { name: 'Home', href: '#home' },
+    { name: 'About Us', href: '#about' },
+    { name: 'Services', href: '#services' },
+  ];
+
+  const hubLinks = [
+    { name: 'Training & Seminars', filterId: 'training' },
+    { name: 'Jobs', filterId: 'job' },
+    { name: 'Events', filterId: 'event' },
+  ];
+
+  const hubFilters = [
+    { id: 'all', label: 'All' },
+    { id: 'training', label: 'Training & Seminars' },
+    { id: 'job', label: 'Jobs' },
+    { id: 'event', label: 'Events' },
+  ];
 
   if (!mounted) return null
 
@@ -74,14 +92,25 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-8 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
-            {['home', 'about', 'services', 'hub'].map((l) => (
-               <a key={l} href={`#${l}`} className="hover:text-[#1FC8C8] transition-all">{l}</a>
+          <div className="hidden xl:flex items-center gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
+            {standardLinks.map((link) => (
+               <a key={link.name} href={link.href} className="hover:text-[#1FC8C8] transition-all">{link.name}</a>
             ))}
-            <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2.5 rounded-full font-black hover:bg-white transition-all">Contact Us</a>
+            {/* Auto-filtering Hub Links */}
+            {hubLinks.map((link) => (
+               <a 
+                 key={link.name} 
+                 href="#hub" 
+                 onClick={() => setFilter(link.filterId)}
+                 className="hover:text-[#1FC8C8] transition-all"
+               >
+                 {link.name}
+               </a>
+            ))}
+            <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2.5 rounded-full font-black hover:bg-white transition-all ml-2">Contact Us</a>
           </div>
 
-          <button className="lg:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button className="xl:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -89,11 +118,19 @@ export default function Home() {
         {/* MOBILE MENU */}
         <AnimatePresence>
           {isMenuOpen && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="lg:hidden absolute left-0 top-full w-full bg-[#0A2A5E] border-b border-white/10 p-6 flex flex-col gap-6 text-xs font-black uppercase tracking-widest text-white shadow-2xl">
-              <a href="#home" onClick={() => setIsMenuOpen(false)}>Home</a>
-              <a href="#about" onClick={() => setIsMenuOpen(false)}>About Us</a>
-              <a href="#services" onClick={() => setIsMenuOpen(false)}>Services</a>
-              <a href="#hub" onClick={() => setIsMenuOpen(false)}>Opportunity Hub</a>
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="xl:hidden absolute left-0 top-full w-full bg-[#0A2A5E] border-b border-white/10 p-6 flex flex-col gap-6 text-xs font-black uppercase tracking-widest text-white shadow-2xl">
+              {standardLinks.map((link) => (
+                 <a key={link.name} href={link.href} onClick={() => setIsMenuOpen(false)}>{link.name}</a>
+              ))}
+              {hubLinks.map((link) => (
+                 <a 
+                   key={link.name} 
+                   href="#hub" 
+                   onClick={() => { setFilter(link.filterId); setIsMenuOpen(false); }}
+                 >
+                   {link.name}
+                 </a>
+              ))}
               <a href="#contact" onClick={() => setIsMenuOpen(false)} className="text-[#1FC8C8]">Contact Us</a>
             </motion.div>
           )}
@@ -132,8 +169,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🏛️ 3. SERVICES */}
-      <section id="services" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-24 pb-12 bg-white">
+      {/* 🏛️ 3. SERVICES (Scroll Fixed) */}
+      <section id="services" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-6 pt-28 pb-12 bg-white scroll-mt-10 lg:scroll-mt-0">
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-10 lg:mb-16">
              <h2 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter text-[#0A2A5E] mb-3">Our Services.</h2>
@@ -160,23 +197,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ⚡ 4. OPPORTUNITY HUB (6 IN A ROW ON PC) */}
-      <section id="hub" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-4 md:px-6 pt-24 pb-12 bg-[#0F4C81]">
+      {/* ⚡ 4. OPPORTUNITY HUB (Fixed Filters) */}
+      <section id="hub" className="min-h-screen lg:h-screen w-full flex flex-col items-center justify-center px-4 md:px-6 pt-24 pb-12 bg-[#0F4C81] scroll-mt-0">
         <div className="w-full max-w-[1400px] mx-auto flex flex-col h-full justify-center">
           
           <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
             <h2 className="text-3xl md:text-4xl font-black uppercase italic text-white tracking-tighter">Opportunity Hub</h2>
             <div className="flex flex-wrap justify-center gap-2 bg-black/20 p-1.5 rounded-full">
-              {['all', 'job', 'event', 'training'].map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-5 py-2 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/60 hover:text-white'}`}>{f}s</button>
+              {hubFilters.map((f) => (
+                <button 
+                  key={f.id} 
+                  onClick={() => setFilter(f.id)} 
+                  className={`px-5 py-2 rounded-full text-[8px] font-black uppercase tracking-widest transition-all ${filter === f.id ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/60 hover:text-white'}`}
+                >
+                  {f.label}
+                </button>
               ))}
             </div>
           </div>
           
-          {/* 6 Grid columns for lg screens */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
              {displayItems.length === 0 ? (
-               <div className="col-span-full text-center py-10 text-white/50 text-xs font-black uppercase tracking-widest">No scouts available in this category.</div>
+               <div className="col-span-full text-center py-10 text-white/50 text-xs font-black uppercase tracking-widest">No listings available in this category.</div>
              ) : displayItems.map((item) => (
                <div key={item.id} className="bg-white rounded-2xl md:rounded-3xl overflow-hidden flex flex-col shadow-2xl h-full border-2 border-transparent hover:border-[#1FC8C8] transition-all">
                   <div className="h-28 lg:h-32 bg-slate-900 relative">
@@ -199,13 +241,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 💬 5. CONTACT & FOOTER IN ONE VIEWPORT SECTION */}
+      {/* 💬 5. CONTACT & FOOTER */}
       <section id="contact" className="h-screen w-full flex flex-col justify-between px-6 pt-24 pb-6 bg-[#0A2A5E] relative overflow-hidden">
         
-        {/* Main Content Vertical Center */}
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-16 items-center flex-1">
           
-          {/* LEFT: Re-styled Typography */}
           <div className="text-center lg:text-left text-white w-full flex flex-col items-center lg:items-start justify-center">
             <h2 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter uppercase italic leading-[0.9] mb-3 md:mb-5 text-white w-full drop-shadow-lg">
               MOVE AHEAD, <br/>
@@ -216,10 +256,8 @@ export default function Home() {
             </p>
           </div>
 
-          {/* RIGHT: Compact Contact Card */}
           <div className="flex flex-col gap-5 text-left bg-white/5 p-6 lg:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-white/10 backdrop-blur-sm">
              
-             {/* Vertically Stacked Phone and Email */}
              <div className="flex flex-col gap-4 md:gap-5 mb-2">
                <div className="flex items-center gap-4 text-white">
                   <div className="p-3 md:p-4 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8] flex-shrink-0"><Phone size={20}/></div>
@@ -238,13 +276,12 @@ export default function Home() {
                </div>
              </div>
 
-             {/* WhatsApp Buttons Grid */}
              <div className="flex flex-col sm:flex-row gap-3">
                <a href={WHATSAPP_DIRECT} target="_blank" className="flex-1 flex items-center justify-center gap-2 p-4 md:p-5 bg-white text-[#0A2A5E] rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-[#1FC8C8] transition-all text-center">
-                  <WhatsAppIcon size={18} /> Send WhatsApp Message
+                  <WhatsAppIcon size={18} /> WhatsApp Message
                </a>
                <a href={WHATSAPP_CHANNEL} target="_blank" className="flex-1 flex items-center justify-center gap-2 p-4 md:p-5 bg-white/10 text-white rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-white/20 transition-all text-center">
-                  <Smartphone size={16} className="flex-shrink-0"/> Join WhatsApp Channel
+                  <Smartphone size={16} className="flex-shrink-0"/> Join Channel
                </a>
              </div>
 
@@ -255,7 +292,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* COMPACT FOOTER - Attached strictly to the bottom */}
         <div className="w-full flex flex-col justify-center items-center mt-auto pt-6 border-t border-white/10 text-center gap-1.5">
            <span className="text-[#1FC8C8] font-black italic uppercase text-base tracking-tighter">Precede Concepts</span>
            <span className="text-white/30 text-[7px] md:text-[8px] font-black uppercase tracking-[0.5em]">Accra Ghana &middot; &copy; 2026</span>
