@@ -1,22 +1,23 @@
 import { supabase } from './supabase';
 
-// 1. This must match the Admin Page exactly to stop the error
+// 1. Updated Interface to exactly match the new Admin UI
 export interface EventData {
-  category: 'event' | 'job' | 'training' | 'sports' | 'others' | 'seminar';
+  category: 'event' | 'job' | 'training';
+  sub_category: string;
   title: string;
-  price_type?: string; 
-  price?: string;
-  time_category?: 'Morning' | 'Afternoon' | 'Evening' | 'Night';
-  venue?: string;
-  region?: string;
-  salary_range?: string;
-  job_type?: string;
-  deadline?: string;
-  link?: string;
-  image_url?: string;
-  review_text?: string;
-  is_featured?: boolean;
-  rating?: number;
+  price_type: string; 
+  price: string;
+  time_category: string;
+  duration: string;
+  venue: string;
+  region: string;
+  salary_range: string;
+  event_date: string;
+  link: string;
+  image_url: string;
+  review_text: string;
+  is_featured: boolean;
+  rating: number;
 }
 
 /**
