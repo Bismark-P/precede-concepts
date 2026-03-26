@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { addManualEntry } from '@/app/lib/collector';
 import { 
   ArrowLeft, Sparkles, Image as ImageIcon, 
-  Calendar, Tag, MapPin, Plus, LayoutDashboard, CheckCircle2 
+  Plus, LayoutDashboard, CheckCircle2, Star
 } from 'lucide-react';
 
 export default function AdminAddEvent() {
   const [loading, setLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false); // New state to trigger the button
+  const [showSuccess, setShowSuccess] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   const [formData, setFormData] = useState<any>({
@@ -25,7 +25,7 @@ export default function AdminAddEvent() {
     link: '',
     image_url: '',
     review_text: '',
-    is_featured: false,
+    is_featured: false, // Default is false
     rating: 5
   });
 
@@ -37,11 +37,12 @@ export default function AdminAddEvent() {
     const res = await addManualEntry(formData);
     
     if (res.success) {
-      setShowSuccess(true); // Reveal the dashboard button
+      setShowSuccess(true);
       setFormData({
         ...formData,
         title: '', price: '', venue: '', event_date: '', 
-        link: '', image_url: '', review_text: '', salary_range: ''
+        link: '', image_url: '', review_text: '', salary_range: '',
+        is_featured: false // Reset toggle after success
       });
       setImgError(false);
       window.scrollTo(0, 0);
@@ -58,16 +59,14 @@ export default function AdminAddEvent() {
     <div className="min-h-screen bg-slate-100 py-12 px-4">
       <div className="max-w-xl mx-auto p-10 bg-white shadow-2xl rounded-[3rem] border border-slate-200 text-left">
         
-        {/* HEADER */}
         <div className="flex items-center justify-between mb-8">
           <a href="/admin" className="p-3 bg-slate-50 rounded-full text-slate-400 hover:text-[#0A2A5E] shadow-sm transition-all">
             <ArrowLeft size={20}/>
           </a>
           <h1 className="text-2xl font-black uppercase italic text-[#0A2A5E] flex items-center gap-2">New Scout</h1>
-          <div className="w-10 h-10" /> {/* Spacer */}
+          <div className="w-10 h-10" /> 
         </div>
 
-        {/* SUCCESS ALERT (Only shows after submit) */}
         {showSuccess && (
           <div className="mb-8 p-4 bg-[#1FC8C8]/10 border-2 border-[#1FC8C8]/20 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3 text-[#0A2A5E]">
@@ -106,13 +105,30 @@ export default function AdminAddEvent() {
                 <option value="Matriculation">Matriculation</option>
                 <option value="Conference">Conference</option>
                 <option value="Seminar">Seminar</option>
-                <option value="Full-time">Full-time Job</option>
-                <option value="Remote">Remote Job</option>
               </select>
             </div>
             <div>
               <label className={labelClass}>Date *</label>
               <input type="date" required className={inputClass} value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
+            </div>
+          </div>
+
+          {/* ⭐ THE NEW TOP PICKS TOGGLE */}
+          <div 
+            onClick={() => setFormData({...formData, is_featured: !formData.is_featured})}
+            className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.is_featured ? 'bg-[#1FC8C8]/10 border-[#1FC8C8]' : 'bg-slate-50 border-slate-100 hover:border-slate-200'}`}
+          >
+            <div className="flex items-center gap-3">
+               <div className={`p-2 rounded-lg ${formData.is_featured ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-slate-200 text-slate-400'}`}>
+                  <Star size={16} fill={formData.is_featured ? "currentColor" : "none"} />
+               </div>
+               <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#0A2A5E]">Promote to Top Picks</p>
+                  <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Will appear in the "Our Picks" section</p>
+               </div>
+            </div>
+            <div className={`w-10 h-5 rounded-full relative transition-all ${formData.is_featured ? 'bg-[#1FC8C8]' : 'bg-slate-300'}`}>
+               <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${formData.is_featured ? 'right-1' : 'left-1'}`} />
             </div>
           </div>
 
@@ -123,7 +139,6 @@ export default function AdminAddEvent() {
             {loading ? "SENDING..." : <><Plus size={18} /> Send to Queue</>}
           </button>
 
-          {/* Fallback dashboard link always at bottom */}
           {!showSuccess && (
             <a href="/admin" className="block text-center text-[9px] font-black uppercase text-slate-300 hover:text-slate-500 transition-all tracking-widest pt-2">
               Back to Dashboard
