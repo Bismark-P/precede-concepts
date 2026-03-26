@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { addManualEntry } from '@/app/lib/collector';
 import { 
   ArrowLeft, Sparkles, Image as ImageIcon, 
-  Calendar, Tag, MapPin, Plus 
+  Calendar, Tag, MapPin, Plus, LayoutDashboard, CheckCircle2 
 } from 'lucide-react';
 
 export default function AdminAddEvent() {
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false); // New state to trigger the button
   const [imgError, setImgError] = useState(false);
 
   const [formData, setFormData] = useState<any>({
@@ -31,10 +32,12 @@ export default function AdminAddEvent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setShowSuccess(false);
+
     const res = await addManualEntry(formData);
     
     if (res.success) {
-      alert("📥 Scout added to Queue! Review it in the Dashboard.");
+      setShowSuccess(true); // Reveal the dashboard button
       setFormData({
         ...formData,
         title: '', price: '', venue: '', event_date: '', 
@@ -48,16 +51,34 @@ export default function AdminAddEvent() {
     setLoading(false);
   };
 
-  const inputClass = "w-full p-4 bg-white border-2 border-slate-200 rounded-2xl font-bold text-slate-900 outline-none focus:border-[#0A2A5E] text-sm shadow-sm";
+  const inputClass = "w-full p-4 bg-white border-2 border-slate-200 rounded-2xl font-bold text-slate-900 outline-none focus:border-[#0A2A5E] text-sm shadow-sm transition-all";
   const labelClass = "block text-[10px] font-black uppercase text-slate-500 mb-1.5 tracking-widest ml-1";
 
   return (
     <div className="min-h-screen bg-slate-100 py-12 px-4">
       <div className="max-w-xl mx-auto p-10 bg-white shadow-2xl rounded-[3rem] border border-slate-200 text-left">
-        <div className="flex items-center gap-4 mb-8">
-          <a href="/admin" className="p-3 bg-slate-50 rounded-full text-slate-400 hover:text-[#0A2A5E] shadow-sm"><ArrowLeft size={20}/></a>
+        
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-8">
+          <a href="/admin" className="p-3 bg-slate-50 rounded-full text-slate-400 hover:text-[#0A2A5E] shadow-sm transition-all">
+            <ArrowLeft size={20}/>
+          </a>
           <h1 className="text-2xl font-black uppercase italic text-[#0A2A5E] flex items-center gap-2">New Scout</h1>
+          <div className="w-10 h-10" /> {/* Spacer */}
         </div>
+
+        {/* SUCCESS ALERT (Only shows after submit) */}
+        {showSuccess && (
+          <div className="mb-8 p-4 bg-[#1FC8C8]/10 border-2 border-[#1FC8C8]/20 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+            <div className="flex items-center gap-3 text-[#0A2A5E]">
+              <CheckCircle2 size={20} className="text-[#1FC8C8]" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Added to Queue!</span>
+            </div>
+            <a href="/admin" className="flex items-center gap-2 bg-[#0A2A5E] text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all">
+              <LayoutDashboard size={14} /> View Hub
+            </a>
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="p-1.5 bg-slate-100 rounded-2xl flex gap-1 border border-slate-200">
@@ -84,6 +105,7 @@ export default function AdminAddEvent() {
                 <option value="Graduation">Graduation</option>
                 <option value="Matriculation">Matriculation</option>
                 <option value="Conference">Conference</option>
+                <option value="Seminar">Seminar</option>
                 <option value="Full-time">Full-time Job</option>
                 <option value="Remote">Remote Job</option>
               </select>
@@ -95,11 +117,18 @@ export default function AdminAddEvent() {
           </div>
 
           <div><label className={labelClass}>Venue</label><input className={inputClass} placeholder="Location" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} /></div>
-          <div><label className={labelClass}>Flyer URL</label><input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} /></div>
+          <div><label className={labelClass}>Flyer URL</label><input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => {setFormData({...formData, image_url: e.target.value}); setImgError(false);}} /></div>
 
           <button disabled={loading} className="w-full bg-[#0A2A5E] text-white p-6 rounded-2xl font-black uppercase text-xs tracking-[0.3em] shadow-xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all flex items-center justify-center gap-3">
             {loading ? "SENDING..." : <><Plus size={18} /> Send to Queue</>}
           </button>
+
+          {/* Fallback dashboard link always at bottom */}
+          {!showSuccess && (
+            <a href="/admin" className="block text-center text-[9px] font-black uppercase text-slate-300 hover:text-slate-500 transition-all tracking-widest pt-2">
+              Back to Dashboard
+            </a>
+          )}
         </form>
       </div>
     </div>
