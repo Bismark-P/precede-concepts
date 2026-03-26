@@ -1,275 +1,149 @@
-"use client";
-import { useState } from 'react';
-import { addManualEntry } from '@/app/lib/collector';
-import { 
-  ArrowLeft, Image as ImageIcon, Sparkles, Eye, Clock, 
-  MapPin, CircleDollarSign, Briefcase, GraduationCap, Trophy, Plus 
-} from 'lucide-react';
+'use client'
+import { useState, useEffect } from 'react'
+import { Lock, ShieldCheck, Plus, Trash2, Check, ArrowLeft, Star, Eye, EyeOff, Activity, Clock, Search, MapPin, DollarSign } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
-interface EventData {
-  category: 'event' | 'job' | 'training';
-  sub_category: string;
-  title: string;
-  price_type: string; 
-  price: string;
-  time_category: string;
-  duration: string;
-  venue: string;
-  region: string;
-  salary_range: string;
-  event_date: string;
-  link: string;
-  image_url: string;
-  review_text: string;
-  is_featured: boolean;
-  rating: number;
-}
-
-export default function AdminAddEvent() {
-  const [loading, setLoading] = useState(false);
-  const [imgError, setImgError] = useState(false);
-  const [isSalaryDisclosed, setIsSalaryDisclosed] = useState(true);
-
-  const [formData, setFormData] = useState<EventData>({
-    category: 'event', 
-    sub_category: 'Conference',
-    title: '',
-    price_type: 'Paid', 
-    price: '',
-    time_category: 'TBD', // Default to TBD for flexibility
-    duration: '',
-    venue: '',
-    region: 'Greater Accra',
-    salary_range: '',
-    event_date: '',
-    link: '',
-    image_url: '',
-    review_text: '',
-    is_featured: false,
-    rating: 5
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    const finalData = { ...formData };
-    if (formData.category === 'job' && !isSalaryDisclosed) {
-        finalData.salary_range = 'Undisclosed';
-    }
-
-    const res = await addManualEntry(finalData);
-    if (res.success) {
-      alert("🚀 Published to Precede Hub!");
-      setFormData({
-        ...formData,
-        title: '', price: '', venue: '', image_url: '', 
-        review_text: '', salary_range: '', event_date: '', link: '', duration: ''
-      });
-      setImgError(false);
-      window.scrollTo(0, 0);
-    } else {
-      alert("❌ Error: " + res.error);
-    }
-    setLoading(false);
-  };
-
-  const regions = ["Ahafo", "Ashanti", "Bono", "Bono East", "Central", "Eastern", "Greater Accra", "Northern", "North East", "Oti", "Savannah", "Upper East", "Upper West", "Volta", "Western", "Western North"];
-  const timeCategories = ["TBD", "Morning", "Afternoon", "Evening", "Night", "Half-day", "Full-day", "All-night"];
-
-  const inputClass = "w-full p-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-900 outline-none focus:border-[#0A2A5E] focus:ring-4 ring-[#0A2A5E]/10 placeholder-slate-300 transition-all shadow-sm text-sm";
+export default function AdminPortal() {
+  const [isAuth, setIsAuth] = useState(false)
+  const [pass, setPass] = useState('')
+  const [showPass, setShowPass] = useState(false)
+  const [items, setItems] = useState<any[]>([])
+  const [logs, setLogs] = useState<any[]>([])
   
-  // Helper for clean optional labels
-  const Label = ({ text, optional = true }: { text: string, optional?: boolean }) => (
-    <label className="block text-[10px] font-black uppercase text-slate-500 mb-1.5 tracking-widest ml-1">
-      {text} {optional && <span className="text-slate-400 font-semibold normal-case tracking-normal ml-1">(Optional)</span>}
-    </label>
-  );
+  const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_PASSWORD
+
+  useEffect(() => { 
+    if(isAuth) { fetchPending(); fetchLogs(); } 
+  }, [isAuth])
+
+  async function fetchPending() {
+    const { data } = await supabase.from('jobs').select('*').eq('status', 'pending').order('created_at', { ascending: false })
+    if (data) setItems(data)
+  }
+
+  async function fetchLogs() {
+    const { data } = await supabase.from('sync_logs').select('*').order('executed_at', { ascending: false }).limit(5)
+    if (data) setLogs(data)
+  }
+
+  if (!isAuth) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-center">
+        <div className="bg-white p-10 md:p-12 rounded-[3.5rem] w-full max-w-sm shadow-2xl border-t-8 border-blue-600">
+          <Lock size={40} className="mx-auto text-blue-600 mb-6" />
+          <h2 className="text-2xl font-black uppercase italic mb-8 text-slate-950">Secure Gate</h2>
+          <div className="relative mb-6">
+            <input 
+              type={showPass ? "text" : "password"} 
+              placeholder="Authorization Code" 
+              className="w-full p-5 bg-slate-100 rounded-2xl text-center font-bold tracking-widest text-slate-950 outline-none focus:bg-white border-2 border-transparent focus:border-blue-600 transition-all" 
+              onChange={(e) => setPass(e.target.value)} 
+            />
+            <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+              {showPass ? <EyeOff size={18}/> : <Eye size={18}/>}
+            </button>
+          </div>
+          <button onClick={() => pass === ADMIN_SECRET ? setIsAuth(true) : alert('Unauthorized Access')} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-blue-600 transition-all">Authorize Session</button>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="max-w-xl mx-auto p-6 md:p-10 bg-slate-50 shadow-2xl rounded-[3rem] mt-10 mb-20 font-sans border border-slate-200 text-left">
-      <div className="flex items-center gap-4 mb-8">
-         <a href="/admin" className="p-3 bg-white border border-slate-200 rounded-full text-slate-600 hover:text-[#0A2A5E] hover:border-[#0A2A5E] transition-all"><ArrowLeft size={20}/></a>
-         <h1 className="text-2xl font-black uppercase italic text-[#0A2A5E] flex items-center gap-2">
-           <Sparkles className="text-[#1FC8C8]" size={24} /> Hub Publisher
-         </h1>
-      </div>
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="p-6 md:p-16 max-w-6xl mx-auto font-sans min-h-screen bg-white">
+      <header className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6 text-left">
+        <div className="flex items-center gap-4 w-full">
+          <a href="/" className="text-slate-300 hover:text-blue-600 transition-all"><ArrowLeft size={32}/></a>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black uppercase italic flex items-center gap-3"><ShieldCheck className="text-blue-600" /> Control Hub</h1>
+            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Curation Mode Active</span>
+          </div>
+        </div>
         
-        {/* CATEGORY SELECTOR */}
-        <div className="p-1.5 bg-slate-200/50 rounded-2xl flex gap-1 border border-slate-200">
-          {(['event', 'job', 'training'] as const).map((cat) => (
-            <button 
-              key={cat} type="button"
-              onClick={() => setFormData({
-                  ...formData, 
-                  category: cat,
-                  sub_category: cat === 'job' ? 'Full-time' : 'Conference' 
-              })}
-              className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${formData.category === cat ? 'bg-white text-[#0A2A5E] shadow-md border border-slate-200' : 'text-slate-500 hover:text-slate-800'}`}
-            >
-              {cat}
-            </button>
+        <a href="/admin/add" className="w-full md:w-auto bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-900 transition-all shadow-lg shadow-blue-50">
+          <Plus size={14}/> Add New Listing
+        </a>
+      </header>
+
+      <div className="grid lg:grid-cols-3 gap-12 text-left">
+        <div className="lg:col-span-2 space-y-6">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-2"><Activity size={14}/> Pending Queue</h2>
+          
+          {items.length === 0 ? (
+            <div className="text-center py-20 bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-100">
+              <Search className="mx-auto text-slate-200 mb-4" size={40} />
+              <p className="text-slate-300 text-[10px] font-black uppercase tracking-widest">Queue is clear</p>
+            </div>
+          ) : items.map(item => (
+            <div key={item.id} className="p-4 bg-white border border-slate-100 rounded-[2rem] flex flex-col md:flex-row justify-between items-center hover:border-blue-500 transition-all gap-4 shadow-sm">
+              
+              <div className="flex items-center gap-4 text-left w-full">
+                 {/* 🖼️ MINI FLYER PREVIEW */}
+                 <div className="w-20 h-20 bg-slate-900 rounded-2xl overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    {item.image_url ? (
+                        <img src={item.image_url} alt="flyer" className="w-full h-full object-cover" />
+                    ) : (
+                        <span className="text-[8px] font-black text-slate-500 uppercase italic">Precede</span>
+                    )}
+                 </div>
+
+                 <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[8px] font-black bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full uppercase tracking-widest">{item.category}</span>
+                        <span className="text-[8px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full uppercase tracking-widest">{item.time_category}</span>
+                    </div>
+                    <h3 className="font-bold text-slate-950 leading-tight mb-1">{item.title}</h3>
+                    <div className="flex items-center gap-3 text-slate-400 text-[10px] font-bold">
+                        <span className="flex items-center gap-1"><MapPin size={10}/> {item.venue || 'No Venue'} • {item.region}</span>
+                        <span className="flex items-center gap-1"><DollarSign size={10}/> {item.price || 'Free'}</span>
+                    </div>
+                 </div>
+              </div>
+
+              <div className="flex gap-2 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
+                <button 
+                    onClick={async () => {await supabase.from('jobs').update({ is_featured: !item.is_featured }).eq('id', item.id); fetchPending();}} 
+                    className={`${item.is_featured ? 'text-yellow-500 bg-yellow-50' : 'text-slate-300 bg-slate-50'} p-3 rounded-xl transition-all`}
+                >
+                    <Star fill={item.is_featured ? "currentColor" : "none"} size={20}/>
+                </button>
+                <button 
+                    onClick={async () => {await supabase.from('jobs').update({status: 'approved'}).eq('id', item.id); fetchPending();}} 
+                    className="flex-1 md:flex-none p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all flex justify-center items-center gap-2 font-black text-[10px] uppercase tracking-widest px-6"
+                >
+                    <Check size={16}/> Approve
+                </button>
+                <button 
+                    onClick={async () => { if(confirm('Delete this entry?')) { await supabase.from('jobs').delete().eq('id', item.id); fetchPending(); } }} 
+                    className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all flex justify-center"
+                >
+                    <Trash2 size={20}/>
+                </button>
+              </div>
+            </div>
           ))}
         </div>
 
-        {/* IMAGE PREVIEW */}
-        <div className="relative w-full h-56 bg-slate-900 rounded-[2rem] overflow-hidden flex items-center justify-center border-4 border-slate-200 shadow-inner">
-          {formData.image_url && !imgError ? (
-            <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" onError={() => setImgError(true)} />
-          ) : (
-            <div className="text-center opacity-40">
-               <ImageIcon size={48} className="mx-auto mb-2 text-white" />
-               <h2 className="text-white font-black italic text-xl uppercase tracking-widest">No Image</h2>
-            </div>
-          )}
-        </div>
-
-        {/* GENERAL INFO */}
-        <div>
-          <Label text="Flyer / Image URL" />
-          <input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => {setFormData({...formData, image_url: e.target.value}); setImgError(false);}} />
-        </div>
-
-        <div>
-          <Label text="Title / Heading" optional={false} />
-          <input className={inputClass} placeholder="Enter a catchy title..." required value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} />
-        </div>
-
-        {/* --- EVENT FIELDS --- */}
-        {formData.category === 'event' && (
-          <div className="p-6 bg-white border border-slate-200 rounded-[2rem] space-y-5 shadow-sm">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#1FC8C8] mb-4">Event Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label text="Event Type" optional={false} />
-                <select className={inputClass} value={formData.sub_category} onChange={(e) => setFormData({...formData, sub_category: e.target.value})}>
-                  <option value="Conference">Conference</option><option value="Meetup">Meetup</option><option value="Party">Party</option><option value="Exhibition">Exhibition</option><option value="Other">Other</option>
-                </select>
-              </div>
-              <div>
-                <Label text="Event Date" />
-                <input type="date" className={inputClass} value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label text="Venue" />
-                <input className={inputClass} placeholder="e.g. Accra ICC" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
-              </div>
-              <div>
-                <Label text="Time" optional={false} />
-                <select className={inputClass} value={formData.time_category} onChange={(e) => setFormData({...formData, time_category: e.target.value})}>
-                  {timeCategories.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-            </div>
+        {/* LOGS SIDEBAR */}
+        <div className="bg-slate-50 p-8 rounded-[2.5rem] h-fit border border-slate-100 text-left">
+           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 flex items-center gap-2"><Clock size={14}/> Session History</h2>
+          <div className="space-y-6">
+            {logs.length === 0 ? <p className="text-[10px] text-slate-400 font-bold uppercase">No activity recorded</p> : logs.map((log, idx) => (
+                <div key={idx} className="flex gap-4 items-start border-l-2 border-emerald-500 pl-4 py-1">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-900 uppercase">Successful Broadcast</p>
+                    <p className="text-[9px] font-bold text-slate-400">{new Date(log.executed_at).toLocaleString()}</p>
+                  </div>
+                </div>
+            ))}
           </div>
-        )}
-
-        {/* --- JOB FIELDS --- */}
-        {formData.category === 'job' && (
-          <div className="p-6 bg-white border border-slate-200 rounded-[2rem] space-y-5 shadow-sm">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#1FC8C8] mb-4">Job Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label text="Employment Type" optional={false} />
-                <select className={inputClass} value={formData.sub_category} onChange={(e) => setFormData({...formData, sub_category: e.target.value})}>
-                  <option value="Full-time">Full-time</option><option value="Part-time">Part-time</option><option value="Remote">Remote</option><option value="Contract">Contract</option><option value="Internship">Internship</option>
-                </select>
-              </div>
-              <div>
-                <Label text="Location" />
-                <input className={inputClass} placeholder="e.g. East Legon" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
-              </div>
-            </div>
-            
-            <div>
-               <div className="flex justify-between items-end mb-1.5">
-                 <Label text="Salary" />
-                 <label className="flex items-center gap-2 text-[10px] font-bold text-slate-500 cursor-pointer">
-                    <input type="checkbox" checked={!isSalaryDisclosed} onChange={() => setIsSalaryDisclosed(!isSalaryDisclosed)} className="accent-[#0A2A5E]" /> Undisclosed
-                 </label>
-               </div>
-               <input disabled={!isSalaryDisclosed} className={`${inputClass} disabled:opacity-50 disabled:bg-slate-100`} placeholder="e.g. GHS 3,000 - 5,000" value={formData.salary_range} onChange={(e) => setFormData({...formData, salary_range: e.target.value})} />
-            </div>
-
-            <div>
-              <Label text="Application Deadline" />
-              <input type="date" className={inputClass} value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
-            </div>
-          </div>
-        )}
-
-        {/* --- TRAINING & SEMINAR FIELDS --- */}
-        {formData.category === 'training' && (
-          <div className="p-6 bg-white border border-slate-200 rounded-[2rem] space-y-5 shadow-sm">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#1FC8C8] mb-4">Training Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label text="Training Type" optional={false} />
-                <select className={inputClass} value={formData.sub_category} onChange={(e) => setFormData({...formData, sub_category: e.target.value})}>
-                  <option value="Seminar">Seminar</option><option value="Workshop">Workshop</option><option value="Webinar">Webinar</option><option value="Masterclass">Masterclass</option><option value="Bootcamp">Bootcamp</option>
-                </select>
-              </div>
-              <div>
-                <Label text="Start Date" />
-                <input type="date" className={inputClass} value={formData.event_date} onChange={(e) => setFormData({...formData, event_date: e.target.value})} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label text="Duration" />
-                <input className={inputClass} placeholder="e.g. 3 Weeks" value={formData.duration} onChange={(e) => setFormData({...formData, duration: e.target.value})} />
-              </div>
-              <div>
-                <Label text="Venue / Link" />
-                <input className={inputClass} placeholder="Physical or Zoom" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})} />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* PRICING */}
-        {formData.category !== 'job' && (
-          <div className="flex gap-4">
-            <div className="w-1/3">
-              <Label text="Access" optional={false} />
-              <select className={inputClass} value={formData.price_type} onChange={(e) => setFormData({...formData, price_type: e.target.value})}>
-                <option value="Paid">Paid</option><option value="Free">Free</option>
-              </select>
-            </div>
-            <div className="w-2/3">
-              <Label text="Fee / Price" />
-              <input disabled={formData.price_type === 'Free'} className={`${inputClass} disabled:opacity-50 disabled:bg-slate-100`} placeholder="e.g. GHS 150+" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} />
-            </div>
-          </div>
-        )}
-
-        {/* UNIVERSAL FOOTER FIELDS */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label text="Region" optional={false} />
-            <select className={inputClass} value={formData.region} onChange={(e) => setFormData({...formData, region: e.target.value})}>
-              {regions.map(reg => <option key={reg} value={reg}>{reg}</option>)}
-            </select>
-          </div>
-          <div>
-            <Label text="External Link" />
-            <input className={inputClass} placeholder="URL to Apply/Register" value={formData.link} onChange={(e) => setFormData({...formData, link: e.target.value})} />
+          <div className="mt-12 p-4 bg-white rounded-2xl border border-slate-200">
+             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-loose">
+               Note: Once approved, entries move immediately to the live discovery feed.
+             </p>
           </div>
         </div>
-
-        <div>
-          <Label text="Description / Summary" />
-          <textarea className={`${inputClass} min-h-[120px] resize-y`} placeholder="Write a brief overview..." value={formData.review_text} onChange={(e) => setFormData({...formData, review_text: e.target.value})} />
-        </div>
-
-        <button disabled={loading} className="w-full bg-[#0A2A5E] text-white p-6 rounded-2xl font-black uppercase text-xs tracking-[0.3em] shadow-xl shadow-[#0A2A5E]/20 hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all disabled:opacity-50 mt-4">
-          {loading ? "SYNCING TO DATABASE..." : "🚀 PUBLISH TO HUB"}
-        </button>
-      </form>
+      </div>
     </div>
-  );
+  )
 }
