@@ -113,33 +113,35 @@ export default function Home() {
       {/* --- 🚀 HERO --- */}
       <section id="home" className="h-screen flex items-center justify-center px-6 bg-[#0A2A5E] relative overflow-hidden text-center">
         <div className="z-10">
-          <p className="text-[#1FC8C8] text-[9px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4 italic opacity-90">SIMPLIFYING PROGRESS, DELIVERING VALUE.</p>
+          <p className="text-[#1FC8C8] text-[9px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4 italic opacity-90">PROGRESS SIMPLIFIED, VALUE DELIVERED.</p>
           <h1 className="text-6xl md:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white select-none">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
+          <p className="text-white/40 text-[8px] md:text-[11px] font-black uppercase tracking-[0.4em] mt-8 italic">SIMPLIFYING PROGRESS, DELIVERING VALUE.</p>
         </div>
       </section>
 
-      {/* --- 🏢 ABOUT US (Premium Spacing & Line Control) --- */}
-      <section id="about" className="min-h-screen flex items-center justify-center px-6 bg-[#1FC8C8] py-20">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-16 items-center text-[#0A2A5E]">
+      {/* --- 🏢 ABOUT US (Perfect Size & Alignment) --- */}
+      <section id="about" className="h-screen flex items-center justify-center px-6 bg-[#1FC8C8]">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16 items-center text-[#0A2A5E] w-full">
           <div>
-            <h2 className="text-6xl md:text-[8rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-6">BEYOND A <br/> DIGITAL <br/> AGENCY.</h2>
+            <h2 className="text-[4rem] md:text-[7.5rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-4">
+              BEYOND <br/> 
+              A <span className="text-white drop-shadow-sm">DIGITAL</span> <br/> 
+              AGENCY.
+            </h2>
             <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-50 italic">Move ahead, stay ahead.</p>
           </div>
           
           <div className="border-l-[8px] border-[#0A2A5E] pl-8 md:pl-12 flex flex-col justify-center h-full">
-            <div className="flex flex-col gap-8">
-              {/* Forced ~2 Lines on Desktop: Small text, wide tracking */}
-              <p className="font-black text-[13px] md:text-[15px] italic uppercase tracking-[0.2em] leading-loose opacity-75 max-w-[85%]">
-                Precede Concepts bridges the gap between high-end professional services and accessible solutions in Ghana.
+            <div className="flex flex-col gap-6">
+              <p className="font-black text-base md:text-lg italic uppercase tracking-[0.1em] leading-relaxed opacity-80 max-w-[95%]">
+                PRECEDE CONCEPTS BRIDGES THE GAP BETWEEN HIGH-END PROFESSIONAL SERVICES AND ACCESSIBLE SOLUTIONS IN GHANA.
               </p>
               
-              {/* Forced ~3 Lines on Desktop: Large text, tight leading */}
-              <p className="text-2xl md:text-3xl lg:text-[2rem] font-black uppercase leading-[1.3] max-w-[95%]">
+              <p className="text-base md:text-lg font-bold leading-relaxed max-w-[95%] opacity-90">
                 We operate a dual-purpose ecosystem: a primary business executing top-tier digital & multimedia services, and a CSR hub driving traffic by curating vital community resources.
               </p>
               
-              {/* Unchanged Core Pillars */}
-              <div className="pt-8 mt-2 border-t-2 border-[#0A2A5E]/10">
+              <div className="pt-6 mt-2 border-t-2 border-[#0A2A5E]/15">
                 <p className="text-[11px] md:text-[13px] font-bold uppercase italic leading-loose tracking-wide opacity-90">
                   <span className="text-[#0A2A5E] font-black">BUSINESS GROWTH:</span> Registration, Development, Strategic Consultation. <br/>
                   <span className="text-[#0A2A5E] font-black">IDENTITY & BRANDING:</span> Graphic Design, Branding, Professional Printing, Banners, Stickers, Labels. <br/>
@@ -179,7 +181,7 @@ export default function Home() {
       <section id="hub" className="min-h-screen py-32 px-6 bg-[#0F4C81]">
         <div className="max-w-[1500px] mx-auto text-left">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-10">
-            <div className="flex-1 w-full max-w-2xl">
+            <div className="flex-1 w-full max-w-xl">
               <h2 className="text-5xl font-black uppercase italic text-white mb-8 tracking-tighter">OPPORTUNITY HUB.</h2>
               <div className="relative group">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={24} />
@@ -204,53 +206,55 @@ export default function Home() {
           {featured.length > 0 && filter === 'all' && !searchQuery && (
             <div className="mb-20">
               <div className="flex items-center gap-2 text-[#1FC8C8] mb-10 font-black uppercase italic text-sm tracking-widest"><Sparkles size={20}/> FEATURED PICKS</div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-5">
                 {featured.map(item => <ScoutCard key={`f-${item.id}`} item={item} isFeatured />)}
               </div>
               <div className="h-px w-full bg-white/10 mt-20" />
             </div>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 mt-12">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-5 mt-12">
             {filteredItems.map(item => <ScoutCard key={item.id} item={item} />)}
           </div>
         </div>
       </section>
 
-      {/* --- 💬 CONTACT & FOOTER (Merged for One Screen) --- */}
-      <section id="contact" className="min-h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 pt-32 pb-8 text-white relative">
-        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 items-center flex-1">
+      {/* --- 💬 CONTACT & FOOTER (One Screen Synergy) --- */}
+      <section id="contact" className="min-h-screen md:h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 pt-32 pb-8 text-white relative">
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-16 items-center flex-1">
           <div className="text-left">
-            <h2 className="text-7xl lg:text-[9.5rem] font-black italic uppercase leading-[0.8] mb-6">MOVE AHEAD, <br/><span className="text-[#1FC8C8]">STAY AHEAD.</span></h2>
-            <p className="text-white/30 text-[12px] font-black uppercase tracking-[0.5em] italic">PROGRESS SIMPLIFIED — VALUE DELIVERED</p>
+            <h2 className="text-[4.5rem] md:text-7xl lg:text-[8rem] font-black italic uppercase leading-[0.8] mb-6">
+              MOVE AHEAD, <br/><span className="text-[#1FC8C8] drop-shadow-[0_0_25px_rgba(31,200,200,0.3)]">STAY AHEAD.</span>
+            </h2>
+            <p className="text-white/40 text-[10px] md:text-[12px] font-black uppercase tracking-[0.5em] italic">PROGRESS SIMPLIFIED — VALUE DELIVERED</p>
           </div>
           
-          <div className="bg-white/5 p-12 rounded-[4.5rem] border-4 border-white/10 shadow-2xl backdrop-blur-sm">
-            <div className="space-y-12 mb-12 text-left">
-              <div className="flex items-center gap-8 group cursor-pointer transition-all hover:translate-x-2">
-                <div className="p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Phone size={36}/></div>
-                <div><span className="text-[12px] font-black uppercase text-white/40 tracking-widest leading-none">VOICE LINE</span><p className="text-4xl font-black italic tracking-tighter">{BUSINESS_PHONE}</p></div>
+          <div className="bg-white/5 p-8 md:p-12 rounded-[3.5rem] border-4 border-white/10 shadow-2xl backdrop-blur-sm">
+            <div className="space-y-10 mb-10 text-left">
+              <div className="flex items-center gap-6 md:gap-8 group cursor-pointer transition-all hover:translate-x-2">
+                <div className="p-5 md:p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Phone size={30}/></div>
+                <div><span className="text-[10px] md:text-[12px] font-black uppercase text-white/40 tracking-widest leading-none">VOICE LINE</span><p className="text-3xl md:text-4xl font-black italic tracking-tighter">0591999544</p></div>
               </div>
-              <div className="flex items-center gap-8 group cursor-pointer transition-all hover:translate-x-2">
-                <div className="p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Mail size={36}/></div>
-                <div><span className="text-[12px] font-black uppercase text-white/40 tracking-widest leading-none">DIGITAL MAIL</span><p className="text-xl md:text-2xl font-black italic tracking-tighter">{BUSINESS_EMAIL}</p></div>
+              <div className="flex items-center gap-6 md:gap-8 group cursor-pointer transition-all hover:translate-x-2">
+                <div className="p-5 md:p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Mail size={30}/></div>
+                <div><span className="text-[10px] md:text-[12px] font-black uppercase text-white/40 tracking-widest leading-none">DIGITAL MAIL</span><p className="text-xl md:text-2xl font-black italic tracking-tighter break-all">precedeconcepts@gmail.com</p></div>
               </div>
             </div>
             
-            <div className="flex flex-col gap-6">
-               <div className="grid grid-cols-2 gap-6">
-                  <a href={`https://wa.me/233591999544`} target="_blank" className="bg-white text-[#0A2A5E] p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl hover:-translate-y-1"><WhatsAppIcon /> WHATSAPP</a>
-                  <a href={`https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W`} target="_blank" className="bg-white/10 border-2 border-white/10 p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-white/20 transition-all hover:-translate-y-1"><Smartphone size={20}/> CHANNEL</a>
+            <div className="flex flex-col gap-4 md:gap-6">
+               <div className="grid grid-cols-2 gap-4 md:gap-6">
+                  <a href={`https://wa.me/233591999544`} target="_blank" className="bg-white text-[#0A2A5E] p-5 md:p-6 rounded-[2rem] font-black uppercase italic text-[10px] md:text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl hover:-translate-y-1"><WhatsAppIcon /> WHATSAPP</a>
+                  <a href={`https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W`} target="_blank" className="bg-white/10 border-2 border-white/10 p-5 md:p-6 rounded-[2rem] font-black uppercase italic text-[10px] md:text-xs flex items-center justify-center gap-3 hover:bg-white/20 transition-all hover:-translate-y-1"><Smartphone size={20}/> CHANNEL</a>
                </div>
-               <button onClick={() => window.location.href = `mailto:${BUSINESS_EMAIL}`} className="bg-[#1FC8C8] text-[#0A2A5E] p-8 rounded-[3rem] font-black uppercase italic text-sm shadow-2xl hover:bg-white transition-all tracking-[0.2em] hover:-translate-y-1">SEND AN EMAIL</button>
+               <button onClick={() => window.location.href = `mailto:${BUSINESS_EMAIL}`} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 md:p-8 rounded-[3rem] font-black uppercase italic text-xs md:text-sm shadow-2xl hover:bg-white transition-all tracking-[0.2em] hover:-translate-y-1">SEND AN EMAIL</button>
             </div>
           </div>
         </div>
 
-        {/* Footer Unified at the bottom of the Contact section */}
-        <div className="text-center pt-16 mt-16 border-t border-white/5">
-          <p className="text-[#1FC8C8] font-black uppercase italic text-[12px] tracking-[0.5em]">PRECEDE CONCEPTS</p>
-          <p className="text-white/20 font-black uppercase text-[10px] tracking-[0.3em] mt-3">ACCRA GHANA · © 2026</p>
+        {/* --- 🏁 UNIFIED FOOTER --- */}
+        <div className="shrink-0 text-center pt-8 mt-12 md:mt-16 border-t border-white/5 w-full">
+          <p className="text-[#1FC8C8] font-black uppercase italic text-[10px] tracking-[0.5em]">PRECEDE CONCEPTS</p>
+          <p className="text-white/20 font-black uppercase text-[8px] tracking-[0.3em] mt-2">ACCRA GHANA · © 2026</p>
         </div>
       </section>
 
@@ -260,9 +264,9 @@ export default function Home() {
           <motion.button 
             initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
             onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
-            className="fixed bottom-10 right-10 z-[150] p-5 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl shadow-2xl hover:bg-white hover:scale-110 transition-all"
+            className="fixed bottom-8 right-8 z-[150] p-4 md:p-5 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl shadow-2xl hover:bg-white hover:scale-110 transition-all"
           >
-            <ArrowUp size={28} />
+            <ArrowUp size={24} />
           </motion.button>
         )}
       </AnimatePresence>
@@ -279,23 +283,28 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map_query || item.venue)}`;
 
   return (
-    <div className={`group bg-white rounded-[2rem] overflow-hidden flex flex-col shadow-lg transition-all hover:scale-[1.03] h-full ${isFeatured ? 'border-4 border-[#1FC8C8] ring-8 ring-[#1FC8C8]/5' : 'border border-slate-100'}`}>
-      <div className="h-20 bg-slate-900 relative">
+    <div className={`group bg-white rounded-[1.5rem] overflow-hidden flex flex-col shadow-lg transition-all hover:scale-[1.03] h-full ${isFeatured ? 'border-[3px] border-[#1FC8C8] ring-4 ring-[#1FC8C8]/10' : 'border border-slate-100'}`}>
+      {/* Ultra Compact Card Image */}
+      <div className="h-16 bg-slate-900 relative">
         {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-80" />}
-        <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2.5 py-1 rounded-full uppercase italic tracking-widest">{item.category}</span>
+        <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-0.5 rounded-full uppercase italic tracking-widest">{item.category}</span>
       </div>
+      
+      {/* Compact Card Content */}
       <div className="p-4 flex flex-col flex-1 text-left">
-        <h4 className="font-black text-[13px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 h-8 mb-3 text-left">{item.title}</h4>
-        <div className="mb-4 text-left pb-3 border-b border-slate-100">
-          <p className="text-[10px] font-black uppercase italic text-slate-500 leading-none">{targetDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
-          <p className={`text-[9px] font-black uppercase italic mt-1.5 ${isToday ? 'text-red-600 animate-pulse' : isPast ? 'text-slate-300' : 'text-[#1FC8C8]'}`}>{isToday ? 'TODAY' : isPast ? 'PAST' : `${diff} DAYS LEFT`}</p>
+        <h4 className="font-black text-[12px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 h-8 mb-2 text-left">{item.title}</h4>
+        
+        <div className="mb-3 text-left pb-2 border-b border-slate-100 flex justify-between items-end">
+          <p className="text-[9px] font-black uppercase italic text-slate-500 leading-none">{targetDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+          <p className={`text-[9px] font-black uppercase italic leading-none ${isToday ? 'text-red-600 animate-pulse' : isPast ? 'text-slate-300' : 'text-[#1FC8C8]'}`}>{isToday ? 'TODAY' : isPast ? 'PAST' : `${diff}D`}</p>
         </div>
-        <div className="mt-auto flex flex-col gap-3 text-left">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-[11px] font-black text-[#0A2A5E] uppercase italic truncate"><MapPin size={12} className="text-[#1FC8C8] flex-shrink-0"/> {item.venue}</div>
-            <a href={mapUrl} target="_blank" className="text-[7px] font-black text-blue-500 uppercase italic hover:text-[#1FC8C8] transition-colors ml-5 tracking-wide">VIEW PRECISE LOCATION</a>
+        
+        <div className="mt-auto flex flex-col gap-2 text-left">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-1.5 text-[10px] font-black text-[#0A2A5E] uppercase italic truncate"><MapPin size={10} className="text-[#1FC8C8] flex-shrink-0"/> {item.venue}</div>
+            <a href={mapUrl} target="_blank" className="text-[7px] font-black text-blue-500 uppercase italic hover:text-[#1FC8C8] transition-colors ml-4 tracking-wide">PRECISE LOCATION</a>
           </div>
-          <a href={item.link} target="_blank" className="w-full py-2 bg-slate-50 text-[#0A2A5E] border border-slate-200 rounded-xl text-[9px] font-black uppercase text-center group-hover:bg-[#0A2A5E] group-hover:text-white transition-all shadow-sm">VIEW DETAILS</a>
+          <a href={item.link} target="_blank" className="w-full py-2 bg-slate-50 text-[#0A2A5E] border border-slate-200 rounded-lg text-[8px] font-black uppercase text-center group-hover:bg-[#0A2A5E] group-hover:text-white transition-all shadow-sm">VIEW DETAILS</a>
         </div>
       </div>
     </div>
