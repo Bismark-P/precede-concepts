@@ -64,7 +64,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#0A2A5E] font-sans text-slate-950 scroll-smooth overflow-x-hidden">
-      {/* --- 🧭 NAVIGATION (Places & Spaces Restored) --- */}
+      {/* --- 🧭 NAVIGATION --- */}
       <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E]/90 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-white">
           <div className="flex items-center gap-3">
@@ -85,13 +85,38 @@ export default function Home() {
 
       {/* --- 🚀 HERO --- */}
       <section id="home" className="h-screen flex items-center justify-center bg-[#0A2A5E] text-center relative overflow-hidden">
-        <div className="z-10">
-          <p className="text-[#1FC8C8] text-[10px] md:text-[14px] font-black uppercase tracking-[0.6em] mb-4 italic">Simplifying progress, delivering value.</p>
-          <h1 className="text-6xl md:text-9xl font-black uppercase italic leading-[0.85] text-white">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
+        <div className="z-10 px-6">
+          <p className="text-[#1FC8C8] text-[10px] md:text-[14px] font-black uppercase tracking-[0.6em] mb-4 italic text-left md:text-center">Simplifying progress, delivering value.</p>
+          <h1 className="text-6xl md:text-9xl font-black uppercase italic leading-[0.85] text-white text-left md:text-center">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
         </div>
       </section>
 
-      {/* --- ⚡ OPPORTUNITY HUB (Search & Featured Restored) --- */}
+      {/* --- 🏢 ABOUT (P3.PNG STYLE) --- */}
+      <section id="about" className="bg-[#1FC8C8] py-32 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col gap-24">
+          <div className="flex flex-col lg:flex-row gap-12 text-[#0A2A5E] text-left">
+            <h2 className="lg:w-1/3 text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.8]">BEYOND A <br/> DIGITAL <br/> AGENCY.</h2>
+            <div className="lg:w-2/3 border-l-8 border-[#0A2A5E] pl-10 flex flex-col gap-8">
+              <p className="font-black text-2xl md:text-4xl italic uppercase leading-tight">Precede Concepts bridges high-end professional services and accessible solutions in Ghana.</p>
+              <p className="text-xl font-bold opacity-80 leading-relaxed">We operate a dual-purpose ecosystem: a digital business support agency and a CSR hub for community resources.</p>
+            </div>
+          </div>
+          <div className="flex flex-col lg:flex-row gap-12 text-[#0A2A5E] text-left pt-20 border-t-8 border-[#0A2A5E]/10">
+            <div className="lg:w-1/3"><h3 className="text-3xl font-black uppercase italic tracking-tighter">EMPOWERING THE <br/> GHANAIAN HUSTLE</h3></div>
+            <div className="lg:w-2/3">
+              <p className="text-xl font-bold leading-relaxed opacity-90 mb-8">Based in Accra, we provide the digital, creative, and operational systems needed to scale. We build smart solutions that simplify your workflows and amplify your brand, giving you the tools to lead.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Business Growth</p><p className="text-sm font-bold opacity-70">Registration, Development, Strategic Consultation</p></div>
+                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Identity & Branding</p><p className="text-sm font-bold opacity-70">Graphic Design, Branding, Professional Printing</p></div>
+                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Tech & Innovation</p><p className="text-sm font-bold opacity-70">IT Support, Web Audits, Digital Solutions, AI</p></div>
+                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Capacity Building</p><p className="text-sm font-bold opacity-70">Specialized Training, Computing Concepts</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- ⚡ OPPORTUNITY HUB --- */}
       <section id="hub" className="min-h-screen py-32 px-6 bg-[#0F4C81]">
         <div className="max-w-[1400px] mx-auto text-left">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
@@ -110,7 +135,7 @@ export default function Home() {
             </div>
             <div className="flex flex-wrap gap-2 bg-black/20 p-1.5 rounded-full border border-white/5">
               {['all', 'training', 'job', 'event', 'place'].map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/40'}`}>
+                <button key={f} onClick={() => setFilter(f)} className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/40 hover:text-white'}`}>
                   {f === 'place' ? 'Places & Spaces' : f}
                 </button>
               ))}
@@ -134,37 +159,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🏢 ABOUT US (Breathable Layout) --- */}
-      <section id="about" className="bg-[#1FC8C8] py-32 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col gap-24">
-          <div className="flex flex-col lg:flex-row gap-12 text-[#0A2A5E] text-left">
-            <h2 className="lg:w-1/3 text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.8]">BEYOND A <br/> DIGITAL <br/> AGENCY.</h2>
-            <div className="lg:w-2/3 border-l-8 border-[#0A2A5E] pl-10 flex flex-col gap-8">
-              <p className="font-black text-2xl md:text-4xl italic uppercase leading-tight">Precede Concepts bridges high-end professional services and accessible solutions in Ghana.</p>
-              <p className="text-xl font-bold opacity-80 leading-relaxed">We operate a dual-purpose ecosystem: a digital business support agency and a CSR hub for community resources.</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-12 text-[#0A2A5E] text-left pt-20 border-t-8 border-[#0A2A5E]/10">
-            <div className="lg:w-1/3"><h3 className="text-3xl font-black uppercase italic tracking-tighter">EMPOWERING THE <br/> GHANAIAN HUSTLE</h3></div>
-            <div className="lg:w-2/3">
-              <p className="text-xl font-bold leading-relaxed opacity-90 mb-8">Based in Accra, we provide the digital, creative, and operational systems needed to scale. We build smart solutions that simplify your workflows and amplify your brand, giving you the tools to lead.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Business Growth</p><p className="text-sm font-bold opacity-70">Registration, Development, Strategic Consultation</p></div>
-                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Identity & Branding</p><p className="text-sm font-bold opacity-70">Graphic Design, Branding, Professional Printing</p></div>
-                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Tech & Innovation</p><p className="text-sm font-bold opacity-70">IT Support, Web Audits, Digital Solutions, AI</p></div>
-                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Capacity Building</p><p className="text-sm font-bold opacity-70">Specialized Training, Computing Concepts</p></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* --- 🛠️ SERVICES --- */}
       <section id="services" className="py-32 bg-white px-6">
         <div className="max-w-7xl mx-auto text-left">
           <h2 className="text-5xl font-black uppercase italic text-[#0A2A5E] mb-20">Our Core Services.</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
             {services.map((s, i) => (
               <div key={i} className="p-10 bg-slate-50 border border-slate-100 rounded-[3rem] transition-all hover:border-[#1FC8C8] group">
                 <div className="flex items-center gap-5 mb-8 pb-8 border-b-2 border-slate-200/50">
@@ -175,7 +174,7 @@ export default function Home() {
                   {s.list.slice(0, 3).map((item, idx) => (
                     <li key={idx} className="flex items-center gap-3 text-[12px] font-black text-slate-500 uppercase italic"><CheckCircle2 size={16} className="text-[#1FC8C8] flex-shrink-0"/> {item}</li>
                   ))}
-                  <li className="pt-2 text-[10px] font-black text-[#1FC8C8] uppercase tracking-widest italic border-t-2 border-slate-100 w-fit">And More...</li>
+                  <li className="pt-2 text-[10px] font-black text-[#1FC8C8] uppercase tracking-widest italic border-t-2 border-slate-100 w-fit">AND MORE...</li>
                 </ul>
               </div>
             ))}
@@ -194,11 +193,11 @@ export default function Home() {
             <div className="space-y-8 mb-12">
               <div className="flex items-center gap-6">
                 <div className="p-5 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8]"><Phone size={32}/></div>
-                <div><span className="text-[10px] font-black uppercase text-white/40">Voice</span><p className="text-4xl font-black italic">{BUSINESS_PHONE}</p></div>
+                <div><span className="text-[10px] font-black uppercase text-white/40">Voice Line</span><p className="text-4xl font-black italic tracking-tighter">{BUSINESS_PHONE}</p></div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="p-5 bg-[#1FC8C8]/20 rounded-2xl text-[#1FC8C8]"><Mail size={32}/></div>
-                <div><span className="text-[10px] font-black uppercase text-white/40">Mail</span><p className="text-2xl font-black italic">{BUSINESS_EMAIL}</p></div>
+                <div><span className="text-[10px] font-black uppercase text-white/40">Digital Mail</span><p className="text-2xl font-black italic tracking-tighter">{BUSINESS_EMAIL}</p></div>
               </div>
             </div>
             <div className="flex flex-col gap-4">
