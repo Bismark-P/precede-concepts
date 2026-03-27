@@ -9,6 +9,7 @@ import {
   Sparkles, Search, Calendar, Map as MapIcon
 } from 'lucide-react'
 
+// --- CUSTOM WHATSAPP ICON ---
 const WhatsAppIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
@@ -41,7 +42,12 @@ export default function Home() {
     window.location.href = `mailto:${BUSINESS_EMAIL}?subject=New Inquiry for Precede Concepts`;
   };
 
-  // --- RESTORED FEATURED & HUB LOGIC ---
+  const handleNavFilter = (filterId: string) => {
+    setFilter(filterId);
+    setIsMenuOpen(false);
+    document.getElementById('hub')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const filteredBySearch = items.filter(item => {
     const searchLow = searchQuery.toLowerCase();
     const matchesSearch = item.title?.toLowerCase().includes(searchLow) || 
@@ -56,15 +62,14 @@ export default function Home() {
     return matchesSearch && matchesFilter;
   });
 
-  // Featured shows regardless of search to keep the Hub looking active
   const featuredItems = items.filter(i => i.is_featured === true && i.status === 'approved').slice(0, 6);
   const displayItems = filteredBySearch.slice(0, visibleCount);
 
   const hubFilters = [
     { id: 'all', label: 'All' },
+    { id: 'event', label: 'Events' },
     { id: 'training', label: 'Training' },
     { id: 'job', label: 'Jobs' },
-    { id: 'event', label: 'Events' },
     { id: 'place', label: 'Places & Spaces' }
   ];
 
@@ -72,46 +77,60 @@ export default function Home() {
 
   return (
     <div className="bg-[#0A2A5E] font-sans text-slate-950 scroll-smooth">
+      {/* --- 🧭 NAVIGATION --- */}
       <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E]/90 backdrop-blur-md border-b border-white/10 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-white text-left">
+        <div className="max-w-7xl mx-auto flex justify-between items-center text-white">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#1FC8C8] rounded-lg flex items-center justify-center font-black italic text-[#0A2A5E] text-[10px] shadow-lg">PC</div>
             <span className="text-sm md:text-lg font-black tracking-tighter uppercase italic leading-none">Precede Concepts</span>
           </div>
-          <div className="hidden xl:flex items-center gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
+          <div className="hidden xl:flex items-center gap-5 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
             <a href="#home" className="hover:text-[#1FC8C8] transition-all">Home</a>
-            <a href="#about" className="hover:text-[#1FC8C8] transition-all">About</a>
-            <a href="#services" className="hover:text-[#1FC8C8] transition-all">Services</a>
-            <a href="#hub" className="hover:text-[#1FC8C8] transition-all">The Hub</a>
+            <button onClick={() => handleNavFilter('event')} className="hover:text-[#1FC8C8] transition-all uppercase">Events</button>
+            <button onClick={() => handleNavFilter('training')} className="hover:text-[#1FC8C8] transition-all uppercase">Training</button>
+            <button onClick={() => handleNavFilter('job')} className="hover:text-[#1FC8C8] transition-all uppercase">Jobs</button>
+            <button onClick={() => handleNavFilter('place')} className="hover:text-[#1FC8C8] transition-all uppercase whitespace-nowrap">Places & Spaces</button>
             <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2.5 rounded-full font-black ml-2 transition-all hover:bg-white">Contact Us</a>
           </div>
           <button className="xl:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>{isMenuOpen ? <X size={24} /> : <Menu size={24} />}</button>
         </div>
       </nav>
 
-      {/* 🚀 RESTORED HERO WITH MOTION & SUBHEADERS */}
+      {/* --- 📱 MOBILE MENU --- */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="fixed inset-0 z-[200] bg-[#0A2A5E] flex flex-col p-8 text-left">
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-3 text-white"><div className="w-8 h-8 bg-[#1FC8C8] rounded-lg flex items-center justify-center font-black italic text-[#0A2A5E] text-[10px]">PC</div><span className="font-black italic uppercase">Menu</span></div>
+              <button onClick={() => setIsMenuOpen(false)} className="text-white bg-white/10 p-2 rounded-full"><X size={28} /></button>
+            </div>
+            <div className="flex flex-col gap-6 text-white overflow-y-auto">
+               <a href="#home" onClick={() => setIsMenuOpen(false)} className="text-4xl font-black uppercase italic tracking-tighter">Home</a>
+               <div className="flex flex-col gap-4 border-t border-white/10 pt-6">
+                 {hubFilters.map(f => (
+                   <button key={f.id} onClick={() => handleNavFilter(f.id)} className="text-2xl font-black uppercase italic text-left text-white/50 hover:text-[#1FC8C8]">{f.label}</button>
+                 ))}
+               </div>
+               <a href="#contact" onClick={() => setIsMenuOpen(false)} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 rounded-2xl font-black uppercase text-center mt-6">Get in Touch</a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- 🚀 HERO --- */}
       <section id="home" className="min-h-screen lg:h-screen flex items-center justify-center px-6 pt-20 bg-[#0A2A5E] relative overflow-hidden text-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="z-10"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="z-10">
           <p className="text-[#1FC8C8] text-[10px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4">Simplifying progress, delivering value.</p>
-          <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.85] text-white">
-            THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.
-          </h1>
+          <h1 className="text-5xl md:text-8xl lg:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.85] text-white">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
           <p className="text-white/40 text-[10px] md:text-[12px] font-black uppercase tracking-[0.4em] mt-6">Progress Simplified — Value Delivered</p>
         </motion.div>
-        
-        {/* Floating Decorative Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
           <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 5, repeat: Infinity }} className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#1FC8C8] rounded-full blur-[120px]" />
           <motion.div animate={{ y: [0, 20, 0] }} transition={{ duration: 7, repeat: Infinity }} className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#0F4C81] rounded-full blur-[150px]" />
         </div>
       </section>
 
-      {/* About (Design Intact) */}
+      {/* --- 🏢 ABOUT --- */}
       <section id="about" className="min-h-screen lg:h-screen w-full flex items-center justify-center px-6 pt-20 bg-[#1FC8C8]">
         <div className="max-w-6xl mx-auto w-full flex flex-col lg:flex-row gap-12 items-center">
           <h2 className="lg:flex-1 text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-[#0A2A5E] leading-none text-center lg:text-left">Beyond a <br/> Digital Agency.</h2>
@@ -122,7 +141,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services (Design Intact) */}
+      {/* --- 🛠️ SERVICES --- */}
       <section id="services" className="min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-12 bg-white">
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-10 text-[#0A2A5E]"><h2 className="text-4xl font-black uppercase italic">Our Services.</h2><p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.5em]">Comprehensive Business Solutions</p></div>
@@ -147,7 +166,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ⚡ THE HUB (RESTORED FEATURED PICKS) */}
+      {/* --- ⚡ THE HUB --- */}
       <section id="hub" className="min-h-screen w-full flex flex-col items-center px-4 md:px-6 pt-32 pb-20 bg-[#0F4C81] scroll-mt-0">
         <div className="w-full max-w-[1400px] mx-auto flex flex-col">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
@@ -171,19 +190,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* OUR PICKS - ALWAYS VISIBLE IF DATA EXISTS */}
           {featuredItems.length > 0 && filter === 'all' && searchQuery === '' && (
             <div className="mb-16 text-left">
               <div className="flex items-center gap-3 mb-6"><Sparkles size={18} className="text-[#1FC8C8]" /><h3 className="text-sm font-black uppercase tracking-[0.3em] text-[#1FC8C8] italic">Our Top Picks</h3></div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-5">
                 {featuredItems.map((item) => <ScoutCard key={`f-${item.id}`} item={item} isFeatured={true} />)}
               </div>
               <div className="h-px w-full bg-white/10 mt-16"></div>
             </div>
           )}
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {displayItems.length > 0 ? displayItems.map((item) => <ScoutCard key={item.id} item={item} />) : <div className="col-span-full py-20 text-white/20 font-black uppercase italic text-center">No results found in this category.</div>}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
+            {displayItems.map((item) => <ScoutCard key={item.id} item={item} />)}
           </div>
 
           {filteredBySearch.length > visibleCount && (
@@ -192,8 +210,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact Section (Restored mailto button) */}
-      <section id="contact" className="h-screen w-full flex flex-col justify-between px-6 pt-24 pb-6 bg-[#0A2A5E] relative overflow-hidden text-white">
+      {/* --- 💬 CONTACT --- */}
+      <section id="contact" className="min-h-screen w-full flex flex-col justify-between px-6 pt-24 pb-6 bg-[#0A2A5E] relative overflow-hidden text-white">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 items-center flex-1">
           <div className="text-left"><h2 className="text-5xl lg:text-[5.5rem] font-black italic uppercase leading-none mb-4">MOVE AHEAD, <br/><span className="text-[#1FC8C8]">STAY AHEAD.</span></h2></div>
           <div className="bg-white/5 p-10 rounded-[3rem] border border-white/10 text-left">
@@ -228,22 +246,22 @@ function ScoutCard({ item, isFeatured = false }: { item: any, isFeatured?: boole
     <div className={`group bg-white rounded-[2rem] overflow-hidden flex flex-col shadow-2xl h-full border-2 ${isFeatured ? 'border-[#1FC8C8] ring-4 ring-[#1FC8C8]/10' : 'border-transparent'} hover:scale-[1.02] transition-all duration-300`}>
       <div className="h-28 lg:h-32 bg-slate-900 relative">
         {item.image_url && <img src={item.image_url} className="w-full h-full object-cover" />}
-        <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 rounded-full uppercase">{item.category}</span>
-        {isToday && <span className="absolute top-2 right-2 animate-pulse text-[6px] font-black bg-red-50 text-white px-2 py-1 rounded-full uppercase tracking-widest">Live Today</span>}
+        <span className="absolute top-2 left-2 text-[8px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 rounded-full uppercase tracking-widest">{item.category}</span>
+        {isToday && <span className="absolute top-2 right-2 animate-pulse text-[8px] font-black bg-red-500 text-white px-2 py-1 rounded-full uppercase">Live Today</span>}
       </div>
-      <div className="p-4 text-left flex flex-col flex-1">
-        <h4 className="font-black text-[10px] lg:text-[11px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 mb-1 h-8">{item.title}</h4>
-        <p className="text-[7px] font-black text-[#1FC8C8] uppercase tracking-widest mb-2 italic">Organised by: {item.organizer_body || "Precede Verified"}</p>
-        <div className="mb-3">
-          <p className="text-[9px] font-black text-[#0A2A5E] uppercase italic flex items-center gap-1"><Calendar size={10}/> {item.recurring_day ? `Every ${item.recurring_day}` : `${dayName}, ${shortDate}`}</p>
-          <p className={`text-[7px] font-bold uppercase mt-0.5 ${diffInDays <= 3 && diffInDays >= 0 ? 'text-orange-500' : 'text-slate-400'}`}>{diffInDays === 0 ? "Happening Now" : diffInDays > 0 ? `${diffInDays} Days Left` : "Past Event"}</p>
+      <div className="p-5 text-left flex flex-col flex-1">
+        <h4 className="font-black text-[14px] lg:text-[16px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 mb-2 h-10">{item.title}</h4>
+        <p className="text-[9px] lg:text-[11px] font-black text-[#1FC8C8] uppercase tracking-widest mb-4 italic">By: {item.organizer_body || "Precede Verified"}</p>
+        <div className="mb-4">
+          <p className="text-[11px] lg:text-[13px] font-black text-[#0A2A5E] uppercase italic flex items-center gap-2"><Calendar size={14}/> {item.recurring_day ? `Every ${item.recurring_day}` : `${dayName}, ${shortDate}`}</p>
+          <p className={`text-[10px] lg:text-[12px] font-black uppercase mt-1 tracking-widest ${diffInDays <= 3 && diffInDays >= 0 ? 'text-orange-500' : 'text-slate-400'}`}>{diffInDays === 0 ? "Happening Now" : diffInDays > 0 ? `${diffInDays} Days Left` : "Past Event"}</p>
         </div>
-        <div className="pt-3 border-t border-slate-100 mt-auto">
-          <div className="flex flex-col gap-0.5 overflow-hidden mb-3">
-             <div className="flex items-center gap-1 text-[8px] font-bold text-slate-400 uppercase truncate"><MapPin size={9}/> {item.venue}</div>
-             <a href={mapUrl} target="_blank" className="text-[7px] font-black text-blue-500 uppercase flex items-center gap-1 hover:text-[#1FC8C8] transition-all"><MapIcon size={9}/> View Location</a>
+        <div className="pt-4 border-t border-slate-100 mt-auto">
+          <div className="flex flex-col gap-1 overflow-hidden mb-4">
+             <div className="flex items-center gap-2 text-[11px] lg:text-[13px] font-bold text-slate-500 uppercase truncate"><MapPin size={14} className="flex-shrink-0"/> {item.venue}</div>
+             <a href={mapUrl} target="_blank" className="text-[10px] lg:text-[12px] font-black text-blue-500 uppercase flex items-center gap-1 hover:text-[#1FC8C8] transition-all"><MapIcon size={12}/> View Location</a>
           </div>
-          <a href={item.link} target="_blank" className="w-full py-2 bg-slate-50 border border-slate-100 rounded-xl text-[#0A2A5E] hover:bg-[#0A2A5E] hover:text-white transition-all text-[8px] font-black uppercase flex items-center justify-center gap-2">Join / Apply <ArrowUpRight size={10}/></a>
+          <a href={item.link} target="_blank" className="w-full py-4 bg-slate-50 border border-slate-100 rounded-xl text-[#0A2A5E] hover:bg-[#0A2A5E] hover:text-white transition-all text-[11px] lg:text-[13px] font-black uppercase flex items-center justify-center gap-2 shadow-sm">View Details <ArrowUpRight size={14}/></a>
         </div>
       </div>
     </div>
