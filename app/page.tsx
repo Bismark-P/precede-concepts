@@ -112,20 +112,26 @@ export default function Home() {
 
       {/* --- 🚀 HERO --- */}
       <section id="home" className="h-screen flex items-center justify-center px-6 bg-[#0A2A5E] relative overflow-hidden text-center">
-        <div className="z-10">
+        <motion.div 
+          className="z-10"
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.4, ease: "easeOut" }}
+        >
           <p className="text-[#1FC8C8] text-[9px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4 italic opacity-90">PROGRESS SIMPLIFIED, VALUE DELIVERED.</p>
           <h1 className="text-6xl md:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white select-none">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
           <p className="text-white/40 text-[8px] md:text-[11px] font-black uppercase tracking-[0.4em] mt-8 italic">SIMPLIFYING PROGRESS, DELIVERING VALUE.</p>
-        </div>
+        </motion.div>
       </section>
 
-      {/* --- 🏢 ABOUT US (Perfect Size & Alignment) --- */}
+      {/* --- 🏢 ABOUT US --- */}
       <section id="about" className="h-screen flex items-center justify-center px-6 bg-[#1FC8C8]">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16 items-center text-[#0A2A5E] w-full">
           <div>
-            <h2 className="text-[4rem] md:text-[7.5rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-4">
+            {/* Forced exactly 3 lines using whitespace-nowrap on the middle line */}
+            <h2 className="text-[4rem] md:text-[6.5rem] lg:text-[7.5rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-4">
               BEYOND <br/> 
-              A <span className="text-white drop-shadow-sm">DIGITAL</span> <br/> 
+              <span className="whitespace-nowrap">A <span className="text-white">DIGITAL</span></span> <br/> 
               AGENCY.
             </h2>
             <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-50 italic">Move ahead, stay ahead.</p>
@@ -133,11 +139,13 @@ export default function Home() {
           
           <div className="border-l-[8px] border-[#0A2A5E] pl-8 md:pl-12 flex flex-col justify-center h-full">
             <div className="flex flex-col gap-6">
-              <p className="font-black text-base md:text-lg italic uppercase tracking-[0.1em] leading-relaxed opacity-80 max-w-[95%]">
+              {/* Paragraph 1: Standardized reading size */}
+              <p className="font-black text-[13px] md:text-[15px] italic uppercase tracking-[0.2em] leading-loose opacity-80 max-w-[95%]">
                 PRECEDE CONCEPTS BRIDGES THE GAP BETWEEN HIGH-END PROFESSIONAL SERVICES AND ACCESSIBLE SOLUTIONS IN GHANA.
               </p>
               
-              <p className="text-base md:text-lg font-bold leading-relaxed max-w-[95%] opacity-90">
+              {/* Paragraph 2: Sentence style, perfectly matched standard reading size */}
+              <p className="text-[13px] md:text-[15px] font-bold leading-relaxed max-w-[95%] opacity-90">
                 We operate a dual-purpose ecosystem: a primary business executing top-tier digital & multimedia services, and a CSR hub driving traffic by curating vital community resources.
               </p>
               
@@ -219,40 +227,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 💬 CONTACT & FOOTER (One Screen Synergy) --- */}
-      <section id="contact" className="min-h-screen md:h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 pt-32 pb-8 text-white relative">
-        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-16 items-center flex-1">
+      {/* --- 💬 CONTACT & FOOTER (Single Unified Screen) --- */}
+      <section id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 pt-24 pb-0 text-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-12 items-center flex-1">
           <div className="text-left">
-            <h2 className="text-[4.5rem] md:text-7xl lg:text-[8rem] font-black italic uppercase leading-[0.8] mb-6">
-              MOVE AHEAD, <br/><span className="text-[#1FC8C8] drop-shadow-[0_0_25px_rgba(31,200,200,0.3)]">STAY AHEAD.</span>
+            <h2 className="text-[3.8rem] md:text-6xl lg:text-[7rem] font-black italic uppercase leading-[0.8] mb-6">
+              MOVE AHEAD, <br/>
+              <motion.span 
+                className="text-[#1FC8C8] inline-block"
+                animate={{ y: [0, -15, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                STAY AHEAD.
+              </motion.span>
             </h2>
-            <p className="text-white/40 text-[10px] md:text-[12px] font-black uppercase tracking-[0.5em] italic">PROGRESS SIMPLIFIED — VALUE DELIVERED</p>
+            <p className="text-white/40 text-[10px] md:text-[11px] font-black uppercase tracking-[0.5em] italic">PROGRESS SIMPLIFIED — VALUE DELIVERED</p>
           </div>
           
-          <div className="bg-white/5 p-8 md:p-12 rounded-[3.5rem] border-4 border-white/10 shadow-2xl backdrop-blur-sm">
-            <div className="space-y-10 mb-10 text-left">
-              <div className="flex items-center gap-6 md:gap-8 group cursor-pointer transition-all hover:translate-x-2">
-                <div className="p-5 md:p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Phone size={30}/></div>
-                <div><span className="text-[10px] md:text-[12px] font-black uppercase text-white/40 tracking-widest leading-none">VOICE LINE</span><p className="text-3xl md:text-4xl font-black italic tracking-tighter">0591999544</p></div>
+          <div className="bg-white/5 p-8 md:p-10 rounded-[3rem] border-4 border-white/10 shadow-2xl backdrop-blur-sm">
+            <div className="space-y-8 mb-8 text-left">
+              <div className="flex items-center gap-6 group cursor-pointer transition-all hover:translate-x-2">
+                <div className="p-5 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Phone size={28}/></div>
+                <div><span className="text-[10px] md:text-[11px] font-black uppercase text-white/40 tracking-widest leading-none">VOICE LINE</span><p className="text-3xl md:text-4xl font-black italic tracking-tighter">0591999544</p></div>
               </div>
-              <div className="flex items-center gap-6 md:gap-8 group cursor-pointer transition-all hover:translate-x-2">
-                <div className="p-5 md:p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Mail size={30}/></div>
-                <div><span className="text-[10px] md:text-[12px] font-black uppercase text-white/40 tracking-widest leading-none">DIGITAL MAIL</span><p className="text-xl md:text-2xl font-black italic tracking-tighter break-all">precedeconcepts@gmail.com</p></div>
+              <div className="flex items-center gap-6 group cursor-pointer transition-all hover:translate-x-2">
+                <div className="p-5 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Mail size={28}/></div>
+                <div><span className="text-[10px] md:text-[11px] font-black uppercase text-white/40 tracking-widest leading-none">DIGITAL MAIL</span><p className="text-lg md:text-xl font-black italic tracking-tighter break-all">precedeconcepts@gmail.com</p></div>
               </div>
             </div>
             
-            <div className="flex flex-col gap-4 md:gap-6">
-               <div className="grid grid-cols-2 gap-4 md:gap-6">
-                  <a href={`https://wa.me/233591999544`} target="_blank" className="bg-white text-[#0A2A5E] p-5 md:p-6 rounded-[2rem] font-black uppercase italic text-[10px] md:text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl hover:-translate-y-1"><WhatsAppIcon /> WHATSAPP</a>
-                  <a href={`https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W`} target="_blank" className="bg-white/10 border-2 border-white/10 p-5 md:p-6 rounded-[2rem] font-black uppercase italic text-[10px] md:text-xs flex items-center justify-center gap-3 hover:bg-white/20 transition-all hover:-translate-y-1"><Smartphone size={20}/> CHANNEL</a>
+            <div className="flex flex-col gap-5">
+               <div className="grid grid-cols-2 gap-5">
+                  <a href={`https://wa.me/233591999544`} target="_blank" className="bg-white text-[#0A2A5E] p-5 rounded-[1.5rem] font-black uppercase italic text-[10px] md:text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl hover:-translate-y-1"><WhatsAppIcon /> WHATSAPP</a>
+                  <a href={`https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W`} target="_blank" className="bg-white/10 border-2 border-white/10 p-5 rounded-[1.5rem] font-black uppercase italic text-[10px] md:text-xs flex items-center justify-center gap-3 hover:bg-white/20 transition-all hover:-translate-y-1"><Smartphone size={18}/> CHANNEL</a>
                </div>
-               <button onClick={() => window.location.href = `mailto:${BUSINESS_EMAIL}`} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 md:p-8 rounded-[3rem] font-black uppercase italic text-xs md:text-sm shadow-2xl hover:bg-white transition-all tracking-[0.2em] hover:-translate-y-1">SEND AN EMAIL</button>
+               <button onClick={() => window.location.href = `mailto:${BUSINESS_EMAIL}`} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 rounded-[2rem] font-black uppercase italic text-xs md:text-sm shadow-2xl hover:bg-white transition-all tracking-[0.2em] hover:-translate-y-1">SEND AN EMAIL</button>
             </div>
           </div>
         </div>
 
         {/* --- 🏁 UNIFIED FOOTER --- */}
-        <div className="shrink-0 text-center pt-8 mt-12 md:mt-16 border-t border-white/5 w-full">
+        <div className="shrink-0 text-center pb-6 pt-6 border-t border-white/5 w-full">
           <p className="text-[#1FC8C8] font-black uppercase italic text-[10px] tracking-[0.5em]">PRECEDE CONCEPTS</p>
           <p className="text-white/20 font-black uppercase text-[8px] tracking-[0.3em] mt-2">ACCRA GHANA · © 2026</p>
         </div>
@@ -284,13 +299,11 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
 
   return (
     <div className={`group bg-white rounded-[1.5rem] overflow-hidden flex flex-col shadow-lg transition-all hover:scale-[1.03] h-full ${isFeatured ? 'border-[3px] border-[#1FC8C8] ring-4 ring-[#1FC8C8]/10' : 'border border-slate-100'}`}>
-      {/* Ultra Compact Card Image */}
       <div className="h-16 bg-slate-900 relative">
         {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-80" />}
         <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-0.5 rounded-full uppercase italic tracking-widest">{item.category}</span>
       </div>
       
-      {/* Compact Card Content */}
       <div className="p-4 flex flex-col flex-1 text-left">
         <h4 className="font-black text-[12px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 h-8 mb-2 text-left">{item.title}</h4>
         
