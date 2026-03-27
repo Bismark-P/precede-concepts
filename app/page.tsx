@@ -51,67 +51,96 @@ export default function Home() {
   const featuredItems = items.filter(i => i.is_featured && i.status === 'approved').slice(0, 6);
   const displayItems = filteredBySearch.slice(0, 18);
 
-  const services = [
-    { title: 'Admin & Printing', icon: <Printer size={20}/>, list: ['Professional Typing & Printing', 'Banner & Sticker Printing', 'Large Format Labels', 'Business Registration Assist', 'Binding & Lamination'] },
-    { title: 'Identity & Branding', icon: <Palette size={20}/>, list: ['Logo Design', 'Professional Flyers', 'Strategic Consultation', 'Brand Guidelines', 'Visual Identity'] },
-    { title: 'Tech & Engineering', icon: <Code2 size={20}/>, list: ['Web Development', 'Web Audit & Grading', 'AI Integration', 'Backend Systems', 'IT Support'] },
-    { title: 'Growth Marketing', icon: <Megaphone size={20}/>, list: ['SEO Visibility', 'Social Media Mgt.', 'Targeted Google Ads', 'Content Marketing', 'Lead Gen'] },
-    { title: 'Multimedia', icon: <PlayCircle size={20}/>, list: ['Cinematic Video', 'Product Photo', 'Sound Engineering', 'Drone Ops', 'Commercial Editing'] },
-    { title: 'Operations', icon: <Users size={20}/>, list: ['Technical Ops', 'Remote Assistance', 'White-Label Tech', 'B2B Execution', 'Execution Support'] },
+  const coreServices = [
+    { title: 'Admin & Printing', icon: <Printer size={20}/>, list: ['Professional Typing', 'Printing', 'Banners', 'Stickers', 'Labels', 'Binding', 'Lamination'] },
+    { title: 'Identity & Branding', icon: <Palette size={20}/>, list: ['Logo Design', 'Branding', 'Flyers', 'Strategic Consultation'] },
+    { title: 'Tech & Engineering', icon: <Code2 size={20}/>, list: ['Web Development', 'Web Audit & Grading', 'AI Integration', 'IT Support'] },
+    { title: 'Operations', icon: <Users size={20}/>, list: ['Business Registration', 'Technical Ops', 'Remote Assistance'] },
   ]
 
   if (!mounted) return null
 
   return (
     <div className="bg-[#0A2A5E] font-sans text-slate-950 scroll-smooth overflow-x-hidden">
-      {/* --- 🧭 NAVIGATION --- */}
+      {/* --- 🧭 NAVIGATION (Strict Order) --- */}
       <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E]/90 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-white">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#1FC8C8] rounded-lg flex items-center justify-center font-black italic text-[#0A2A5E] text-[10px] shadow-lg">PC</div>
             <span className="text-sm md:text-lg font-black tracking-tighter uppercase italic leading-none">Precede Concepts</span>
           </div>
-          <div className="hidden xl:flex items-center gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/70">
-            <a href="#home">Home</a> <a href="#about">About</a> <a href="#services">Services</a>
-            <button onClick={() => handleNavFilter('training')}>Training</button>
+          <div className="hidden xl:flex items-center gap-5 text-[8px] font-black uppercase tracking-[0.2em] text-white/70">
+            <a href="#home">Home</a> 
+            <a href="#about">About Us</a> 
+            <a href="#services">Services</a>
+            <button onClick={() => handleNavFilter('training')}>Training & Seminars</button>
             <button onClick={() => handleNavFilter('job')}>Jobs</button>
             <button onClick={() => handleNavFilter('event')}>Events</button>
             <button onClick={() => handleNavFilter('place')} className="text-[#1FC8C8]">Places & Spaces</button>
-            <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2 rounded-full font-black">Contact</a>
+            <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-4 py-2 rounded-full font-black ml-2">Contact</a>
           </div>
           <button className="xl:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}><Menu size={24} /></button>
         </div>
       </nav>
 
-      {/* --- 🚀 HERO --- */}
-      <section id="home" className="h-screen flex items-center justify-center bg-[#0A2A5E] text-center relative overflow-hidden">
+      {/* --- 🚀 HOME / HERO --- */}
+      <section id="home" className="h-screen flex items-center justify-center bg-[#0A2A5E] relative overflow-hidden text-center">
         <div className="z-10 px-6">
-          <p className="text-[#1FC8C8] text-[10px] md:text-[14px] font-black uppercase tracking-[0.6em] mb-4 italic text-left md:text-center">Simplifying progress, delivering value.</p>
-          <h1 className="text-6xl md:text-9xl font-black uppercase italic leading-[0.85] text-white text-left md:text-center">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
+          <p className="text-[#1FC8C8] text-[10px] md:text-[14px] font-black uppercase tracking-[0.6em] mb-4 italic">Simplifying progress, delivering value.</p>
+          <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.85] text-white">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
         </div>
       </section>
 
-      {/* --- 🏢 ABOUT (P3.PNG STYLE) --- */}
-      <section id="about" className="bg-[#1FC8C8] py-32 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col gap-24">
-          <div className="flex flex-col lg:flex-row gap-12 text-[#0A2A5E] text-left">
-            <h2 className="lg:w-1/3 text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.8]">BEYOND A <br/> DIGITAL <br/> AGENCY.</h2>
-            <div className="lg:w-2/3 border-l-8 border-[#0A2A5E] pl-10 flex flex-col gap-8">
-              <p className="font-black text-2xl md:text-4xl italic uppercase leading-tight">Precede Concepts bridges high-end professional services and accessible solutions in Ghana.</p>
-              <p className="text-xl font-bold opacity-80 leading-relaxed">We operate a dual-purpose ecosystem: a digital business support agency and a CSR hub for community resources.</p>
+      {/* --- 🏢 ABOUT US (ONE SCREEN FIT) --- */}
+      <section id="about" className="h-screen bg-[#1FC8C8] flex items-center justify-center px-6 py-12">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10 items-center text-[#0A2A5E] text-left">
+          <div className="lg:w-1/3">
+            <h2 className="text-6xl md:text-[7rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-4">BEYOND A <br/> DIGITAL <br/> AGENCY.</h2>
+            <p className="text-xs font-black uppercase tracking-[0.4em] opacity-60 italic">Move ahead, stay ahead.</p>
+          </div>
+          <div className="lg:w-2/3 border-l-8 border-[#0A2A5E] pl-8 flex flex-col gap-6">
+            <p className="font-black text-xl md:text-2xl italic leading-tight uppercase">
+              Precede Concepts bridges high-end professional services and accessible solutions in Ghana. 
+              We operate a dual-purpose ecosystem: a digital business support agency and a CSR hub for community resources.
+            </p>
+            <div className="space-y-4">
+              <h3 className="font-black text-sm uppercase tracking-widest text-[#0A2A5E]">Empowering the Ghanaian Hustle</h3>
+              <p className="text-base font-bold leading-relaxed opacity-90">
+                Based in Accra, we provide the digital, creative, and operational systems needed to scale. We simplify your workflows and amplify your brand, giving you the tools to lead.
+              </p>
+            </div>
+            {/* SERVICES LISTED WITH COMMAS TO SAVE SPACE */}
+            <div className="pt-6 border-t-2 border-[#0A2A5E]/20">
+              <h4 className="font-black text-xs uppercase mb-2 tracking-widest">Our Core Pillars:</h4>
+              <p className="text-sm font-black uppercase italic opacity-80 leading-relaxed">
+                <span className="text-[#0A2A5E]">Business Growth:</span> Business Registration, Development, Strategic Consultation. <br/>
+                <span className="text-[#0A2A5E]">Identity & Branding:</span> Graphic Design, Branding, Professional Printing, Banners, Stickers, Labels. <br/>
+                <span className="text-[#0A2A5E]">Tech & Innovation:</span> IT Support, Web Development, Web Audit & Grading, AI Integration. <br/>
+                <span className="text-[#0A2A5E]">Capacity Building:</span> Specialized Training, Computing Concepts.
+              </p>
             </div>
           </div>
-          <div className="flex flex-col lg:flex-row gap-12 text-[#0A2A5E] text-left pt-20 border-t-8 border-[#0A2A5E]/10">
-            <div className="lg:w-1/3"><h3 className="text-3xl font-black uppercase italic tracking-tighter">EMPOWERING THE <br/> GHANAIAN HUSTLE</h3></div>
-            <div className="lg:w-2/3">
-              <p className="text-xl font-bold leading-relaxed opacity-90 mb-8">Based in Accra, we provide the digital, creative, and operational systems needed to scale. We build smart solutions that simplify your workflows and amplify your brand, giving you the tools to lead.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Business Growth</p><p className="text-sm font-bold opacity-70">Registration, Development, Strategic Consultation</p></div>
-                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Identity & Branding</p><p className="text-sm font-bold opacity-70">Graphic Design, Branding, Professional Printing</p></div>
-                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Tech & Innovation</p><p className="text-sm font-bold opacity-70">IT Support, Web Audits, Digital Solutions, AI</p></div>
-                <div className="flex flex-col gap-2"><p className="font-black italic text-[#0A2A5E] uppercase border-b-2 border-[#0A2A5E] w-fit">Capacity Building</p><p className="text-sm font-bold opacity-70">Specialized Training, Computing Concepts</p></div>
+        </div>
+      </section>
+
+      {/* --- 🛠️ SERVICES (BEFORE HUB) --- */}
+      <section id="services" className="min-h-screen py-32 bg-white px-6">
+        <div className="max-w-7xl mx-auto text-left">
+          <h2 className="text-5xl font-black uppercase italic text-[#0A2A5E] mb-16">The Portfolio.</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {coreServices.map((s, i) => (
+              <div key={i} className="p-8 bg-slate-50 border-2 border-slate-100 rounded-[2.5rem] flex flex-col group hover:border-[#1FC8C8] transition-all">
+                <div className="flex items-center gap-4 mb-6 pb-6 border-b-2 border-slate-200/50">
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#0F4C81] group-hover:bg-[#1FC8C8] transition-all">{s.icon}</div>
+                  <h3 className="text-xs font-black uppercase italic text-[#0A2A5E]">{s.title}</h3>
+                </div>
+                <ul className="space-y-3">
+                  {s.list.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase italic leading-tight"><CheckCircle2 size={12} className="text-[#1FC8C8]"/> {item}</li>
+                  ))}
+                </ul>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -121,12 +150,12 @@ export default function Home() {
         <div className="max-w-[1400px] mx-auto text-left">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
             <div className="flex-1 w-full max-w-xl">
-              <h2 className="text-4xl font-black uppercase italic text-white mb-6">Opportunity Hub</h2>
+              <h2 className="text-4xl font-black uppercase italic text-white mb-6">Opportunity Hub.</h2>
               <div className="relative">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={20} />
                 <input 
                   type="text" 
-                  placeholder="Search typing, printing, web dev, AirBnB..." 
+                  placeholder="Search typing, printing, web dev, hotels, AirBnB..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full p-5 pl-16 bg-white/10 border-2 border-white/10 rounded-[2rem] text-white outline-none focus:border-[#1FC8C8] font-bold text-sm"
@@ -142,10 +171,10 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Featured Picks Restored */}
+          {/* Featured Picks Logic */}
           {featuredItems.length > 0 && filter === 'all' && searchQuery === '' && (
             <div className="mb-16">
-              <div className="flex items-center gap-2 text-[#1FC8C8] mb-6 font-black uppercase italic text-sm"><Sparkles size={18}/> Featured Picks</div>
+              <div className="flex items-center gap-2 text-[#1FC8C8] mb-6 font-black uppercase italic text-sm"><Sparkles size={18}/> Our Top Picks</div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 {featuredItems.map(item => <ScoutCard key={`f-${item.id}`} item={item} />)}
               </div>
@@ -159,36 +188,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 🛠️ SERVICES --- */}
-      <section id="services" className="py-32 bg-white px-6">
-        <div className="max-w-7xl mx-auto text-left">
-          <h2 className="text-5xl font-black uppercase italic text-[#0A2A5E] mb-20">Our Core Services.</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
-            {services.map((s, i) => (
-              <div key={i} className="p-10 bg-slate-50 border border-slate-100 rounded-[3rem] transition-all hover:border-[#1FC8C8] group">
-                <div className="flex items-center gap-5 mb-8 pb-8 border-b-2 border-slate-200/50">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#0F4C81] group-hover:bg-[#1FC8C8] transition-all">{s.icon}</div>
-                  <h3 className="text-lg font-black uppercase italic text-[#0A2A5E] leading-none">{s.title}</h3>
-                </div>
-                <ul className="space-y-4">
-                  {s.list.slice(0, 3).map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-3 text-[12px] font-black text-slate-500 uppercase italic"><CheckCircle2 size={16} className="text-[#1FC8C8] flex-shrink-0"/> {item}</li>
-                  ))}
-                  <li className="pt-2 text-[10px] font-black text-[#1FC8C8] uppercase tracking-widest italic border-t-2 border-slate-100 w-fit">AND MORE...</li>
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* --- 💬 CONTACT --- */}
-      <section id="contact" className="min-h-screen bg-[#0A2A5E] flex items-center justify-center px-6 text-white text-left">
+      <section id="contact" className="h-screen bg-[#0A2A5E] flex items-center justify-center px-6 text-white text-left">
         <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-16 items-center">
-          <div className="flex flex-col gap-6">
-            <h2 className="text-7xl lg:text-[8.5rem] font-black italic uppercase leading-[0.85]">MOVE AHEAD, <br/><span className="text-[#1FC8C8]">STAY AHEAD.</span></h2>
-            <p className="text-white/30 text-xs font-black uppercase tracking-[0.5em] mt-4">[ Ready to transform your business? Get in touch today. ]</p>
-          </div>
+          <h2 className="text-7xl lg:text-[8.5rem] font-black italic uppercase leading-[0.85]">MOVE AHEAD, <br/><span className="text-[#1FC8C8]">STAY AHEAD.</span></h2>
           <div className="bg-white/5 p-12 rounded-[4rem] border-4 border-white/10 shadow-2xl">
             <div className="space-y-8 mb-12">
               <div className="flex items-center gap-6">
@@ -201,13 +204,9 @@ export default function Home() {
               </div>
             </div>
             <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <a href={`https://wa.me/233591999544`} target="_blank" className="bg-white text-[#0A2A5E] p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl"><WhatsAppIcon /> Whatsapp</a>
-                <a href={`https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W`} target="_blank" className="bg-white/10 border-2 border-white/10 p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-2 hover:bg-white/20 transition-all"><Smartphone size={20}/> JOIN CHANNEL</a>
-              </div>
-              <button onClick={() => window.location.href = `mailto:${BUSINESS_EMAIL}`} className="bg-[#1FC8C8] text-[#0A2A5E] p-7 rounded-[2.5rem] font-black uppercase italic text-sm flex items-center justify-center gap-4 shadow-2xl hover:bg-white transition-all">
-                <Send size={24} /> Send us an Email
-              </button>
+               <a href={`https://wa.me/233591999544`} target="_blank" className="bg-white text-[#0A2A5E] p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl"><WhatsAppIcon /> Whatsapp</a>
+               <a href={`https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W`} target="_blank" className="bg-white/10 border-2 border-white/10 p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all"><Smartphone size={20}/> Join Channel</a>
+               <button onClick={() => window.location.href = `mailto:${BUSINESS_EMAIL}`} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 rounded-[2rem] font-black uppercase italic text-sm shadow-2xl hover:bg-white transition-all">Send us an Email</button>
             </div>
           </div>
         </div>
@@ -224,20 +223,26 @@ function ScoutCard({ item }: { item: any }) {
   const isPast = targetDate < today && !isToday;
 
   return (
-    <div className="group bg-white rounded-[2rem] overflow-hidden flex flex-col shadow-lg border border-slate-100 h-full transition-all hover:scale-[1.03]">
+    <div className="group bg-white rounded-[1.5rem] overflow-hidden flex flex-col shadow-lg border border-slate-100 h-full transition-all hover:scale-[1.03]">
       <div className="h-24 bg-slate-900 relative">
         {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-80" />}
-        <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2.5 py-1 rounded-full uppercase italic tracking-widest">{item.category}</span>
+        <span className="absolute top-2 left-2 text-[6px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-0.5 rounded-full uppercase italic tracking-widest">{item.category}</span>
       </div>
-      <div className="p-5 flex flex-col flex-1 text-left">
-        <h4 className="font-black text-[14px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 h-9 mb-2 text-left">{item.title}</h4>
-        <div className="mb-4 text-left border-b border-slate-100 pb-3">
-          <p className="text-[10px] font-black uppercase italic text-slate-500">{targetDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
-          <p className={`text-[10px] font-black uppercase italic mt-1 ${isToday ? 'text-red-600 animate-pulse' : isPast ? 'text-slate-300' : 'text-[#1FC8C8]'}`}>{isToday ? 'TODAY' : isPast ? 'PAST' : `${diff} DAYS LEFT`}</p>
+      <div className="p-4 flex flex-col flex-1 text-left">
+        <h4 className="font-black text-[11px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 h-8 mb-2">{item.title}</h4>
+        <div className="mb-4">
+          <p className="text-[9px] font-black uppercase italic text-slate-500">
+            {targetDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+          </p>
+          <p className={`text-[9px] font-black uppercase italic mt-1 ${isToday ? 'text-red-600 animate-pulse' : isPast ? 'text-slate-300' : 'text-[#1FC8C8]'}`}>
+            {isToday ? 'TODAY' : isPast ? 'PAST' : `${diff} DAYS LEFT`}
+          </p>
         </div>
-        <div className="mt-auto flex flex-col gap-3 text-left">
-          <div className="flex items-center gap-2 text-[11px] font-black text-[#0A2A5E] uppercase italic truncate"><MapPin size={12} className="text-[#1FC8C8] flex-shrink-0"/> {item.venue}</div>
-          <a href={item.link} target="_blank" className="w-full py-2.5 bg-slate-50 text-[#0A2A5E] border border-slate-200 rounded-xl text-[9px] font-black uppercase text-center group-hover:bg-[#0A2A5E] group-hover:text-white transition-all shadow-sm">View Details</a>
+        <div className="pt-3 border-t border-slate-100 mt-auto flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-[10px] font-black text-[#0A2A5E] uppercase italic truncate">
+            <MapPin size={11} className="text-[#1FC8C8] flex-shrink-0"/> {item.venue}
+          </div>
+          <a href={item.link} target="_blank" className="w-full py-2 bg-slate-50 text-[#0A2A5E] border border-slate-200 rounded-lg text-[8px] font-black uppercase text-center group-hover:bg-[#0A2A5E] group-hover:text-white transition-all shadow-sm">View Details</a>
         </div>
       </div>
     </div>
