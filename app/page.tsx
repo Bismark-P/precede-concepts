@@ -53,10 +53,30 @@ export default function Home() {
 
   const filteredItems = items.filter(item => {
     const s = searchQuery.toLowerCase();
+    
+    // Calculate dates for smart 'today' and 'tomorrow' search functionality
+    const itemDate = new Date(item.event_date);
+    itemDate.setHours(0,0,0,0);
+    
+    const todayDate = new Date();
+    todayDate.setHours(0,0,0,0);
+    
+    const tomorrowDate = new Date(todayDate);
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+
+    const isItemToday = itemDate.getTime() === todayDate.getTime();
+    const isItemTomorrow = itemDate.getTime() === tomorrowDate.getTime();
+
+    const matchesTodaySearch = s.includes('today') && isItemToday;
+    const matchesTomorrowSearch = s.includes('tomorrow') && isItemTomorrow;
+
     const match = item.title?.toLowerCase().includes(s) || 
                   item.venue?.toLowerCase().includes(s) || 
                   item.category?.toLowerCase().includes(s) ||
-                  item.organizer_body?.toLowerCase().includes(s);
+                  item.organizer_body?.toLowerCase().includes(s) ||
+                  matchesTodaySearch || 
+                  matchesTomorrowSearch;
+
     const catMatch = filter === 'all' || (filter === 'training' ? (item.category === 'training' || item.category === 'seminar') : item.category === filter);
     return match && catMatch;
   });
@@ -200,7 +220,7 @@ export default function Home() {
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={24} />
                 <input 
                   type="text" 
-                  placeholder="SEARCH LOCATIONS, RESTAURANTS, PUBS, HOTELS..." 
+                  placeholder="SEARCH LOCATIONS, RESTAURANTS, PUBS, HOTELS, OR TYPE 'TODAY'..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full p-6 pl-18 bg-white/10 border-2 border-white/10 rounded-[2rem] text-white outline-none focus:border-[#1FC8C8] font-black uppercase text-sm italic transition-all placeholder:text-white/30"
@@ -303,6 +323,14 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
   const diff = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
   const isToday = targetDate.toDateString() === today.toDateString();
   const isPast = targetDate < today && !isToday;
+  
+  // Calculate specific wording for the time difference
+  let timeDisplay = '';
+  if (isToday) timeDisplay = 'TODAY';
+  else if (isPast) timeDisplay = 'PAST';
+  else if (diff === 1) timeDisplay = 'TOMORROW';
+  else timeDisplay = `${diff} DAYS MORE`;
+
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map_query || item.venue)}`;
 
   return (
@@ -317,7 +345,9 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
         
         <div className="mb-3 text-left pb-2 border-b border-slate-100 flex justify-between items-end">
           <p className="text-[9px] font-black uppercase italic text-slate-500 leading-none">{targetDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-          <p className={`text-[9px] font-black uppercase italic leading-none ${isToday ? 'text-red-600 animate-pulse' : isPast ? 'text-slate-300' : 'text-[#1FC8C8]'}`}>{isToday ? 'TODAY' : isPast ? 'PAST' : `${diff}D`}</p>
+          <p className={`text-[8px] md:text-[9px] font-black uppercase italic leading-none ${isToday ? 'text-red-600 animate-pulse' : isPast ? 'text-slate-300' : 'text-[#1FC8C8]'}`}>
+            {timeDisplay}
+          </p>
         </div>
         
         <div className="mt-auto flex flex-col gap-2 text-left">
