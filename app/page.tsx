@@ -121,9 +121,10 @@ export default function Home() {
         <motion.div 
           key={heroKey} 
           className="z-10"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: [0.95, 1.03, 1, 1.03, 1] }} 
-          transition={{ duration: 7, ease: "easeInOut" }}
+          initial={{ opacity: 0, scale: 1.05 }}
+          whileInView={{ opacity: 1, scale: 1 }} 
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
         >
           <p className="text-[#1FC8C8] text-[9px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4 italic opacity-90">PROGRESS SIMPLIFIED, VALUE DELIVERED.</p>
           <h1 className="text-6xl md:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white select-none">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
@@ -231,17 +232,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 💬 CONTACT & FOOTER (Upward Settling Animation) --- */}
+      {/* --- 💬 CONTACT & FOOTER --- */}
       <section id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 pt-24 pb-0 text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-12 items-center flex-1">
           
-          {/* Scroll-Triggered Entrance moving from beneath and settling */}
           <motion.div 
             className="text-left"
             initial={{ y: 60, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            viewport={{ once: false, amount: 0.5 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
           >
             <h2 className="text-[3.8rem] md:text-6xl lg:text-[7rem] font-black italic uppercase leading-[0.8] mb-2">
               MOVE AHEAD, <br/>
