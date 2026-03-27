@@ -10,6 +10,7 @@ export default function AdminAddEvent() {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSalaryDisclosed, setIsSalaryDisclosed] = useState(true);
+  const [isFree, setIsFree] = useState(false); // New state for Free toggle
 
   const [formData, setFormData] = useState<any>({
     category: 'event', 
@@ -46,6 +47,11 @@ export default function AdminAddEvent() {
       finalData.salary_range = 'Undisclosed';
     }
 
+    // Handle Free event/place logic
+    if (formData.category !== 'job' && isFree) {
+      finalData.price = 'Free';
+    }
+
     const { error } = await supabase.from('jobs').insert([finalData]);
 
     if (!error) {
@@ -59,6 +65,7 @@ export default function AdminAddEvent() {
         is_featured: false,
         parent_id: null
       });
+      setIsFree(false); // Reset Free toggle
       window.scrollTo(0, 0);
       
       // Auto-hide success message after 5 seconds
@@ -134,11 +141,14 @@ export default function AdminAddEvent() {
                 </div>
               </div>
               <div>
-                <label className={labelClass}>Recurring Day (Optional)</label>
-                <select className={inputClass} value={formData.recurring_day} onChange={(e) => setFormData({...formData, recurring_day: e.target.value})}>
-                  <option value="">None (One-time)</option>
-                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
+                {/* UPGRADED RECURRING FIELD: Now accepts flexible custom text */}
+                <label className={labelClass}>Schedule / Recurrence</label>
+                <input 
+                  className={inputClass} 
+                  placeholder="e.g. Mon-Sat, 9AM-5PM" 
+                  value={formData.recurring_day} 
+                  onChange={(e) => setFormData({...formData, recurring_day: e.target.value})} 
+                />
               </div>
             </div>
           </div>
@@ -186,15 +196,30 @@ export default function AdminAddEvent() {
               <div>
                  <div className="flex justify-between items-center mb-1.5 px-1">
                   <label className={labelClass}>{formData.category === 'job' ? 'Salary Range' : 'Entry Price'}</label>
-                  {formData.category === 'job' && (
+                  
+                  {/* Dynamic Toggle: Shows "Undisclosed" for Jobs, "Free" for everything else */}
+                  {formData.category === 'job' ? (
                     <label className="flex items-center gap-1 text-[8px] font-black uppercase text-[#1FC8C8] cursor-pointer">
                       <input type="checkbox" checked={!isSalaryDisclosed} onChange={() => setIsSalaryDisclosed(!isSalaryDisclosed)} /> Undisclosed
                     </label>
+                  ) : (
+                    <label className="flex items-center gap-1 text-[8px] font-black uppercase text-[#1FC8C8] cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={isFree} 
+                        onChange={() => {
+                          setIsFree(!isFree);
+                          if (!isFree) setFormData({...formData, price: 'Free'});
+                          else setFormData({...formData, price: ''});
+                        }} 
+                      /> Free
+                    </label>
                   )}
                 </div>
+                
                 <input 
-                  disabled={formData.category === 'job' && !isSalaryDisclosed} 
-                  className={`${inputClass} disabled:opacity-30`} 
+                  disabled={(formData.category === 'job' && !isSalaryDisclosed) || (formData.category !== 'job' && isFree)} 
+                  className={`${inputClass} disabled:opacity-30 disabled:bg-slate-100 disabled:cursor-not-allowed`} 
                   placeholder={formData.category === 'job' ? "GHS..." : "Price or Free"} 
                   value={formData.category === 'job' ? formData.salary_range : formData.price} 
                   onChange={(e) => formData.category === 'job' ? setFormData({...formData, salary_range: e.target.value}) : setFormData({...formData, price: e.target.value})} 
