@@ -47,7 +47,10 @@ export default function Home() {
 
   const filteredItems = items.filter(item => {
     const s = searchQuery.toLowerCase();
-    const match = item.title?.toLowerCase().includes(s) || item.venue?.toLowerCase().includes(s) || item.category?.toLowerCase().includes(s);
+    const match = item.title?.toLowerCase().includes(s) || 
+                  item.venue?.toLowerCase().includes(s) || 
+                  item.category?.toLowerCase().includes(s) ||
+                  item.organizer_body?.toLowerCase().includes(s);
     const catMatch = filter === 'all' || (filter === 'training' ? (item.category === 'training' || item.category === 'seminar') : item.category === filter);
     return match && catMatch;
   });
@@ -55,12 +58,12 @@ export default function Home() {
   const featured = items.filter(i => i.is_featured && i.status === 'approved').slice(0, 6);
 
   const services = [
-    { title: 'ADMIN & SECRETARIAL', icon: <Printer size={20}/>, list: ['Printing & Photocopy', 'Document Binding', 'Scanning & Laminating'] },
-    { title: 'GRAPHIC DESIGN', icon: <Palette size={20}/>, list: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Visuals'] },
-    { title: 'DIGITAL SOLUTIONS', icon: <Code2 size={20}/>, list: ['Web Development', 'Backend Systems', 'API Integrations'] },
-    { title: 'DIGITAL MARKETING', icon: <Megaphone size={20}/>, list: ['Social Media Mgt.', 'SEO Optimization', 'Targeted Ads'] },
-    { title: 'MEDIA PRODUCTION', icon: <PlayCircle size={20}/>, list: ['Content Creation', 'Video Editing', 'Photo Retouching'] },
-    { title: 'AGENCY OUTSOURCING', icon: <Users size={20}/>, list: ['White-Label Tech', 'Remote Assistance', 'B2B Execution'] },
+    { title: 'ADMIN & SECRETARIAL', icon: <Printer size={18}/>, list: ['Printing & Photocopy', 'Document Binding', 'Scanning & Laminating'] },
+    { title: 'GRAPHIC DESIGN', icon: <Palette size={18}/>, list: ['Logo & Branding', 'Flyers & Banners', 'UI/UX Visuals'] },
+    { title: 'DIGITAL SOLUTIONS', icon: <Code2 size={18}/>, list: ['Web Development', 'Backend Systems', 'API Integrations'] },
+    { title: 'DIGITAL MARKETING', icon: <Megaphone size={18}/>, list: ['Social Media Mgt.', 'SEO Optimization', 'Targeted Ads'] },
+    { title: 'MEDIA PRODUCTION', icon: <PlayCircle size={18}/>, list: ['Content Creation', 'Video Editing', 'Photo Retouching'] },
+    { title: 'AGENCY OUTSOURCING', icon: <Users size={18}/>, list: ['White-Label Tech', 'Remote Assistance', 'B2B Execution'] },
   ]
 
   if (!mounted) return null
@@ -70,19 +73,19 @@ export default function Home() {
       {/* --- 🧭 NAVIGATION --- */}
       <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E]/90 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex justify-between items-center text-white">
-          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-            <div className="w-10 h-10 bg-[#1FC8C8] rounded-xl flex items-center justify-center font-black italic text-[#0A2A5E] text-[12px] shadow-lg group-hover:scale-110 transition-transform">PC</div>
-            <span className="text-sm md:text-xl font-black uppercase italic tracking-tighter">PRECEDE CONCEPTS</span>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+            <div className="w-9 h-9 bg-[#1FC8C8] rounded-lg flex items-center justify-center font-black italic text-[#0A2A5E] text-[11px] shadow-lg group-hover:scale-110 transition-transform duration-300">PC</div>
+            <span className="text-sm md:text-lg font-black uppercase italic tracking-tighter">PRECEDE CONCEPTS</span>
           </div>
-          <div className="hidden xl:flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.1em]">
-            {['HOME', 'ABOUT', 'SERVICES'].map((link) => (
-              <a key={link} href={`#${link.toLowerCase()}`} className="hover:text-[#1FC8C8] transition-colors duration-300">{link}</a>
-            ))}
-            <button onClick={() => handleNavFilter('training')} className="hover:text-[#1FC8C8] transition-colors">TRAINING</button>
-            <button onClick={() => handleNavFilter('job')} className="hover:text-[#1FC8C8] transition-colors">JOBS</button>
-            <button onClick={() => handleNavFilter('event')} className="hover:text-[#1FC8C8] transition-colors">EVENTS</button>
-            <button onClick={() => handleNavFilter('place')} className="text-[#1FC8C8] hover:brightness-125 transition-all">PLACES & SPACES</button>
-            <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-6 py-2.5 rounded-full font-black ml-4 shadow-lg hover:bg-white transition-all transform hover:-translate-y-1">CONTACT</a>
+          <div className="hidden xl:flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.15em]">
+            <a href="#home" className="hover:text-[#1FC8C8] transition-colors duration-300">HOME</a>
+            <a href="#about" className="hover:text-[#1FC8C8] transition-colors duration-300">ABOUT US</a>
+            <a href="#services" className="hover:text-[#1FC8C8] transition-colors duration-300">SERVICES</a>
+            <button onClick={() => handleNavFilter('training')} className="hover:text-[#1FC8C8] transition-colors duration-300">TRAINING & SEMINARS</button>
+            <button onClick={() => handleNavFilter('job')} className="hover:text-[#1FC8C8] transition-colors duration-300">JOBS</button>
+            <button onClick={() => handleNavFilter('event')} className="hover:text-[#1FC8C8] transition-colors duration-300">EVENTS</button>
+            <button onClick={() => handleNavFilter('place')} className="hover:text-[#1FC8C8] transition-colors duration-300">PLACES & SPACES</button>
+            <a href="#contact" className="bg-[#1FC8C8] text-[#0A2A5E] px-6 py-2.5 rounded-full font-black ml-4 shadow-lg hover:bg-white transition-all transform hover:-translate-y-0.5">CONTACT</a>
           </div>
           <button className="xl:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}><Menu size={28} /></button>
         </div>
@@ -93,12 +96,15 @@ export default function Home() {
         {isMenuOpen && (
           <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="fixed inset-0 z-[200] bg-[#0A2A5E] flex flex-col p-8 text-white">
             <div className="flex justify-between items-center mb-12"><span className="font-black italic text-[#1FC8C8]">MENU</span><button onClick={() => setIsMenuOpen(false)}><X size={32}/></button></div>
-            <div className="flex flex-col gap-8 text-3xl font-black italic">
+            <div className="flex flex-col gap-8 text-2xl font-black italic uppercase">
               <a href="#home" onClick={() => setIsMenuOpen(false)}>HOME</a>
-              <a href="#about" onClick={() => setIsMenuOpen(false)}>ABOUT</a>
+              <a href="#about" onClick={() => setIsMenuOpen(false)}>ABOUT US</a>
               <a href="#services" onClick={() => setIsMenuOpen(false)}>SERVICES</a>
-              <button onClick={() => handleNavFilter('place')} className="text-left text-[#1FC8C8]">PLACES & SPACES</button>
-              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="bg-[#1FC8C8] text-[#0A2A5E] p-4 rounded-2xl text-center text-xl">CONTACT</a>
+              <button onClick={() => handleNavFilter('training')} className="text-left">TRAINING & SEMINARS</button>
+              <button onClick={() => handleNavFilter('job')} className="text-left">JOBS</button>
+              <button onClick={() => handleNavFilter('event')} className="text-left">EVENTS</button>
+              <button onClick={() => handleNavFilter('place')} className="text-left">PLACES & SPACES</button>
+              <a href="#contact" onClick={() => setIsMenuOpen(false)} className="bg-[#1FC8C8] text-[#0A2A5E] p-4 rounded-2xl text-center text-xl mt-4">CONTACT</a>
             </div>
           </motion.div>
         )}
@@ -107,34 +113,40 @@ export default function Home() {
       {/* --- 🚀 HERO --- */}
       <section id="home" className="h-screen flex items-center justify-center px-6 bg-[#0A2A5E] relative overflow-hidden text-center">
         <div className="z-10">
-          <p className="text-[#1FC8C8] text-[8px] md:text-[11px] font-black uppercase tracking-[0.6em] mb-4 italic opacity-80">SIMPLIFYING PROGRESS, DELIVERING VALUE.</p>
-          <h1 className="text-6xl md:text-[9rem] font-black tracking-tighter uppercase italic leading-[0.85] text-white select-none">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
-          <p className="text-white/40 text-[8px] md:text-[11px] font-black uppercase tracking-[0.4em] mt-10 italic">PROGRESS SIMPLIFIED — VALUE DELIVERED</p>
+          <p className="text-[#1FC8C8] text-[9px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4 italic opacity-90">SIMPLIFYING PROGRESS, DELIVERING VALUE.</p>
+          <h1 className="text-6xl md:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white select-none">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
         </div>
       </section>
 
-      {/* --- 🏢 ABOUT US (FIXED OVERLAP & BREATHABLE) --- */}
-      <section id="about" className="min-h-screen lg:h-screen bg-[#1FC8C8] flex items-center justify-center px-6 py-20">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1.2fr_2fr] gap-16 items-center text-[#0A2A5E]">
+      {/* --- 🏢 ABOUT US (Premium Spacing & Line Control) --- */}
+      <section id="about" className="min-h-screen flex items-center justify-center px-6 bg-[#1FC8C8] py-20">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-16 items-center text-[#0A2A5E]">
           <div>
-            <h2 className="text-6xl md:text-[8.5rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-4">BEYOND A <br/> DIGITAL <br/> AGENCY.</h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 italic">Move ahead, stay ahead.</p>
+            <h2 className="text-6xl md:text-[8rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-6">BEYOND A <br/> DIGITAL <br/> AGENCY.</h2>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-50 italic">Move ahead, stay ahead.</p>
           </div>
-          <div className="border-l-[12px] border-[#0A2A5E] pl-8 md:pl-16 flex flex-col gap-10">
-            <p className="font-black text-sm md:text-lg italic uppercase tracking-[0.2em] leading-relaxed opacity-70">
-              Precede Concepts bridges the gap between high-end professional services and accessible solutions in Ghana.
-            </p>
-            <p className="text-xl md:text-3xl font-black uppercase leading-[1.3]">
-              We operate a dual-purpose ecosystem: a primary business executing top-tier digital & multimedia services, and a CSR hub driving traffic by curating vital community resources.
-            </p>
-            <div className="pt-10 border-t-4 border-[#0A2A5E]/10">
-              <h4 className="font-black text-[10px] mb-4 tracking-[0.3em] opacity-40">CORE PILLARS</h4>
-              <p className="text-[12px] md:text-[14px] font-bold uppercase italic leading-loose tracking-wide">
-                BUSINESS GROWTH: Registration, Strategic Consultation. <br/>
-                IDENTITY & BRANDING: Design, Printing, Banners, Stickers, Labels. <br/>
-                TECH: Web Dev, Web Audit, AI Integration. <br/>
-                CAPACITY: Specialized Training.
+          
+          <div className="border-l-[8px] border-[#0A2A5E] pl-8 md:pl-12 flex flex-col justify-center h-full">
+            <div className="flex flex-col gap-8">
+              {/* Forced ~2 Lines on Desktop: Small text, wide tracking */}
+              <p className="font-black text-[13px] md:text-[15px] italic uppercase tracking-[0.2em] leading-loose opacity-75 max-w-[85%]">
+                Precede Concepts bridges the gap between high-end professional services and accessible solutions in Ghana.
               </p>
+              
+              {/* Forced ~3 Lines on Desktop: Large text, tight leading */}
+              <p className="text-2xl md:text-3xl lg:text-[2rem] font-black uppercase leading-[1.3] max-w-[95%]">
+                We operate a dual-purpose ecosystem: a primary business executing top-tier digital & multimedia services, and a CSR hub driving traffic by curating vital community resources.
+              </p>
+              
+              {/* Unchanged Core Pillars */}
+              <div className="pt-8 mt-2 border-t-2 border-[#0A2A5E]/10">
+                <p className="text-[11px] md:text-[13px] font-bold uppercase italic leading-loose tracking-wide opacity-90">
+                  <span className="text-[#0A2A5E] font-black">BUSINESS GROWTH:</span> Registration, Development, Strategic Consultation. <br/>
+                  <span className="text-[#0A2A5E] font-black">IDENTITY & BRANDING:</span> Graphic Design, Branding, Professional Printing, Banners, Stickers, Labels. <br/>
+                  <span className="text-[#0A2A5E] font-black">TECH & INNOVATION:</span> IT Support, Web Development, Web Audit & Grading, AI Integration. <br/>
+                  <span className="text-[#0A2A5E] font-black">CAPACITY BUILDING:</span> Specialized Training, Computing Concepts.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -142,20 +154,21 @@ export default function Home() {
 
       {/* --- 🛠️ SERVICES --- */}
       <section id="services" className="min-h-screen py-32 bg-white px-6">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-5xl font-black uppercase italic text-[#0A2A5E] mb-20 tracking-tighter text-left">OUR SERVICES.</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="max-w-7xl mx-auto text-left">
+          <h2 className="text-5xl font-black uppercase italic text-[#0A2A5E] mb-20 tracking-tighter">OUR SERVICES.</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((s, i) => (
-              <div key={i} className="p-10 bg-slate-50 border-2 border-slate-100 rounded-[3.5rem] transition-all hover:border-[#1FC8C8] group hover:shadow-2xl hover:-translate-y-2 duration-500">
+              <div key={i} className="p-8 bg-slate-50 border-2 border-slate-100 rounded-[3rem] transition-all hover:border-[#1FC8C8] group hover:shadow-xl duration-500 flex flex-col h-full">
                 <div className="flex items-center gap-5 mb-8 pb-8 border-b-2 border-slate-200/50">
                   <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#0F4C81] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all duration-500">{s.icon}</div>
                   <h3 className="text-lg font-black uppercase italic text-[#0A2A5E] leading-none">{s.title}</h3>
                 </div>
-                <ul className="space-y-4 text-left">
+                <ul className="space-y-4 mb-6 flex-1 text-left">
                   {s.list.map((item, idx) => (
                     <li key={idx} className="flex items-center gap-3 text-[12px] font-black text-slate-500 uppercase italic"><CheckCircle2 size={16} className="text-[#1FC8C8] flex-shrink-0"/> {item}</li>
                   ))}
                 </ul>
+                <p className="text-[10px] font-black text-[#1FC8C8] uppercase tracking-widest italic pt-4 border-t border-slate-200/50 w-fit">AND MORE...</p>
               </div>
             ))}
           </div>
@@ -172,16 +185,16 @@ export default function Home() {
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={24} />
                 <input 
                   type="text" 
-                  placeholder="SEARCH LOCATIONS, RESTAURANTS, PUBS..." 
+                  placeholder="SEARCH LOCATIONS, RESTAURANTS, PUBS, HOTELS..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full p-6 pl-18 bg-white/10 border-2 border-white/10 rounded-[2rem] text-white outline-none focus:border-[#1FC8C8] font-black uppercase text-sm italic transition-all placeholder:text-white/20"
+                  className="w-full p-6 pl-18 bg-white/10 border-2 border-white/10 rounded-[2rem] text-white outline-none focus:border-[#1FC8C8] font-black uppercase text-sm italic transition-all placeholder:text-white/30"
                 />
               </div>
             </div>
             <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-full border border-white/5">
               {['all', 'training', 'job', 'event', 'place'].map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E] shadow-xl' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
+                <button key={f} onClick={() => setFilter(f)} className={`px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E] shadow-xl' : 'text-white/40 hover:text-white hover:bg-white/10'}`}>
                   {f === 'place' ? 'PLACES & SPACES' : f.toUpperCase()}
                 </button>
               ))}
@@ -204,32 +217,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 💬 CONTACT --- */}
-      <section id="contact" className="min-h-screen bg-[#0A2A5E] flex items-center justify-center px-6 text-white text-left">
-        <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-20 items-center">
-          <div>
-            <h2 className="text-7xl lg:text-[9.5rem] font-black italic uppercase leading-[0.8] mb-4">MOVE AHEAD, <br/><span className="text-[#1FC8C8]">STAY AHEAD.</span></h2>
-            <p className="text-white/30 text-[11px] font-black uppercase tracking-[0.5em] italic">PROGRESS SIMPLIFIED — VALUE DELIVERED</p>
+      {/* --- 💬 CONTACT & FOOTER (Merged for One Screen) --- */}
+      <section id="contact" className="min-h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 pt-32 pb-8 text-white relative">
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 items-center flex-1">
+          <div className="text-left">
+            <h2 className="text-7xl lg:text-[9.5rem] font-black italic uppercase leading-[0.8] mb-6">MOVE AHEAD, <br/><span className="text-[#1FC8C8]">STAY AHEAD.</span></h2>
+            <p className="text-white/30 text-[12px] font-black uppercase tracking-[0.5em] italic">PROGRESS SIMPLIFIED — VALUE DELIVERED</p>
           </div>
+          
           <div className="bg-white/5 p-12 rounded-[4.5rem] border-4 border-white/10 shadow-2xl backdrop-blur-sm">
-            <div className="space-y-12 mb-12">
-              <div className="flex items-center gap-8 group cursor-pointer">
-                <div className="p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all"><Phone size={36}/></div>
-                <div><span className="text-[12px] font-black uppercase text-white/40 tracking-widest">VOICE</span><p className="text-4xl font-black italic tracking-tighter">0591999544</p></div>
+            <div className="space-y-12 mb-12 text-left">
+              <div className="flex items-center gap-8 group cursor-pointer transition-all hover:translate-x-2">
+                <div className="p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Phone size={36}/></div>
+                <div><span className="text-[12px] font-black uppercase text-white/40 tracking-widest leading-none">VOICE LINE</span><p className="text-4xl font-black italic tracking-tighter">{BUSINESS_PHONE}</p></div>
               </div>
-              <div className="flex items-center gap-8 group cursor-pointer">
-                <div className="p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all"><Mail size={36}/></div>
-                <div><span className="text-[12px] font-black uppercase text-white/40 tracking-widest">MAIL</span><p className="text-2xl font-black italic tracking-tighter">precedeconcepts@gmail.com</p></div>
+              <div className="flex items-center gap-8 group cursor-pointer transition-all hover:translate-x-2">
+                <div className="p-6 bg-[#1FC8C8]/20 rounded-3xl text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-colors"><Mail size={36}/></div>
+                <div><span className="text-[12px] font-black uppercase text-white/40 tracking-widest leading-none">DIGITAL MAIL</span><p className="text-xl md:text-2xl font-black italic tracking-tighter">{BUSINESS_EMAIL}</p></div>
               </div>
             </div>
+            
             <div className="flex flex-col gap-6">
                <div className="grid grid-cols-2 gap-6">
-                  <a href={`https://wa.me/233591999544`} target="_blank" className="bg-white text-[#0A2A5E] p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all transform hover:-translate-y-1"><WhatsAppIcon /> WHATSAPP</a>
-                  <a href={`https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W`} target="_blank" className="bg-white/10 border-2 border-white/10 p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-white/20 transition-all transform hover:-translate-y-1"><Smartphone size={20}/> CHANNEL</a>
+                  <a href={`https://wa.me/233591999544`} target="_blank" className="bg-white text-[#0A2A5E] p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl hover:-translate-y-1"><WhatsAppIcon /> WHATSAPP</a>
+                  <a href={`https://whatsapp.com/channel/0029Vb7Mfjf5EjxpZuIIpA2W`} target="_blank" className="bg-white/10 border-2 border-white/10 p-6 rounded-[2rem] font-black uppercase italic text-xs flex items-center justify-center gap-3 hover:bg-white/20 transition-all hover:-translate-y-1"><Smartphone size={20}/> CHANNEL</a>
                </div>
-               <button onClick={() => window.location.href = `mailto:${BUSINESS_EMAIL}`} className="bg-[#1FC8C8] text-[#0A2A5E] p-8 rounded-[3rem] font-black uppercase italic text-sm shadow-2xl hover:bg-white transition-all transform hover:-translate-y-1 tracking-[0.2em]">SEND AN EMAIL</button>
+               <button onClick={() => window.location.href = `mailto:${BUSINESS_EMAIL}`} className="bg-[#1FC8C8] text-[#0A2A5E] p-8 rounded-[3rem] font-black uppercase italic text-sm shadow-2xl hover:bg-white transition-all tracking-[0.2em] hover:-translate-y-1">SEND AN EMAIL</button>
             </div>
           </div>
+        </div>
+
+        {/* Footer Unified at the bottom of the Contact section */}
+        <div className="text-center pt-16 mt-16 border-t border-white/5">
+          <p className="text-[#1FC8C8] font-black uppercase italic text-[12px] tracking-[0.5em]">PRECEDE CONCEPTS</p>
+          <p className="text-white/20 font-black uppercase text-[10px] tracking-[0.3em] mt-3">ACCRA GHANA · © 2026</p>
         </div>
       </section>
 
@@ -245,11 +266,6 @@ export default function Home() {
           </motion.button>
         )}
       </AnimatePresence>
-
-      <footer className="bg-[#0A2A5E] py-16 border-t border-white/5 text-center">
-          <p className="text-[#1FC8C8] font-black uppercase italic text-[12px] tracking-[0.5em]">PRECEDE CONCEPTS</p>
-          <p className="text-white/20 font-black uppercase text-[10px] tracking-[0.3em] mt-3">ACCRA GHANA · © 2026</p>
-      </footer>
     </div>
   )
 }
@@ -263,23 +279,23 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map_query || item.venue)}`;
 
   return (
-    <div className={`group bg-white rounded-[2.5rem] overflow-hidden flex flex-col shadow-xl transition-all hover:scale-[1.03] h-full ${isFeatured ? 'border-4 border-[#1FC8C8] ring-8 ring-[#1FC8C8]/5' : 'border border-slate-100'}`}>
-      <div className="h-28 bg-slate-900 relative">
+    <div className={`group bg-white rounded-[2rem] overflow-hidden flex flex-col shadow-lg transition-all hover:scale-[1.03] h-full ${isFeatured ? 'border-4 border-[#1FC8C8] ring-8 ring-[#1FC8C8]/5' : 'border border-slate-100'}`}>
+      <div className="h-20 bg-slate-900 relative">
         {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-80" />}
-        <span className="absolute top-4 left-4 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-3 py-1 rounded-full uppercase italic tracking-widest">{item.category}</span>
+        <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2.5 py-1 rounded-full uppercase italic tracking-widest">{item.category}</span>
       </div>
-      <div className="p-6 flex flex-col flex-1 text-left">
-        <h4 className="font-black text-[15px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 h-9 mb-3">{item.title}</h4>
-        <div className="mb-4 pb-3 border-b border-slate-100">
+      <div className="p-4 flex flex-col flex-1 text-left">
+        <h4 className="font-black text-[13px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 h-8 mb-3 text-left">{item.title}</h4>
+        <div className="mb-4 text-left pb-3 border-b border-slate-100">
           <p className="text-[10px] font-black uppercase italic text-slate-500 leading-none">{targetDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
           <p className={`text-[9px] font-black uppercase italic mt-1.5 ${isToday ? 'text-red-600 animate-pulse' : isPast ? 'text-slate-300' : 'text-[#1FC8C8]'}`}>{isToday ? 'TODAY' : isPast ? 'PAST' : `${diff} DAYS LEFT`}</p>
         </div>
-        <div className="mt-auto flex flex-col gap-3">
+        <div className="mt-auto flex flex-col gap-3 text-left">
           <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-[12px] font-black text-[#0A2A5E] uppercase italic truncate"><MapPin size={14} className="text-[#1FC8C8] flex-shrink-0"/> {item.venue}</div>
-            <a href={mapUrl} target="_blank" className="text-[8px] font-black text-blue-500 uppercase italic hover:text-[#1FC8C8] transition-colors ml-5 tracking-tighter">VIEW PRECISE LOCATION</a>
+            <div className="flex items-center gap-2 text-[11px] font-black text-[#0A2A5E] uppercase italic truncate"><MapPin size={12} className="text-[#1FC8C8] flex-shrink-0"/> {item.venue}</div>
+            <a href={mapUrl} target="_blank" className="text-[7px] font-black text-blue-500 uppercase italic hover:text-[#1FC8C8] transition-colors ml-5 tracking-wide">VIEW PRECISE LOCATION</a>
           </div>
-          <a href={item.link} target="_blank" className="w-full py-2.5 bg-slate-50 text-[#0A2A5E] border border-slate-200 rounded-2xl text-[10px] font-black uppercase text-center group-hover:bg-[#0A2A5E] group-hover:text-white transition-all shadow-sm">VIEW DETAILS</a>
+          <a href={item.link} target="_blank" className="w-full py-2 bg-slate-50 text-[#0A2A5E] border border-slate-200 rounded-xl text-[9px] font-black uppercase text-center group-hover:bg-[#0A2A5E] group-hover:text-white transition-all shadow-sm">VIEW DETAILS</a>
         </div>
       </div>
     </div>
