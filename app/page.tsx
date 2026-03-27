@@ -126,9 +126,9 @@ export default function Home() {
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
         >
-          <p className="text-[#1FC8C8] text-[9px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4 italic opacity-90">PROGRESS SIMPLIFIED, VALUE DELIVERED.</p>
+          <p className="text-[#1FC8C8] text-[12px] md:text-[16px] font-black uppercase tracking-[0.5em] mb-6 italic opacity-100">PROGRESS SIMPLIFIED, VALUE DELIVERED.</p>
           <h1 className="text-6xl md:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white select-none">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
-          <p className="text-white/40 text-[8px] md:text-[11px] font-black uppercase tracking-[0.4em] mt-8 italic">SIMPLIFYING PROGRESS, DELIVERING VALUE.</p>
+          <p className="text-white/60 text-[10px] md:text-[14px] font-black uppercase tracking-[0.4em] mt-8 italic">SIMPLIFYING PROGRESS, DELIVERING VALUE.</p>
         </motion.div>
       </section>
 
