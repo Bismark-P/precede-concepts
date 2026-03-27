@@ -22,6 +22,7 @@ export default function Home() {
   const [filter, setFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [showTopBtn, setShowTopBtn] = useState(false)
+  const [heroKey, setHeroKey] = useState(0) 
 
   const BUSINESS_PHONE = "+233 (0)59 199 9544"
   const BUSINESS_EMAIL = "precedeconcepts@gmail.com"
@@ -43,6 +44,11 @@ export default function Home() {
     setFilter(filterId);
     setIsMenuOpen(false);
     document.getElementById('hub')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleHomeClick = () => {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    setHeroKey(prev => prev + 1); 
   };
 
   const filteredItems = items.filter(item => {
@@ -73,12 +79,12 @@ export default function Home() {
       {/* --- 🧭 NAVIGATION --- */}
       <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E]/90 backdrop-blur-md border-b border-white/10 px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex justify-between items-center text-white">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={handleHomeClick}>
             <div className="w-9 h-9 bg-[#1FC8C8] rounded-lg flex items-center justify-center font-black italic text-[#0A2A5E] text-[11px] shadow-lg group-hover:scale-110 transition-transform duration-300">PC</div>
             <span className="text-sm md:text-lg font-black uppercase italic tracking-tighter">PRECEDE CONCEPTS</span>
           </div>
           <div className="hidden xl:flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.15em]">
-            <a href="#home" className="hover:text-[#1FC8C8] transition-colors duration-300">HOME</a>
+            <a href="#home" onClick={handleHomeClick} className="hover:text-[#1FC8C8] transition-colors duration-300">HOME</a>
             <a href="#about" className="hover:text-[#1FC8C8] transition-colors duration-300">ABOUT US</a>
             <a href="#services" className="hover:text-[#1FC8C8] transition-colors duration-300">SERVICES</a>
             <button onClick={() => handleNavFilter('training')} className="hover:text-[#1FC8C8] transition-colors duration-300">TRAINING & SEMINARS</button>
@@ -97,7 +103,7 @@ export default function Home() {
           <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="fixed inset-0 z-[200] bg-[#0A2A5E] flex flex-col p-8 text-white">
             <div className="flex justify-between items-center mb-12"><span className="font-black italic text-[#1FC8C8]">MENU</span><button onClick={() => setIsMenuOpen(false)}><X size={32}/></button></div>
             <div className="flex flex-col gap-8 text-2xl font-black italic uppercase">
-              <a href="#home" onClick={() => setIsMenuOpen(false)}>HOME</a>
+              <a href="#home" onClick={() => { setIsMenuOpen(false); handleHomeClick(); }}>HOME</a>
               <a href="#about" onClick={() => setIsMenuOpen(false)}>ABOUT US</a>
               <a href="#services" onClick={() => setIsMenuOpen(false)}>SERVICES</a>
               <button onClick={() => handleNavFilter('training')} className="text-left">TRAINING & SEMINARS</button>
@@ -113,10 +119,11 @@ export default function Home() {
       {/* --- 🚀 HERO --- */}
       <section id="home" className="h-screen flex items-center justify-center px-6 bg-[#0A2A5E] relative overflow-hidden text-center">
         <motion.div 
+          key={heroKey} 
           className="z-10"
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.4, ease: "easeOut" }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: [0.95, 1.03, 1, 1.03, 1] }} 
+          transition={{ duration: 7, ease: "easeInOut" }}
         >
           <p className="text-[#1FC8C8] text-[9px] md:text-[12px] font-black uppercase tracking-[0.6em] mb-4 italic opacity-90">PROGRESS SIMPLIFIED, VALUE DELIVERED.</p>
           <h1 className="text-6xl md:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white select-none">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
@@ -128,23 +135,20 @@ export default function Home() {
       <section id="about" className="h-screen flex items-center justify-center px-6 bg-[#1FC8C8]">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16 items-center text-[#0A2A5E] w-full">
           <div>
-            {/* Forced exactly 3 lines using whitespace-nowrap on the middle line */}
             <h2 className="text-[4rem] md:text-[6.5rem] lg:text-[7.5rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-4">
               BEYOND <br/> 
               <span className="whitespace-nowrap">A <span className="text-white">DIGITAL</span></span> <br/> 
               AGENCY.
             </h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-50 italic">Move ahead, stay ahead.</p>
+            <p className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.4em] opacity-80 italic text-[#0A2A5E]">MOVE AHEAD, STAY AHEAD.</p>
           </div>
           
           <div className="border-l-[8px] border-[#0A2A5E] pl-8 md:pl-12 flex flex-col justify-center h-full">
             <div className="flex flex-col gap-6">
-              {/* Paragraph 1: Standardized reading size */}
               <p className="font-black text-[13px] md:text-[15px] italic uppercase tracking-[0.2em] leading-loose opacity-80 max-w-[95%]">
                 PRECEDE CONCEPTS BRIDGES THE GAP BETWEEN HIGH-END PROFESSIONAL SERVICES AND ACCESSIBLE SOLUTIONS IN GHANA.
               </p>
               
-              {/* Paragraph 2: Sentence style, perfectly matched standard reading size */}
               <p className="text-[13px] md:text-[15px] font-bold leading-relaxed max-w-[95%] opacity-90">
                 We operate a dual-purpose ecosystem: a primary business executing top-tier digital & multimedia services, and a CSR hub driving traffic by curating vital community resources.
               </p>
@@ -227,22 +231,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 💬 CONTACT & FOOTER (Single Unified Screen) --- */}
+      {/* --- 💬 CONTACT & FOOTER (Upward Settling Animation) --- */}
       <section id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 pt-24 pb-0 text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 lg:gap-12 items-center flex-1">
-          <div className="text-left">
-            <h2 className="text-[3.8rem] md:text-6xl lg:text-[7rem] font-black italic uppercase leading-[0.8] mb-6">
+          
+          {/* Scroll-Triggered Entrance moving from beneath and settling */}
+          <motion.div 
+            className="text-left"
+            initial={{ y: 60, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            <h2 className="text-[3.8rem] md:text-6xl lg:text-[7rem] font-black italic uppercase leading-[0.8] mb-2">
               MOVE AHEAD, <br/>
-              <motion.span 
-                className="text-[#1FC8C8] inline-block"
-                animate={{ y: [0, -15, 0] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                STAY AHEAD.
-              </motion.span>
+            </h2>
+            <h2 className="text-[3.8rem] md:text-6xl lg:text-[7rem] font-black italic uppercase leading-[0.8] mb-6 text-[#1FC8C8]">
+              STAY AHEAD.
             </h2>
             <p className="text-white/40 text-[10px] md:text-[11px] font-black uppercase tracking-[0.5em] italic">PROGRESS SIMPLIFIED — VALUE DELIVERED</p>
-          </div>
+          </motion.div>
           
           <div className="bg-white/5 p-8 md:p-10 rounded-[3rem] border-4 border-white/10 shadow-2xl backdrop-blur-sm">
             <div className="space-y-8 mb-8 text-left">
