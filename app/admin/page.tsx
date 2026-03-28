@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // Added Next.js Link
+import Link from 'next/link'; 
 import { supabase } from '@/app/lib/supabase';
 import { 
   Plus, Check, X, MapPin, Calendar, Clock, LogOut,
@@ -98,7 +98,6 @@ export default function AdminDashboard() {
           <span className="text-lg font-black uppercase italic tracking-tighter">Control Hub</span>
         </div>
         <div className="flex items-center gap-3">
-          {/* 🚀 Changed to <Link> to prevent page reload and keep session active */}
           <Link href="/admin/add" className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2.5 rounded-xl font-black text-[10px] uppercase flex items-center gap-2 hover:bg-white transition-all">
             <Plus size={16} /> New Scout
           </Link>

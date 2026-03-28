@@ -37,7 +37,39 @@ export default function Home() {
 
   async function fetchApproved() {
     const { data } = await supabase.from('jobs').select('*').eq('status', 'approved').order('created_at', { ascending: false })
-    if (data) setItems(data)
+    
+    if (data) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const activeItems: any[] = [];
+      const pastItemIds: string[] = [];
+
+      // Auto-Archiver Logic
+      data.forEach(item => {
+        const targetDate = new Date(item.event_date);
+        targetDate.setHours(0, 0, 0, 0);
+
+        if (targetDate < today) {
+          pastItemIds.push(item.id); // Flag for archiving
+        } else {
+          activeItems.push(item); // Keep on the live hub
+        }
+      });
+
+      // Update the UI instantly with only active items
+      setItems(activeItems);
+
+      // Silently move expired items to the "Past / Analytics" tab in the database
+      if (pastItemIds.length > 0) {
+        supabase.from('jobs')
+          .update({ status: 'past' })
+          .in('id', pastItemIds)
+          .then(({ error }) => {
+            if (error) console.error("Auto-archiver error:", error);
+          });
+      }
+    }
   }
 
   const handleNavFilter = (filterId: string) => {
