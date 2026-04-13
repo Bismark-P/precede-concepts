@@ -199,11 +199,11 @@ export default function Home() {
           <div className="border-l-[8px] border-[#0A2A5E] pl-8 md:pl-12 flex flex-col justify-center h-full">
             <div className="flex flex-col gap-6">
               <p className="font-black text-[13px] md:text-[15px] italic uppercase tracking-[0.2em] leading-loose opacity-80 max-w-[95%]">
-                PRECEDE CONCEPTS BRIDGES THE GAP BETWEEN HIGH-END PROFESSIONAL SERVICES AND ACCESSIBLE SOLUTIONS IN GHANA.
+                BUILT FOR BUSINESS. DESIGNED FOR IMPACT.
               </p>
               
               <p className="text-[13px] md:text-[15px] font-bold leading-relaxed max-w-[95%] opacity-90">
-                We operate a dual-purpose ecosystem: a primary business executing top-tier digital & multimedia services, and a CSR hub driving traffic by curating vital community resources.
+                We operate a dual-purpose ecosystem—delivering high-quality digital, administrative, and development services, while running a CSR hub that connects communities to vital resources and opportunities.
               </p>
               
               <div className="pt-6 mt-2 border-t-2 border-[#0A2A5E]/15">
