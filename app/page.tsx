@@ -7,7 +7,7 @@ import {
   GraduationCap, Briefcase, Shield, HeartHandshake,
   Ticket, FileText, ChevronRight, ArrowUpRight, Share2, 
   AlertTriangle, MessageSquare, Instagram, Twitter, Linkedin, Facebook,
-  CheckCircle2 //
+  CheckCircle2, ArrowUp
 } from 'lucide-react'
 
 const WhatsAppIcon = ({ size = 20 }) => (
@@ -23,12 +23,16 @@ export default function Home() {
   const [filter, setFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [expiredLink, setExpiredLink] = useState(false)
+  const [showTopBtn, setShowTopBtn] = useState(false)
   const [heroKey, setHeroKey] = useState(0)
   const isScrollingManually = useRef(false)
 
   useEffect(() => {
     setMounted(true);
     fetchApproved();
+    const handleScroll = () => setShowTopBtn(window.scrollY > 400);
+    window.addEventListener('scroll', handleScroll);
+    
     const sections = ['home', 'about', 'services', 'hub', 'contact'];
     const observerOptions = { threshold: 0.6 };
     const observer = new IntersectionObserver((entries) => {
@@ -47,7 +51,10 @@ export default function Home() {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
-    return () => observer.disconnect();
+    return () => {
+        observer.disconnect();
+        window.removeEventListener('scroll', handleScroll);
+    }
   }, []);
 
   useEffect(() => {
@@ -98,20 +105,20 @@ export default function Home() {
   });
 
   const featured = items.filter(i => i.is_featured);
-  const initiatives = items.filter(i => i.is_official); // New logic for Initiatives
+  const initiatives = items.filter(i => i.is_official);
 
   const services = [
-    { title: 'ACADEMIC', icon: <GraduationCap size={24}/>, list: ['WAEC Mock Logistics', 'Fidelity Exam Printing', 'Result Management', 'School IT Systems', 'Stationery Supply'] },
-    { title: 'ADMIN', icon: <Briefcase size={24}/>, list: ['Business Registration', 'Statutory IDs', 'Document Logistics', 'Tax Prep & Filing', 'Corporate Concierge'] },
-    { title: 'DIGITAL OPS', icon: <Code2 size={24}/>, list: ['Web Development', 'IT Infrastructure', 'Brand Identity', 'UI/UX Design', 'Cloud Integration'] },
-    { title: 'LEARNING & DEV', icon: <Shield size={24}/>, list: ['Cadet Training', 'Masterclasses', 'Career Consulting', 'Digital Literacy', 'Leadership Coaching'] },
-    { title: 'AGENCY OUTSOURCING', icon: <HeartHandshake size={24}/>, list: ['Talent Booking', 'Event Staffing', 'Fleet Leasing', 'White-Label Tech', 'B2B Execution'] },
+    { title: 'ACADEMIC', icon: <GraduationCap size={32}/>, list: ['WAEC Mock Logistics', 'Fidelity Exam Printing', 'Result Management', 'School IT Systems', 'Stationery Supply'] },
+    { title: 'ADMIN', icon: <Briefcase size={32}/>, list: ['Business Registration', 'Statutory IDs', 'Document Logistics', 'Tax Prep & Filing', 'Corporate Concierge'] },
+    { title: 'DIGITAL OPS', icon: <Code2 size={32}/>, list: ['Web Development', 'IT Infrastructure', 'Brand Identity', 'UI/UX Design', 'Cloud Integration'] },
+    { title: 'LEARNING & DEV', icon: <Shield size={32}/>, list: ['Cadet Training', 'Masterclasses', 'Career Consulting', 'Digital Literacy', 'Leadership Coaching'] },
+    { title: 'AGENCY OUTSOURCING', icon: <HeartHandshake size={32}/>, list: ['Talent Booking', 'Event Staffing', 'Fleet Leasing', 'White-Label Tech', 'B2B Execution'] },
   ];
 
   if (!mounted) return null;
 
   return (
-    <div className="bg-[#0A2A5E] font-sans text-slate-950 selection:bg-[#1FC8C8] selection:text-[#0A2A5E]">
+    <div className="bg-[#0A2A5E] font-sans text-black selection:bg-[#1FC8C8] selection:text-[#0A2A5E]">
       
       {/* --- 🧭 NAVIGATION --- */}
       <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E]/95 backdrop-blur-md border-b border-white/10 px-6 py-5">
@@ -149,168 +156,189 @@ export default function Home() {
         )}
       </AnimatePresence>
 
+      {/* --- ⬆️ BACK TO TOP --- */}
+      <AnimatePresence>
+        {showTopBtn && (
+          <motion.button 
+            initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }}
+            onClick={() => navigateTo('home')}
+            className="fixed bottom-10 right-10 z-[150] bg-[#1FC8C8] text-[#0A2A5E] p-4 rounded-2xl shadow-2xl border-4 border-[#0A2A5E]"
+          >
+            <ArrowUp size={24} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* --- HERO SECTION --- */}
       <section id="home" className="h-screen flex items-center justify-center bg-[#0A2A5E] text-center px-6">
         <motion.div key={heroKey} initial={{opacity:0, y:30}} animate={{opacity:1, y:0}}>
-          <p className="text-[#1FC8C8] text-[16px] font-black uppercase tracking-[0.5em] mb-6 italic">PROGRESS SIMPLIFIED, VALUE DELIVERED.</p>
           <h1 className="text-5xl md:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
+          <p className="text-[#D4AF37] text-[18px] md:text-[24px] font-black uppercase tracking-[0.4em] mt-8 italic drop-shadow-lg">Simplifying Progress, Delivering Value.</p>
         </motion.div>
       </section>
       
-      {/* --- ABOUT SECTION --- */}
+      {/* --- ABOUT SECTION (Updated Paragraphs) --- */}
       <section id="about" className="min-h-screen flex items-center justify-center bg-[#1FC8C8] py-32 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.5fr] gap-16 text-[#0A2A5E]">
-          <div><h2 className="text-[5rem] md:text-[6.5rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-4 text-left">BEYOND <br/><span className="text-white">DIGITAL</span><br/>AGENCY.</h2></div>
-          <div className="border-l-[4px] md:border-l-[8px] border-[#0A2A5E] pl-6 md:pl-12 flex flex-col justify-center font-bold text-lg md:text-xl leading-relaxed text-left">
-            <p>We operate a dual-purpose ecosystem—delivering high-quality digital, administrative, and development services, while running a CSR hub that connects communities to vital resources and opportunities.</p>
+          <div><h2 className="text-[4rem] md:text-[6.5rem] font-black uppercase italic tracking-tighter leading-[0.9] mb-4 text-left">BUILT FOR <br/><span className="text-white">BUSINESS.</span><br/>DESIGNED FOR <br/><span className="text-white">IMPACT.</span></h2></div>
+          <div className="border-l-[6px] md:border-l-[12px] border-[#0A2A5E] pl-8 md:pl-16 flex flex-col justify-center text-left">
+            <h3 className="text-xl md:text-3xl font-black uppercase italic leading-tight mb-8">
+              We operate a dual-purpose ecosystem—delivering high-quality digital, administrative, and development services, while running a CSR hub that connects communities to vital resources and opportunities.
+            </h3>
+            <p className="text-lg md:text-xl font-bold leading-relaxed opacity-80">
+              Our mission is to bridge the gap between complex operational needs and simplified, high-standard execution for both corporate entities and the wider community.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* --- 🛠️ SERVICES SECTION --- */}
+      {/* --- 🛠️ SERVICES SECTION (Pure Black Text + Gold Separator) --- */}
       <section id="services" className="min-h-screen bg-white z-10 relative flex flex-col justify-center py-20 md:py-32">
-        <div className="max-w-[1500px] mx-auto w-full px-6">
-          <h2 className="text-4xl md:text-6xl font-black uppercase italic text-[#0A2A5E] mb-12 tracking-tighter text-left">OUR SERVICES.</h2>
+        <div className="max-w-[1500px] mx-auto w-full px-6 text-black">
+          <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-16 tracking-tighter text-left">OUR SERVICES.</h2>
           
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 md:gap-6 mb-12 items-stretch">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-8 mb-16">
             {services.map((s, i) => (
-              <div key={i} className="p-6 md:p-8 bg-slate-50 border-2 border-slate-100 rounded-[2rem] flex flex-col h-full group hover:border-[#1FC8C8] transition-all">
-                <div className="flex flex-col gap-4 mb-4 pb-4 border-b-2 border-slate-200/50 text-left">
-                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#0F4C81]">{s.icon}</div>
-                  <h3 className="text-[12px] md:text-sm font-black uppercase italic text-[#0A2A5E] leading-tight">{s.title}</h3>
+              <div key={i} className="p-8 md:p-10 bg-slate-50 border-4 border-slate-100 rounded-[2.5rem] flex flex-col h-[450px] md:h-[500px] group hover:border-[#D4AF37] transition-all shadow-lg">
+                <div className="flex flex-col gap-5 mb-6 pb-6 border-b-4 border-slate-200 text-left">
+                  <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#0A2A5E] shadow-md">{s.icon}</div>
+                  <h3 className="text-lg md:text-xl font-black uppercase italic leading-tight">{s.title}</h3>
                 </div>
-                <ul className="space-y-2 mb-6 flex-1 text-left">{s.list.slice(0, 4).map((item, idx) => (<li key={idx} className="flex items-center gap-2 text-[9px] md:text-[10px] font-black text-slate-500 uppercase italic leading-tight"><ChevronRight size={12} className="text-[#1FC8C8] shrink-0"/> {item}</li>))}</ul>
-                <button onClick={() => navigateTo('contact')} className="w-full py-4 rounded-xl text-[10px] md:text-[11px] font-black uppercase bg-[#1FC8C8] text-[#0A2A5E] group-hover:bg-[#0A2A5E] group-hover:text-white transition-all tracking-widest">BOOK SERVICE</button>
+                <ul className="space-y-3 mb-6 flex-1 text-left">{s.list.map((item, idx) => (<li key={idx} className="flex items-start gap-3 text-[11px] md:text-[13px] font-black uppercase italic leading-tight text-black"><ChevronRight size={16} className="text-[#D4AF37] shrink-0"/> {item}</li>))}</ul>
+                <button onClick={() => navigateTo('contact')} className="w-full py-5 rounded-2xl text-[12px] font-black uppercase bg-[#0A2A5E] text-white group-hover:bg-[#D4AF37] transition-all tracking-widest shadow-xl">BOOK SERVICE</button>
               </div>
             ))}
-            {/* 6th Card: And More */}
-            <div className="p-6 md:p-8 bg-slate-900 border-2 border-slate-800 rounded-[2rem] flex flex-col justify-center items-center text-center h-full group">
-               <Sparkles className="text-[#1FC8C8] mb-4" size={32} />
-               <h3 className="text-white font-black uppercase italic text-sm tracking-widest">AND MORE...</h3>
-               <p className="text-[9px] text-white/40 uppercase font-black mt-2">Customized Agency Solutions</p>
+          </div>
+
+          {/* Gold "And More" Bridge */}
+          <div className="flex items-center gap-6 mb-16">
+            <div className="h-[2px] flex-1 bg-slate-100"></div>
+            <div className="flex flex-col items-center">
+              <Sparkles className="text-[#D4AF37] mb-2" size={32} />
+              <h4 className="text-[#D4AF37] font-black uppercase italic text-sm tracking-[0.4em]">AND MORE...</h4>
             </div>
+            <div className="h-[2px] flex-1 bg-slate-100"></div>
           </div>
           
-          {/* Ticketing & Custom Enquiry Blocks */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-10">
-             <div className="bg-[#0A2A5E] p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-between group cursor-pointer hover:ring-8 hover:ring-[#1FC8C8]/10 transition-all text-left shadow-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+             <div className="bg-[#0A2A5E] p-10 md:p-14 rounded-[3rem] md:rounded-[4rem] flex items-center justify-between group cursor-pointer hover:ring-8 hover:ring-[#D4AF37]/20 transition-all text-left shadow-2xl">
                 <div className="text-white">
-                  <h3 className="text-xl md:text-2xl font-black italic uppercase flex items-center gap-3 mb-1"><Ticket className="text-[#1FC8C8]"/> TICKETING & PAYMENTS</h3>
-                  <p className="text-[9px] md:text-xs font-bold opacity-40 uppercase tracking-[0.2em]">Secure revenue and event logistics.</p>
+                  <h3 className="text-2xl md:text-4xl font-black italic uppercase flex items-center gap-4 mb-2"><Ticket className="text-[#1FC8C8]" size={32}/> TICKETING & PAYMENTS</h3>
+                  <p className="text-[11px] md:text-sm font-black text-white/40 uppercase tracking-[0.2em]">Secure revenue and event logistics.</p>
                 </div>
-                <ArrowUpRight className="text-[#1FC8C8]" size={28}/>
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all"><ArrowUpRight size={32}/></div>
              </div>
-             <div className="bg-[#1FC8C8] p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-between group cursor-pointer hover:ring-8 hover:ring-[#0A2A5E]/10 transition-all text-left shadow-2xl">
+             
+             <div className="bg-[#1FC8C8] p-10 md:p-14 rounded-[3rem] md:rounded-[4rem] flex items-center justify-between group cursor-pointer hover:ring-8 hover:ring-[#0A2A5E]/10 transition-all text-left shadow-2xl">
                 <div className="text-[#0A2A5E]">
-                  <h3 className="text-xl md:text-2xl font-black italic uppercase flex items-center gap-3 mb-1"><FileText/> CUSTOM ENQUIRY</h3>
-                  <p className="text-[9px] md:text-xs font-bold opacity-40 uppercase tracking-[0.2em]">Bespoke agency and technical requests.</p>
+                  <h3 className="text-2xl md:text-4xl font-black italic uppercase flex items-center gap-4 mb-2"><FileText size={32}/> CUSTOM ENQUIRY</h3>
+                  <p className="text-[11px] md:text-sm font-black text-[#0A2A5E]/50 uppercase tracking-[0.2em]">Bespoke agency and technical requests.</p>
                 </div>
-                <ArrowUpRight className="text-[#0A2A5E]" size={28}/>
+                <div className="w-16 h-16 bg-[#0A2A5E]/10 rounded-full flex items-center justify-center text-[#0A2A5E] group-hover:bg-[#0A2A5E] group-hover:text-white transition-all"><ArrowUpRight size={32}/></div>
              </div>
           </div>
         </div>
       </section>
 
       {/* --- HUB SECTION --- */}
-      <section id="hub" className="min-h-screen py-20 md:py-32 px-6 bg-[#0F4C81] relative">
+      <section id="hub" className="min-h-screen py-24 px-6 bg-[#0F4C81] relative">
         <div className="max-w-[1500px] mx-auto">
           
           <AnimatePresence>
             {expiredLink && (
-              <motion.div initial={{opacity:0, y:-20}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="mb-10 p-6 md:p-8 bg-red-500/10 border-2 border-red-500/30 rounded-[2rem] flex items-center justify-between backdrop-blur-md">
-                <div className="flex items-center gap-4 text-left">
-                  <div className="p-3 bg-red-500 text-white rounded-xl shrink-0"><AlertTriangle size={20}/></div>
-                  <div className="text-white"><p className="text-[8px] font-black uppercase opacity-50 tracking-widest">ACCESS ALERT</p><h4 className="font-black uppercase italic text-sm md:text-lg">This scout has expired or is no longer available.</h4></div>
+              <motion.div initial={{opacity:0, y:-20}} animate={{opacity:1, y:0}} className="mb-10 p-8 bg-red-500/10 border-4 border-red-500/30 rounded-[3rem] flex items-center justify-between backdrop-blur-md">
+                <div className="flex items-center gap-6 text-left text-white">
+                  <AlertTriangle className="text-red-500" size={32}/>
+                  <div><p className="text-[10px] font-black uppercase opacity-50 tracking-widest">ACCESS ALERT</p><h4 className="font-black uppercase italic text-xl">Scout Expiry: Content No Longer Available.</h4></div>
                 </div>
-                <button onClick={() => {setExpiredLink(false); window.history.replaceState(null, '', '/hub')}} className="shrink-0 ml-4 px-4 md:px-8 py-2 md:py-3 bg-white/10 hover:bg-white text-white hover:text-red-500 rounded-xl text-[9px] font-black uppercase transition-all">DISMISS</button>
+                <button onClick={() => {setExpiredLink(false); window.history.replaceState(null, '', '/hub')}} className="px-10 py-4 bg-white/10 hover:bg-white text-white hover:text-red-500 rounded-2xl text-[11px] font-black uppercase transition-all">DISMISS</button>
               </motion.div>
             )}
           </AnimatePresence>
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-20 gap-10">
             <div className="flex-1 w-full max-w-xl text-left">
-              <h2 className="text-4xl md:text-5xl font-black uppercase italic text-white mb-8 tracking-tighter underline underline-offset-[12px] decoration-[#1FC8C8]">OPPORTUNITY HUB.</h2>
-              <div className="relative"><Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={20} /><input type="text" placeholder="SEARCH HUB..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-5 md:p-6 pl-14 md:pl-18 bg-white/10 border-2 border-white/10 rounded-[2rem] text-white font-black uppercase text-xs md:text-sm italic outline-none focus:border-[#1FC8C8] shadow-2xl"/></div>
+              <h2 className="text-5xl md:text-6xl font-black uppercase italic text-white mb-8 tracking-tighter underline underline-offset-[16px] decoration-[#1FC8C8] decoration-8">OPPORTUNITY HUB.</h2>
+              <div className="relative"><Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={24} /><input type="text" placeholder="SEARCH HUB..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-7 pl-18 bg-white/10 border-4 border-white/10 rounded-[2.5rem] text-white font-black uppercase text-sm italic outline-none focus:border-[#1FC8C8] shadow-3xl"/></div>
             </div>
-            <div className="flex flex-wrap gap-2 bg-black/30 p-1.5 md:p-2 rounded-[2rem] border border-white/5 w-full md:w-auto overflow-x-auto no-scrollbar">
+            <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-full border-2 border-white/10">
               {['all', 'training', 'job', 'event', 'place', 'marketplace'].map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-5 md:px-8 py-2 md:py-3 rounded-full text-[9px] md:text-[10px] font-black uppercase transition-all whitespace-nowrap ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/40 hover:text-white'}`}>{f}</button>
+                <button key={f} onClick={() => setFilter(f)} className={`px-10 py-4 rounded-full text-[11px] font-black uppercase transition-all whitespace-nowrap ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/40 hover:text-white'}`}>{f}</button>
               ))}
             </div>
           </div>
 
-          {/* Collapsible Headers: Initiatives */}
-          <div className="mb-20">
-            <h3 className="flex items-center gap-2 text-[#1FC8C8] mb-8 font-black uppercase italic text-xs tracking-[0.3em] text-left border-b border-white/10 pb-4"><CheckCircle2 size={16}/> Precede Initiatives & Opportunities</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
-          </div>
-
-          {/* Collapsible Headers: Featured */}
-          <div className="mb-20">
-            <h3 className="flex items-center gap-2 text-[#1FC8C8] mb-8 font-black uppercase italic text-xs tracking-[0.3em] text-left border-b border-white/10 pb-4"><Sparkles size={16}/> Featured Picks</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
-          </div>
-
-          {/* Posts */}
-          <div className="mb-20">
-             <h3 className="flex items-center gap-2 text-white/40 mb-8 font-black uppercase italic text-[10px] tracking-[0.4em] text-left border-b border-white/5 pb-4">Standard Posts</h3>
-             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">{filteredItems.filter(i => !i.is_official && !i.is_featured).map(item => <ScoutCard key={item.id} item={item} />)}</div>
+          <div className="space-y-24">
+            <div>
+              <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] text-left border-b-4 border-white/10 pb-6"><CheckCircle2 size={24}/> Precede Initiatives & Opportunities</h3>
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
+            </div>
+            <div>
+              <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] text-left border-b-4 border-white/10 pb-6"><Sparkles size={24}/> Featured Picks</h3>
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
+            </div>
+            <div>
+               <h3 className="text-white/20 mb-12 font-black uppercase italic text-[11px] tracking-[0.5em] text-left border-b-2 border-white/5 pb-6">General Post Archive</h3>
+               <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{filteredItems.filter(i => !i.is_official && !i.is_featured).map(item => <ScoutCard key={item.id} item={item} />)}</div>
+            </div>
           </div>
 
           {/* MARKETPLACE BANNER */}
-          <div className="mt-20 md:mt-32 w-full bg-white/5 border border-white/10 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-12 backdrop-blur-xl shadow-3xl">
-             <div className="flex items-center gap-6 md:gap-8 text-white text-left">
-                <div className="p-4 md:p-6 bg-[#1FC8C8] rounded-2xl md:rounded-3xl text-[#0A2A5E] shrink-0"><Briefcase size={32} /></div>
-                <div><h3 className="text-xl md:text-3xl font-black uppercase italic mb-1 tracking-tighter">THE MARKETPLACE</h3><p className="text-[10px] md:text-sm font-bold text-white/30 uppercase tracking-[0.2em] leading-relaxed">Book a Pro or offer your specific talent.</p></div>
+          <div className="mt-32 w-full bg-white/5 border-4 border-white/10 rounded-[4rem] p-12 md:p-20 flex flex-col md:flex-row items-center justify-between gap-12 backdrop-blur-2xl shadow-3xl">
+             <div className="flex items-center gap-10 text-white text-left">
+                <div className="p-8 bg-[#1FC8C8] rounded-[2.5rem] text-[#0A2A5E] shrink-0 shadow-2xl"><Briefcase size={56} /></div>
+                <div><h3 className="text-3xl md:text-5xl font-black uppercase italic mb-3 tracking-tighter">THE MARKETPLACE</h3><p className="text-[12px] md:text-lg font-black text-white/40 uppercase tracking-[0.3em] leading-relaxed italic">Hire a Professional or Monetize Your Talent.</p></div>
              </div>
-             <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
-                <button onClick={() => setFilter('marketplace')} className="w-full md:w-auto px-10 md:px-12 py-5 md:py-6 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl text-[12px] md:text-[14px] font-black uppercase italic tracking-widest hover:bg-white transition-all shadow-xl">FIND TALENT</button>
-                <button onClick={() => navigateTo('contact')} className="w-full md:w-auto px-10 md:px-12 py-5 md:py-6 bg-white/10 text-white border-2 border-white/10 rounded-2xl text-[12px] md:text-[14px] font-black uppercase italic tracking-widest hover:bg-white/20 transition-all">JOIN AS PRO</button>
+             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                <button onClick={() => setFilter('marketplace')} className="w-full md:w-auto px-16 py-7 bg-[#1FC8C8] text-[#0A2A5E] rounded-3xl text-[16px] font-black uppercase italic tracking-widest hover:bg-white transition-all shadow-2xl">FIND PROS</button>
+                <button onClick={() => navigateTo('contact')} className="w-full md:w-auto px-16 py-7 bg-white/10 text-white border-4 border-white/10 rounded-3xl text-[16px] font-black uppercase italic tracking-widest hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all">JOIN AS PRO</button>
              </div>
           </div>
         </div>
       </section>
 
-      {/* --- 🏁 CONTACT & FOOTER SECTION --- */}
+      {/* --- 🏁 CONTACT & FOOTER (Restored Animations + WhatsApp Channel) --- */}
       <footer id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 py-12 md:py-24 text-white text-left relative overflow-hidden">
-        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center flex-1 z-10">
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 items-center flex-1 z-10">
           <div>
-             <h2 className="text-[4rem] md:text-[7.5rem] font-black italic uppercase leading-[0.8] mb-4 tracking-tighter">MOVE <br/>AHEAD,</h2>
-             <h2 className="text-[4rem] md:text-[7.5rem] font-black italic uppercase leading-[0.8] text-[#1FC8C8] tracking-tighter">STAY <br/>AHEAD.</h2>
-             {/* Social Logos Placeholder */}
-             <div className="mt-12 md:mt-16 flex gap-6 md:gap-8">
-                {/* <a href="#" className="hover:text-[#1FC8C8] transition-all"><Instagram size={24}/></a> 
-                <a href="#" className="hover:text-[#1FC8C8] transition-all"><Twitter size={24}/></a> 
-                <a href="#" className="hover:text-[#1FC8C8] transition-all"><Linkedin size={24}/></a> 
-                <a href="#" className="hover:text-[#1FC8C8] transition-all"><Facebook size={24}/></a> 
-                */}
-                <span className="text-[9px] font-black tracking-[0.5em] text-white/20 uppercase italic">Social Clearance Pending</span>
+             <motion.div initial={{ x: -100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ duration: 0.8 }}>
+                <h2 className="text-[4.5rem] md:text-[8.5rem] font-black italic uppercase leading-[0.8] mb-4 tracking-tighter">MOVE <br/>AHEAD,</h2>
+                <h2 className="text-[4.5rem] md:text-[8.5rem] font-black italic uppercase leading-[0.8] text-[#1FC8C8] tracking-tighter">STAY <br/>AHEAD.</h2>
+             </motion.div>
+             
+             {/* Clickable Social Placeholders */}
+             <div className="mt-16 flex gap-10">
+                {/* <a href="#" className="text-white/30 hover:text-[#1FC8C8] transition-all transform hover:scale-125"><Instagram size={32}/></a> 
+                <a href="#" className="text-white/30 hover:text-[#1FC8C8] transition-all transform hover:scale-125"><Twitter size={32}/></a> 
+                <a href="#" className="text-white/30 hover:text-[#1FC8C8] transition-all transform hover:scale-125"><Linkedin size={32}/></a> 
+                <a href="#" className="text-white/30 hover:text-[#1FC8C8] transition-all transform hover:scale-125"><Facebook size={32}/></a> */}
+                <span className="text-[11px] font-black tracking-[0.6em] text-white/10 uppercase italic">Digital Presence Under Clearance</span>
              </div>
           </div>
 
-          <div className="bg-white/5 p-8 md:p-12 rounded-[3rem] border-2 border-white/10 shadow-3xl backdrop-blur-xl">
-            <div className="space-y-8 md:space-y-10 mb-10">
-              <div className="flex items-center gap-6 group">
-                <div className="p-6 md:p-8 bg-[#1FC8C8]/10 rounded-2xl md:rounded-[2rem] text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all shrink-0"><Phone size={32}/></div>
-                <div><span className="text-[9px] md:text-xs font-black uppercase text-white/30 tracking-widest italic">VOICE CLEARANCE</span><p className="text-3xl md:text-4xl font-black italic mt-1 tracking-tighter leading-none underline decoration-[#1FC8C8]">0591999544</p></div>
+          <div className="bg-white/5 p-10 md:p-16 rounded-[4rem] border-4 border-white/10 shadow-3xl backdrop-blur-3xl">
+            <div className="space-y-12 mb-14 text-left">
+              <div className="flex items-center gap-8 group">
+                <div className="p-8 bg-[#1FC8C8]/10 rounded-[2.5rem] text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all shrink-0"><Phone size={44}/></div>
+                <div><span className="text-[11px] font-black uppercase text-white/40 tracking-[0.4em] italic">DIRECT CLEARANCE</span><p className="text-4xl md:text-5xl font-black italic mt-1 tracking-tighter leading-none underline decoration-[#D4AF37] decoration-8 underline-offset-8">0591999544</p></div>
               </div>
-              <div className="flex items-center gap-6 group">
-                <div className="p-6 md:p-8 bg-[#1FC8C8]/10 rounded-2xl md:rounded-[2rem] text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all shrink-0"><Mail size={32}/></div>
-                <div className="overflow-hidden">
-                  <span className="text-[9px] md:text-xs font-black uppercase text-white/30 tracking-widest italic">SECURE MAIL</span>
-                  <p className="text-lg md:text-xl font-black italic mt-1 truncate">precedeconcepts@gmail.com</p>
+              <div className="flex items-center gap-8 group">
+                <div className="p-8 bg-[#1FC8C8]/10 rounded-[2.5rem] text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all shrink-0"><Mail size={44}/></div>
+                <div className="overflow-hidden text-left">
+                  <span className="text-[11px] font-black uppercase text-white/40 tracking-[0.4em] italic">ENCRYPTED MAIL</span>
+                  <p className="text-xl md:text-2xl font-black italic mt-1 truncate tracking-tight">precedeconcepts@gmail.com</p>
                 </div>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-5 rounded-2xl font-black uppercase italic text-[11px] text-center hover:bg-[#1FC8C8] transition-all flex justify-center items-center gap-2 shadow-xl"><WhatsAppIcon size={18}/> WHATSAPP</a>
-              <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-5 border-2 border-[#1FC8C8]/30 rounded-2xl font-black uppercase italic text-[11px] text-center hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all flex justify-center items-center gap-2"><MessageSquare size={16}/> CHANNEL</a>
-              <button onClick={() => window.location.href='mailto:precedeconcepts@gmail.com'} className="bg-[#1FC8C8] text-[#0A2A5E] p-5 rounded-2xl font-black uppercase italic text-[11px] hover:bg-white transition-all shadow-xl tracking-widest">SEND EMAIL</button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-6 rounded-3xl font-black uppercase italic text-[12px] text-center hover:bg-[#D4AF37] hover:text-white transition-all flex justify-center items-center gap-3 shadow-2xl"><WhatsAppIcon size={24}/> CHAT HUB</a>
+              <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-6 border-4 border-[#1FC8C8]/20 rounded-3xl font-black uppercase italic text-[12px] text-center hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all flex justify-center items-center gap-3"><MessageSquare size={20}/> WHATSAPP CHANNEL</a>
+              <button onClick={() => window.location.href='mailto:precedeconcepts@gmail.com'} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 rounded-3xl font-black uppercase italic text-[12px] hover:bg-white transition-all shadow-2xl tracking-[0.2em]">SEND REQUEST</button>
             </div>
           </div>
         </div>
-        <div className="text-center pt-10 border-t border-white/5 w-full relative z-10"><p className="text-[#1FC8C8] font-black uppercase italic text-[9px] md:text-[11px] tracking-[0.6em]">PRECEDE CONCEPTS ACCRA · © 2026</p></div>
+        <div className="text-center pt-10 border-t-4 border-white/5 w-full relative z-10"><p className="text-[#D4AF37] font-black uppercase italic text-[11px] md:text-[13px] tracking-[0.8em]">PRECEDE CONCEPTS ACCRA · © 2026</p></div>
       </footer>
 
       <style jsx global>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
@@ -324,22 +352,22 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
     e.preventDefault();
     const shareUrl = `${window.location.origin}/hub?id=${item.id}`;
     navigator.clipboard.writeText(shareUrl);
-    alert("Copied to clipboard!");
+    alert("Clearance Link Copied to Clipboard!");
   };
 
   return (
-    <div id={`post-${item.id}`} className={`group bg-white rounded-[1.2rem] md:rounded-[1.5rem] overflow-hidden flex flex-col shadow-lg transition-all hover:scale-[1.03] h-full ${isFeatured ? 'ring-4 ring-[#1FC8C8]' : ''}`}>
-      <div className="h-20 md:h-24 bg-slate-900 relative overflow-hidden">
-        {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" alt={item.title} />}
-        <span className="absolute top-2 left-2 md:top-3 md:left-3 text-[6px] md:text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 md:py-1.5 rounded-md uppercase italic z-10">{item.category}</span>
+    <div id={`post-${item.id}`} className={`group bg-white rounded-[1.5rem] md:rounded-[2rem] overflow-hidden flex flex-col shadow-2xl transition-all hover:scale-[1.05] h-full ${isFeatured ? 'ring-8 ring-[#1FC8C8]' : ''}`}>
+      <div className="h-24 md:h-28 bg-slate-900 relative overflow-hidden">
+        {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-60 group-hover:scale-125 transition-transform duration-1000" alt={item.title} />}
+        <span className="absolute top-3 left-3 md:top-4 md:left-4 text-[7px] md:text-[9px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-3 py-1.5 md:py-2 rounded-xl uppercase italic z-10 shadow-lg">{item.category}</span>
       </div>
-      <div className="p-3 md:p-5 flex flex-col flex-1 text-left">
-        <h4 className="font-black text-[10px] md:text-[11px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 mb-3 h-8 md:h-10">{item.title}</h4>
-        <div className="mt-auto pt-3 md:pt-4 border-t border-slate-100 flex justify-between items-center">
-          <p className="text-[8px] md:text-[9px] font-black uppercase text-slate-400 italic">{targetDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</p>
-          <div className="flex gap-1.5 md:gap-2">
-            <button onClick={handleShare} className="p-2 md:p-2.5 bg-slate-50 text-slate-400 rounded-lg md:rounded-xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all"><Share2 size={12}/></button>
-            <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[8px] md:text-[9px] font-black uppercase bg-[#0A2A5E] text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all">VIEW</a>
+      <div className="p-4 md:p-6 flex flex-col flex-1 text-left">
+        <h4 className="font-black text-[12px] md:text-[14px] text-black uppercase italic leading-tight line-clamp-2 mb-4 h-10 md:h-12">{item.title}</h4>
+        <div className="mt-auto pt-4 md:pt-6 border-t-4 border-slate-50 flex justify-between items-center">
+          <p className="text-[9px] md:text-[11px] font-black uppercase text-slate-400 italic">{targetDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</p>
+          <div className="flex gap-2">
+            <button onClick={handleShare} className="p-2.5 md:p-3 bg-slate-100 text-[#0A2A5E] rounded-xl hover:bg-[#D4AF37] hover:text-white transition-all shadow-md"><Share2 size={16}/></button>
+            <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-[10px] md:text-[11px] font-black uppercase bg-[#0A2A5E] text-white px-5 md:px-7 py-3 md:py-3.5 rounded-xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all shadow-lg tracking-widest">VIEW</a>
           </div>
         </div>
       </div>
