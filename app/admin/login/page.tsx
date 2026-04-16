@@ -4,8 +4,9 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/app/lib/supabase'
 import { Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react'
 
+// ⚡ HARDCODED SUPER ADMIN EMAIL
+const SUPER_ADMIN_EMAIL = 'precedeconcepts@gmail.com'; 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -16,9 +17,9 @@ export default function AdminLogin() {
     setLoading(true)
     setError('')
 
-    // Attempt to sign in with Supabase
+    // Attempt to sign in with the fixed email
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: SUPER_ADMIN_EMAIL,
       password,
     })
 
@@ -26,7 +27,6 @@ export default function AdminLogin() {
       setError(error.message)
       setLoading(false)
     } else {
-      // Success! The layout.tsx will detect the session and the router will push to dashboard
       router.push('/admin')
     }
   }
@@ -41,7 +41,7 @@ export default function AdminLogin() {
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-[#1FC8C8] rounded-2xl flex items-center justify-center font-black italic text-[#0A2A5E] text-2xl mx-auto mb-6 shadow-[0_0_30px_rgba(31,200,200,0.3)]">PC</div>
           <h1 className="text-3xl font-black uppercase italic text-white tracking-tighter">Control Hub</h1>
-          <p className="text-[#1FC8C8] text-[10px] font-black uppercase tracking-[0.4em] mt-2">RESTRICTED ACCESS</p>
+          <p className="text-[#1FC8C8] text-[10px] font-black uppercase tracking-[0.4em] mt-2">SUPER ADMIN ACCESS</p>
         </div>
 
         {/* Login Form */}
@@ -55,24 +55,28 @@ export default function AdminLogin() {
           )}
 
           <div className="space-y-5">
-            <div className="relative group">
-              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-[#1FC8C8] transition-colors" size={20} />
+            {/* Locked Email Field */}
+            <div className="relative group opacity-60">
+              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40" size={20} />
               <input 
                 type="email" 
-                required 
-                placeholder="Admin Email" 
-                className={inputClass}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                readOnly 
+                value={SUPER_ADMIN_EMAIL}
+                className={`${inputClass} cursor-not-allowed`}
               />
+              <div className="absolute right-5 top-1/2 -translate-y-1/2">
+                <Lock size={14} className="text-[#1FC8C8]" />
+              </div>
             </div>
 
+            {/* Active Password Field */}
             <div className="relative group">
               <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-[#1FC8C8] transition-colors" size={20} />
               <input 
                 type="password" 
                 required 
-                placeholder="Admin Password" 
+                autoFocus
+                placeholder="Enter Vault Password" 
                 className={inputClass}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -82,7 +86,7 @@ export default function AdminLogin() {
 
           <button 
             type="submit" 
-            disabled={loading}
+            disabled={loading || !password}
             className="w-full mt-8 bg-[#1FC8C8] text-[#0A2A5E] p-5 rounded-2xl font-black uppercase text-sm tracking-[0.2em] shadow-xl hover:bg-white transition-all disabled:opacity-50 flex items-center justify-center gap-3 group"
           >
             {loading ? 'AUTHENTICATING...' : (

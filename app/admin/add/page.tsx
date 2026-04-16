@@ -1,16 +1,20 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
 import { 
   ArrowLeft, Plus, LayoutDashboard, CheckCircle2, Star,
-  Briefcase, GraduationCap, PartyPopper, Map as MapIcon, Building2, Search
+  Briefcase, GraduationCap, PartyPopper, Map as MapIcon, Building2, Search, ShieldCheck
 } from 'lucide-react';
 
 export default function AdminAddEvent() {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSalaryDisclosed, setIsSalaryDisclosed] = useState(true);
-  const [isFree, setIsFree] = useState(false); // New state for Free toggle
+  const [isFree, setIsFree] = useState(false);
+
+  // 🛡️ SECURITY: Role State
+  const [userRole, setUserRole] = useState<'super_admin' | 'staff'>('staff');
+  const [publishDirectly, setPublishDirectly] = useState(false); // Only Super Admin sees this
 
   const [formData, setFormData] = useState<any>({
     category: 'event', 
@@ -26,14 +30,26 @@ export default function AdminAddEvent() {
     link: '',
     image_url: '',
     is_featured: false,
+    is_official: false,
     organizer_body: '', 
     recurring_day: '',   
     map_query: '',
-    status: 'queued', // Default to queue for admin review
+    status: 'queued', 
     performance_grade: 5,
     performance_notes: '',
-    parent_id: null // To track reposted history
+    parent_id: null 
   });
+
+  // Fetch the current user's role on load
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.user_metadata?.role === 'super_admin') {
+        setUserRole('super_admin');
+      }
+    };
+    fetchUserRole();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,12 +58,16 @@ export default function AdminAddEvent() {
 
     const finalData = { ...formData };
     
-    // Handle undisclosed salary logic
+    // 🛡️ RBAC LOGIC: If Super Admin toggled "Publish Directly", bypass the queue
+    if (userRole === 'super_admin' && publishDirectly) {
+      finalData.status = 'approved';
+    } else {
+      finalData.status = 'queued'; // Force queue for staff submissions
+    }
+    
     if (formData.category === 'job' && !isSalaryDisclosed) {
       finalData.salary_range = 'Undisclosed';
     }
-
-    // Handle Free event/place logic
     if (formData.category !== 'job' && isFree) {
       finalData.price = 'Free';
     }
@@ -56,19 +76,18 @@ export default function AdminAddEvent() {
 
     if (!error) {
       setShowSuccess(true);
-      // Reset form but keep category preference
       setFormData({
         ...formData,
         title: '', price: '', venue: '', event_date: '', 
         link: '', image_url: '', salary_range: '', 
         duration: '', organizer_body: '', recurring_day: '', map_query: '',
-        is_featured: false,
+        is_featured: false, is_official: false,
         parent_id: null
       });
-      setIsFree(false); // Reset Free toggle
+      setIsFree(false);
+      setPublishDirectly(false);
       window.scrollTo(0, 0);
       
-      // Auto-hide success message after 5 seconds
       setTimeout(() => setShowSuccess(false), 5000);
     } else {
       alert("❌ Error: " + error.message);
@@ -96,7 +115,9 @@ export default function AdminAddEvent() {
           <div className="mb-8 p-4 bg-[#1FC8C8]/10 border-2 border-[#1FC8C8] rounded-2xl flex items-center justify-between animate-bounce">
             <div className="flex items-center gap-3 text-[#0A2A5E]">
               <CheckCircle2 size={20} className="text-[#1FC8C8]" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Sent to Queue Successfully!</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                {publishDirectly ? 'Published directly to Live Hub!' : 'Sent to Queue Successfully!'}
+              </span>
             </div>
             <a href="/admin" className="flex items-center gap-2 bg-[#0A2A5E] text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-[#1FC8C8] transition-all">
               <LayoutDashboard size={14} /> Dashboard
@@ -141,7 +162,6 @@ export default function AdminAddEvent() {
                 </div>
               </div>
               <div>
-                {/* UPGRADED RECURRING FIELD: Now accepts flexible custom text */}
                 <label className={labelClass}>Schedule / Recurrence</label>
                 <input 
                   className={inputClass} 
@@ -197,7 +217,6 @@ export default function AdminAddEvent() {
                  <div className="flex justify-between items-center mb-1.5 px-1">
                   <label className={labelClass}>{formData.category === 'job' ? 'Salary Range' : 'Entry Price'}</label>
                   
-                  {/* Dynamic Toggle: Shows "Undisclosed" for Jobs, "Free" for everything else */}
                   {formData.category === 'job' ? (
                     <label className="flex items-center gap-1 text-[8px] font-black uppercase text-[#1FC8C8] cursor-pointer">
                       <input type="checkbox" checked={!isSalaryDisclosed} onChange={() => setIsSalaryDisclosed(!isSalaryDisclosed)} /> Undisclosed
@@ -228,22 +247,40 @@ export default function AdminAddEvent() {
             </div>
           </div>
 
-          {/* MEDIA & PROMOTION */}
+          {/* 🛡️ MEDIA & PROMOTION (RBAC Enabled) */}
           <div className="space-y-4">
-             <div 
-                onClick={() => setFormData({...formData, is_featured: !formData.is_featured})}
-                className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.is_featured ? 'bg-[#1FC8C8]/10 border-[#1FC8C8]' : 'bg-white border-slate-100 hover:border-slate-200'}`}
-              >
-                <div className="flex items-center gap-4 text-left leading-tight">
-                   <div className={`p-3 rounded-xl ${formData.is_featured ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-slate-100 text-slate-300'}`}>
-                      <Star size={18} fill={formData.is_featured ? "currentColor" : "none"} />
+             {/* ONLY Super Admin sees Featured & Official toggles */}
+             {userRole === 'super_admin' && (
+               <div className="grid grid-cols-2 gap-4">
+                 <div 
+                   onClick={() => setFormData({...formData, is_featured: !formData.is_featured})}
+                   className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.is_featured ? 'bg-[#1FC8C8]/10 border-[#1FC8C8]' : 'bg-white border-slate-100 hover:border-slate-200'}`}
+                 >
+                   <div className="flex items-center gap-4 text-left leading-tight">
+                      <div className={`p-3 rounded-xl ${formData.is_featured ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-slate-100 text-slate-300'}`}>
+                         <Star size={18} fill={formData.is_featured ? "currentColor" : "none"} />
+                      </div>
+                      <div>
+                         <p className="text-[11px] font-black uppercase tracking-widest text-[#0A2A5E]">Promote to Our Picks</p>
+                      </div>
                    </div>
-                   <div>
-                      <p className="text-[11px] font-black uppercase tracking-widest text-[#0A2A5E]">Promote to Our Picks</p>
-                      <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Will appear at the very top of the Hub</p>
+                 </div>
+
+                 <div 
+                   onClick={() => setFormData({...formData, is_official: !formData.is_official})}
+                   className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.is_official ? 'bg-[#0A2A5E] border-[#0A2A5E]' : 'bg-white border-slate-100 hover:border-slate-200'}`}
+                 >
+                   <div className="flex items-center gap-4 text-left leading-tight">
+                      <div className={`p-3 rounded-xl ${formData.is_official ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-slate-100 text-slate-300'}`}>
+                         <ShieldCheck size={18} />
+                      </div>
+                      <div>
+                         <p className={`text-[11px] font-black uppercase tracking-widest ${formData.is_official ? 'text-[#1FC8C8]' : 'text-[#0A2A5E]'}`}>Precede Official</p>
+                      </div>
                    </div>
-                </div>
-              </div>
+                 </div>
+               </div>
+             )}
 
              <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -257,8 +294,24 @@ export default function AdminAddEvent() {
              </div>
           </div>
 
-          <button disabled={loading} className="w-full bg-[#0A2A5E] text-white p-6 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-2xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all disabled:opacity-50 mt-4 flex items-center justify-center gap-3">
-            {loading ? "UPLOADING TO QUEUE..." : <><Plus size={18} /> Publish Scout</>}
+          {/* ⚡ SUBMIT BUTTON SECTION (RBAC Enabled) */}
+          {userRole === 'super_admin' && (
+            <div className="p-4 bg-orange-50 border border-orange-200 rounded-2xl flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase text-orange-600 tracking-widest">Super Admin Bypass</p>
+                <p className="text-[8px] font-bold text-orange-400 uppercase tracking-tighter mt-0.5">Toggle ON to push this immediately to the public site without queueing.</p>
+              </div>
+              <label className="flex items-center cursor-pointer">
+                <input type="checkbox" className="hidden" checked={publishDirectly} onChange={() => setPublishDirectly(!publishDirectly)} />
+                <div className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${publishDirectly ? 'bg-orange-500' : 'bg-slate-300'}`}>
+                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${publishDirectly ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                </div>
+              </label>
+            </div>
+          )}
+
+          <button disabled={loading} className={`w-full text-white p-6 rounded-[2rem] font-black uppercase text-xs tracking-[0.3em] shadow-2xl transition-all disabled:opacity-50 mt-4 flex items-center justify-center gap-3 ${publishDirectly ? 'bg-orange-500 hover:bg-orange-600' : 'bg-[#0A2A5E] hover:bg-[#1FC8C8] hover:text-[#0A2A5E]'}`}>
+            {loading ? "PROCESSING..." : <><Plus size={18} /> {publishDirectly ? 'Publish Directly to Live Hub' : 'Send to Pending Queue'}</>}
           </button>
 
         </form>
