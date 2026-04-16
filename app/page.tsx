@@ -3,11 +3,11 @@ import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from './lib/supabase'
 import { 
-  MapPin, Code2, Palette, Printer, 
-  Smartphone, Phone, Mail, Menu, X, Users, PlayCircle, 
-  CheckCircle2, Megaphone, Sparkles, Search, 
-  ArrowUp, GraduationCap, Briefcase, Shield, HeartHandshake,
-  Ticket, FileText, ChevronRight, ArrowUpRight, Share2, AlertTriangle
+  Code2, Phone, Mail, Menu, X, Sparkles, Search, 
+  GraduationCap, Briefcase, Shield, HeartHandshake,
+  Ticket, FileText, ChevronRight, ArrowUpRight, Share2, 
+  AlertTriangle, MessageSquare, Instagram, Twitter, Linkedin, Facebook,
+  CheckCircle2 //
 } from 'lucide-react'
 
 const WhatsAppIcon = ({ size = 20 }) => (
@@ -29,10 +29,8 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
     fetchApproved();
-
     const sections = ['home', 'about', 'services', 'hub', 'contact'];
     const observerOptions = { threshold: 0.6 };
-
     const observer = new IntersectionObserver((entries) => {
       if (isScrollingManually.current) return;
       entries.forEach((entry) => {
@@ -45,12 +43,10 @@ export default function Home() {
         }
       });
     }, observerOptions);
-
     sections.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
-
     return () => observer.disconnect();
   }, []);
 
@@ -58,15 +54,13 @@ export default function Home() {
     if (items.length > 0) {
       const params = new URLSearchParams(window.location.search);
       const postId = params.get('id');
-      
       if (postId) {
         const element = document.getElementById(`post-${postId}`);
         if (element) {
           setExpiredLink(false);
           setTimeout(() => {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            element.classList.add('ring-8', 'ring-[#1FC8C8]', 'animate-pulse');
-            setTimeout(() => element.classList.remove('animate-pulse'), 4000);
+            element.classList.add('ring-8', 'ring-[#1FC8C8]');
           }, 800);
         } else {
           setExpiredLink(true);
@@ -103,7 +97,9 @@ export default function Home() {
     return match && catMatch;
   });
 
-  const featured = items.filter(i => i.is_featured).slice(0, 6);
+  const featured = items.filter(i => i.is_featured);
+  const initiatives = items.filter(i => i.is_official); // New logic for Initiatives
+
   const services = [
     { title: 'ACADEMIC', icon: <GraduationCap size={24}/>, list: ['WAEC Mock Logistics', 'Fidelity Exam Printing', 'Result Management', 'School IT Systems', 'Stationery Supply'] },
     { title: 'ADMIN', icon: <Briefcase size={24}/>, list: ['Business Registration', 'Statutory IDs', 'Document Logistics', 'Tax Prep & Filing', 'Corporate Concierge'] },
@@ -111,8 +107,6 @@ export default function Home() {
     { title: 'LEARNING & DEV', icon: <Shield size={24}/>, list: ['Cadet Training', 'Masterclasses', 'Career Consulting', 'Digital Literacy', 'Leadership Coaching'] },
     { title: 'AGENCY OUTSOURCING', icon: <HeartHandshake size={24}/>, list: ['Talent Booking', 'Event Staffing', 'Fleet Leasing', 'White-Label Tech', 'B2B Execution'] },
   ];
-
-  const partnerLogos = ["GES", "WAEC", "PAYSTACK", "VERCEL", "SUPABASE", "NIN", "GRA", "ORC"];
 
   if (!mounted) return null;
 
@@ -140,18 +134,15 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* --- MOBILE OVERLAY --- */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="fixed inset-0 z-[200] bg-[#0A2A5E] flex flex-col p-8 text-white">
             <div className="flex justify-between items-center mb-8"><span className="font-black italic text-[#1FC8C8]">MENU</span><button onClick={() => setIsMenuOpen(false)}><X size={32}/></button></div>
             <div className="flex flex-col gap-8 text-3xl font-black italic uppercase">
               <button onClick={() => navigateTo('home')}>HOME</button>
-              <button onClick={() => navigateTo('about')}>ABOUT US</button>
+              <button onClick={() => navigateTo('about')}>ABOUT</button>
               <button onClick={() => navigateTo('services')}>SERVICES</button>
               <button onClick={() => handleNavFilter('job')}>JOBS</button>
-              <button onClick={() => handleNavFilter('training')}>TRAINING</button>
-              <button onClick={() => handleNavFilter('event')}>EVENTS</button>
               <button onClick={() => navigateTo('contact')}>CONTACT</button>
             </div>
           </motion.div>
@@ -172,46 +163,49 @@ export default function Home() {
           <div><h2 className="text-[5rem] md:text-[6.5rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-4 text-left">BEYOND <br/><span className="text-white">DIGITAL</span><br/>AGENCY.</h2></div>
           <div className="border-l-[4px] md:border-l-[8px] border-[#0A2A5E] pl-6 md:pl-12 flex flex-col justify-center font-bold text-lg md:text-xl leading-relaxed text-left">
             <p>We operate a dual-purpose ecosystem—delivering high-quality digital, administrative, and development services, while running a CSR hub that connects communities to vital resources and opportunities.</p>
-            <div className="mt-16 flex flex-wrap gap-6 md:gap-10 opacity-60 overflow-hidden">
-               {partnerLogos.map(p => <span key={p} className="font-black text-xl md:text-2xl italic tracking-tighter grayscale">{p}</span>)}
-            </div>
           </div>
         </div>
       </section>
 
-      {/* --- 🛠️ SERVICES SECTION (Responsive Grid) --- */}
+      {/* --- 🛠️ SERVICES SECTION --- */}
       <section id="services" className="min-h-screen bg-white z-10 relative flex flex-col justify-center py-20 md:py-32">
         <div className="max-w-[1500px] mx-auto w-full px-6">
           <h2 className="text-4xl md:text-6xl font-black uppercase italic text-[#0A2A5E] mb-12 tracking-tighter text-left">OUR SERVICES.</h2>
           
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-12">
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 md:gap-6 mb-12 items-stretch">
             {services.map((s, i) => (
-              <div key={i} className="p-6 md:p-8 bg-slate-50 border-2 border-slate-100 rounded-[2rem] flex flex-col h-[380px] md:h-[450px] group hover:border-[#1FC8C8] transition-all">
+              <div key={i} className="p-6 md:p-8 bg-slate-50 border-2 border-slate-100 rounded-[2rem] flex flex-col h-full group hover:border-[#1FC8C8] transition-all">
                 <div className="flex flex-col gap-4 mb-4 pb-4 border-b-2 border-slate-200/50 text-left">
                   <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#0F4C81]">{s.icon}</div>
-                  <h3 className="text-sm md:text-lg font-black uppercase italic text-[#0A2A5E] leading-tight">{s.title}</h3>
+                  <h3 className="text-[12px] md:text-sm font-black uppercase italic text-[#0A2A5E] leading-tight">{s.title}</h3>
                 </div>
-                <ul className="space-y-2 mb-4 flex-1 text-left">{s.list.slice(0, 4).map((item, idx) => (<li key={idx} className="flex items-center gap-2 text-[9px] md:text-[11px] font-black text-slate-500 uppercase italic"><ChevronRight size={12} className="text-[#1FC8C8] shrink-0"/> {item}</li>))}</ul>
-                <button onClick={() => navigateTo('contact')} className="w-full py-3 rounded-xl text-[9px] font-black uppercase bg-[#1FC8C8] text-[#0A2A5E] group-hover:bg-[#0A2A5E] group-hover:text-white transition-all">BOOK</button>
+                <ul className="space-y-2 mb-6 flex-1 text-left">{s.list.slice(0, 4).map((item, idx) => (<li key={idx} className="flex items-center gap-2 text-[9px] md:text-[10px] font-black text-slate-500 uppercase italic leading-tight"><ChevronRight size={12} className="text-[#1FC8C8] shrink-0"/> {item}</li>))}</ul>
+                <button onClick={() => navigateTo('contact')} className="w-full py-4 rounded-xl text-[10px] md:text-[11px] font-black uppercase bg-[#1FC8C8] text-[#0A2A5E] group-hover:bg-[#0A2A5E] group-hover:text-white transition-all tracking-widest">BOOK SERVICE</button>
               </div>
             ))}
+            {/* 6th Card: And More */}
+            <div className="p-6 md:p-8 bg-slate-900 border-2 border-slate-800 rounded-[2rem] flex flex-col justify-center items-center text-center h-full group">
+               <Sparkles className="text-[#1FC8C8] mb-4" size={32} />
+               <h3 className="text-white font-black uppercase italic text-sm tracking-widest">AND MORE...</h3>
+               <p className="text-[9px] text-white/40 uppercase font-black mt-2">Customized Agency Solutions</p>
+            </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-             <div className="bg-[#0A2A5E] p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] flex items-center justify-between group cursor-pointer hover:ring-8 hover:ring-[#1FC8C8]/10 transition-all text-left">
+          {/* Ticketing & Custom Enquiry Blocks */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-10">
+             <div className="bg-[#0A2A5E] p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-between group cursor-pointer hover:ring-8 hover:ring-[#1FC8C8]/10 transition-all text-left shadow-2xl">
                 <div className="text-white">
-                  <h3 className="text-xl md:text-3xl font-black italic uppercase flex items-center gap-3 mb-2"><Ticket className="text-[#1FC8C8]"/> TICKETING</h3>
-                  <p className="text-[9px] md:text-xs font-bold opacity-40 uppercase tracking-[0.2em]">Secure revenue logistics.</p>
+                  <h3 className="text-xl md:text-2xl font-black italic uppercase flex items-center gap-3 mb-1"><Ticket className="text-[#1FC8C8]"/> TICKETING & PAYMENTS</h3>
+                  <p className="text-[9px] md:text-xs font-bold opacity-40 uppercase tracking-[0.2em]">Secure revenue and event logistics.</p>
                 </div>
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-white/10 rounded-full flex items-center justify-center text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all"><ArrowUpRight size={24}/></div>
+                <ArrowUpRight className="text-[#1FC8C8]" size={28}/>
              </div>
-             
-             <div className="bg-[#1FC8C8] p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] flex items-center justify-between group cursor-pointer hover:ring-8 hover:ring-[#0A2A5E]/10 transition-all text-left">
+             <div className="bg-[#1FC8C8] p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-between group cursor-pointer hover:ring-8 hover:ring-[#0A2A5E]/10 transition-all text-left shadow-2xl">
                 <div className="text-[#0A2A5E]">
-                  <h3 className="text-xl md:text-3xl font-black italic uppercase flex items-center gap-3 mb-2"><FileText/> CUSTOM QUERY</h3>
-                  <p className="text-[9px] md:text-xs font-bold opacity-40 uppercase tracking-[0.2em]">Bespoke agency requests.</p>
+                  <h3 className="text-xl md:text-2xl font-black italic uppercase flex items-center gap-3 mb-1"><FileText/> CUSTOM ENQUIRY</h3>
+                  <p className="text-[9px] md:text-xs font-bold opacity-40 uppercase tracking-[0.2em]">Bespoke agency and technical requests.</p>
                 </div>
-                <div className="w-10 h-10 md:w-14 md:h-14 bg-[#0A2A5E]/5 rounded-full flex items-center justify-center text-[#0A2A5E] group-hover:bg-[#0A2A5E] group-hover:text-white transition-all"><ArrowUpRight size={24}/></div>
+                <ArrowUpRight className="text-[#0A2A5E]" size={28}/>
              </div>
           </div>
         </div>
@@ -235,8 +229,8 @@ export default function Home() {
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-10">
             <div className="flex-1 w-full max-w-xl text-left">
-              <h2 className="text-4xl md:text-5xl font-black uppercase italic text-white mb-8 tracking-tighter">OPPORTUNITY HUB.</h2>
-              <div className="relative"><Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={20} /><input type="text" placeholder="SEARCH HUB..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-5 md:p-6 pl-14 md:pl-18 bg-white/10 border-2 border-white/10 rounded-[2rem] text-white font-black uppercase text-xs md:text-sm italic outline-none focus:border-[#1FC8C8]"/></div>
+              <h2 className="text-4xl md:text-5xl font-black uppercase italic text-white mb-8 tracking-tighter underline underline-offset-[12px] decoration-[#1FC8C8]">OPPORTUNITY HUB.</h2>
+              <div className="relative"><Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={20} /><input type="text" placeholder="SEARCH HUB..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-5 md:p-6 pl-14 md:pl-18 bg-white/10 border-2 border-white/10 rounded-[2rem] text-white font-black uppercase text-xs md:text-sm italic outline-none focus:border-[#1FC8C8] shadow-2xl"/></div>
             </div>
             <div className="flex flex-wrap gap-2 bg-black/30 p-1.5 md:p-2 rounded-[2rem] border border-white/5 w-full md:w-auto overflow-x-auto no-scrollbar">
               {['all', 'training', 'job', 'event', 'place', 'marketplace'].map((f) => (
@@ -245,62 +239,78 @@ export default function Home() {
             </div>
           </div>
 
-          {featured.length > 0 && filter === 'all' && (
-            <div className="mb-20">
-              <div className="flex items-center gap-2 text-[#1FC8C8] mb-8 font-black uppercase italic text-xs tracking-widest text-left"><Sparkles size={16}/> PRECEDE INITIATIVES & OPPORTUNITIES</div>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
-            </div>
-          )}
+          {/* Collapsible Headers: Initiatives */}
+          <div className="mb-20">
+            <h3 className="flex items-center gap-2 text-[#1FC8C8] mb-8 font-black uppercase italic text-xs tracking-[0.3em] text-left border-b border-white/10 pb-4"><CheckCircle2 size={16}/> Precede Initiatives & Opportunities</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
+          </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">{filteredItems.map(item => <ScoutCard key={item.id} item={item} />)}</div>
+          {/* Collapsible Headers: Featured */}
+          <div className="mb-20">
+            <h3 className="flex items-center gap-2 text-[#1FC8C8] mb-8 font-black uppercase italic text-xs tracking-[0.3em] text-left border-b border-white/10 pb-4"><Sparkles size={16}/> Featured Picks</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
+          </div>
+
+          {/* Posts */}
+          <div className="mb-20">
+             <h3 className="flex items-center gap-2 text-white/40 mb-8 font-black uppercase italic text-[10px] tracking-[0.4em] text-left border-b border-white/5 pb-4">Standard Posts</h3>
+             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">{filteredItems.filter(i => !i.is_official && !i.is_featured).map(item => <ScoutCard key={item.id} item={item} />)}</div>
+          </div>
 
           {/* MARKETPLACE BANNER */}
-          <div className="mt-20 md:mt-32 w-full bg-white/5 border border-white/10 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-12 backdrop-blur-xl">
+          <div className="mt-20 md:mt-32 w-full bg-white/5 border border-white/10 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-12 backdrop-blur-xl shadow-3xl">
              <div className="flex items-center gap-6 md:gap-8 text-white text-left">
-                <div className="p-4 md:p-6 bg-[#1FC8C8] rounded-2xl md:rounded-3xl text-[#0A2A5E] shrink-0"><Briefcase size={32} className="md:w-12 md:h-12"/></div>
-                <div><h3 className="text-xl md:text-3xl font-black uppercase italic mb-2">THE MARKETPLACE</h3><p className="text-[10px] md:text-sm font-bold text-white/30 uppercase tracking-[0.2em] leading-relaxed">Hire skilled talent or offer your pro services.</p></div>
+                <div className="p-4 md:p-6 bg-[#1FC8C8] rounded-2xl md:rounded-3xl text-[#0A2A5E] shrink-0"><Briefcase size={32} /></div>
+                <div><h3 className="text-xl md:text-3xl font-black uppercase italic mb-1 tracking-tighter">THE MARKETPLACE</h3><p className="text-[10px] md:text-sm font-bold text-white/30 uppercase tracking-[0.2em] leading-relaxed">Book a Pro or offer your specific talent.</p></div>
              </div>
              <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full md:w-auto">
-                <button onClick={() => setFilter('marketplace')} className="w-full md:w-auto px-10 md:px-12 py-5 md:py-6 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl text-[12px] md:text-[14px] font-black uppercase italic tracking-widest hover:bg-white transition-all">FIND TALENT</button>
+                <button onClick={() => setFilter('marketplace')} className="w-full md:w-auto px-10 md:px-12 py-5 md:py-6 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl text-[12px] md:text-[14px] font-black uppercase italic tracking-widest hover:bg-white transition-all shadow-xl">FIND TALENT</button>
                 <button onClick={() => navigateTo('contact')} className="w-full md:w-auto px-10 md:px-12 py-5 md:py-6 bg-white/10 text-white border-2 border-white/10 rounded-2xl text-[12px] md:text-[14px] font-black uppercase italic tracking-widest hover:bg-white/20 transition-all">JOIN AS PRO</button>
              </div>
           </div>
         </div>
       </section>
 
-      {/* --- FOOTER & CONTACT --- */}
-      <footer id="contact" className="min-h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 py-20 md:py-32 text-white text-left">
-        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 md:gap-20 items-center flex-1">
+      {/* --- 🏁 CONTACT & FOOTER SECTION --- */}
+      <footer id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 py-12 md:py-24 text-white text-left relative overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center flex-1 z-10">
           <div>
-             <h2 className="text-[4.5rem] md:text-[7.5rem] font-black italic uppercase leading-[0.8] mb-4">MOVE <br/>AHEAD,</h2>
-             <h2 className="text-[4.5rem] md:text-[7.5rem] font-black italic uppercase leading-[0.8] text-[#1FC8C8]">STAY <br/>AHEAD.</h2>
+             <h2 className="text-[4rem] md:text-[7.5rem] font-black italic uppercase leading-[0.8] mb-4 tracking-tighter">MOVE <br/>AHEAD,</h2>
+             <h2 className="text-[4rem] md:text-[7.5rem] font-black italic uppercase leading-[0.8] text-[#1FC8C8] tracking-tighter">STAY <br/>AHEAD.</h2>
+             {/* Social Logos Placeholder */}
              <div className="mt-12 md:mt-16 flex gap-6 md:gap-8">
-                {['INSTAGRAM', 'LINKEDIN', 'TWITTER'].map(social => (
-                  <a key={social} href="#" className="text-[9px] md:text-[10px] font-black tracking-[0.4em] text-white/30 hover:text-[#1FC8C8] transition-colors">{social}</a>
-                ))}
+                {/* <a href="#" className="hover:text-[#1FC8C8] transition-all"><Instagram size={24}/></a> 
+                <a href="#" className="hover:text-[#1FC8C8] transition-all"><Twitter size={24}/></a> 
+                <a href="#" className="hover:text-[#1FC8C8] transition-all"><Linkedin size={24}/></a> 
+                <a href="#" className="hover:text-[#1FC8C8] transition-all"><Facebook size={24}/></a> 
+                */}
+                <span className="text-[9px] font-black tracking-[0.5em] text-white/20 uppercase italic">Social Clearance Pending</span>
              </div>
           </div>
-          <div className="bg-white/5 p-8 md:p-16 rounded-[3rem] md:rounded-[4rem] border-2 border-white/10 shadow-3xl backdrop-blur-md">
-            <div className="space-y-10 md:space-y-12 mb-12 md:mb-16">
-              <div className="flex items-center gap-6 md:gap-8 group">
+
+          <div className="bg-white/5 p-8 md:p-12 rounded-[3rem] border-2 border-white/10 shadow-3xl backdrop-blur-xl">
+            <div className="space-y-8 md:space-y-10 mb-10">
+              <div className="flex items-center gap-6 group">
                 <div className="p-6 md:p-8 bg-[#1FC8C8]/10 rounded-2xl md:rounded-[2rem] text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all shrink-0"><Phone size={32}/></div>
-                <div><span className="text-[9px] md:text-xs font-black uppercase text-white/30 tracking-widest">CALL CENTRE</span><p className="text-2xl md:text-4xl font-black italic mt-1 tracking-tighter leading-none">0591999544</p></div>
+                <div><span className="text-[9px] md:text-xs font-black uppercase text-white/30 tracking-widest italic">VOICE CLEARANCE</span><p className="text-3xl md:text-4xl font-black italic mt-1 tracking-tighter leading-none underline decoration-[#1FC8C8]">0591999544</p></div>
               </div>
-              <div className="flex items-center gap-6 md:gap-8 group">
+              <div className="flex items-center gap-6 group">
                 <div className="p-6 md:p-8 bg-[#1FC8C8]/10 rounded-2xl md:rounded-[2rem] text-[#1FC8C8] group-hover:bg-[#1FC8C8] group-hover:text-[#0A2A5E] transition-all shrink-0"><Mail size={32}/></div>
                 <div className="overflow-hidden">
-                  <span className="text-[9px] md:text-xs font-black uppercase text-white/30 tracking-widest">EMAIL DEP</span>
-                  <p className="text-lg md:text-2xl font-black italic mt-1 truncate">precedeconcepts@gmail.com</p>
+                  <span className="text-[9px] md:text-xs font-black uppercase text-white/30 tracking-widest italic">SECURE MAIL</span>
+                  <p className="text-lg md:text-xl font-black italic mt-1 truncate">precedeconcepts@gmail.com</p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-3 md:gap-4">
-              <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-6 md:p-8 rounded-2xl md:rounded-3xl font-black uppercase italic text-center hover:bg-[#1FC8C8] transition-all flex justify-center items-center gap-3"><WhatsAppIcon size={20}/> WHATSAPP CHAT</a>
-              <button onClick={() => window.location.href='mailto:precedeconcepts@gmail.com'} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 md:p-8 rounded-2xl md:rounded-3xl font-black uppercase italic hover:bg-white transition-all shadow-xl">REQUEST PROPOSAL</button>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-5 rounded-2xl font-black uppercase italic text-[11px] text-center hover:bg-[#1FC8C8] transition-all flex justify-center items-center gap-2 shadow-xl"><WhatsAppIcon size={18}/> WHATSAPP</a>
+              <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-5 border-2 border-[#1FC8C8]/30 rounded-2xl font-black uppercase italic text-[11px] text-center hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all flex justify-center items-center gap-2"><MessageSquare size={16}/> CHANNEL</a>
+              <button onClick={() => window.location.href='mailto:precedeconcepts@gmail.com'} className="bg-[#1FC8C8] text-[#0A2A5E] p-5 rounded-2xl font-black uppercase italic text-[11px] hover:bg-white transition-all shadow-xl tracking-widest">SEND EMAIL</button>
             </div>
           </div>
         </div>
-        <div className="text-center pt-20 border-t border-white/5 w-full"><p className="text-[#1FC8C8] font-black uppercase italic text-[9px] md:text-[11px] tracking-[0.6em]">PRECEDE CONCEPTS ACCRA · © 2026</p></div>
+        <div className="text-center pt-10 border-t border-white/5 w-full relative z-10"><p className="text-[#1FC8C8] font-black uppercase italic text-[9px] md:text-[11px] tracking-[0.6em]">PRECEDE CONCEPTS ACCRA · © 2026</p></div>
       </footer>
 
       <style jsx global>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
@@ -310,12 +320,11 @@ export default function Home() {
 
 function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
   const targetDate = new Date(item.event_date);
-  
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
     const shareUrl = `${window.location.origin}/hub?id=${item.id}`;
     navigator.clipboard.writeText(shareUrl);
-    alert("Post link copied!");
+    alert("Copied to clipboard!");
   };
 
   return (
@@ -325,7 +334,7 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
         <span className="absolute top-2 left-2 md:top-3 md:left-3 text-[6px] md:text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-2 py-1 md:py-1.5 rounded-md uppercase italic z-10">{item.category}</span>
       </div>
       <div className="p-3 md:p-5 flex flex-col flex-1 text-left">
-        <h4 className="font-black text-[10px] md:text-[12px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 mb-3 h-8 md:h-10">{item.title}</h4>
+        <h4 className="font-black text-[10px] md:text-[11px] text-[#0A2A5E] uppercase italic leading-tight line-clamp-2 mb-3 h-8 md:h-10">{item.title}</h4>
         <div className="mt-auto pt-3 md:pt-4 border-t border-slate-100 flex justify-between items-center">
           <p className="text-[8px] md:text-[9px] font-black uppercase text-slate-400 italic">{targetDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</p>
           <div className="flex gap-1.5 md:gap-2">
