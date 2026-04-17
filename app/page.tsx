@@ -29,7 +29,6 @@ export default function Home() {
   const [heroKey, setHeroKey] = useState(0)
   const isScrollingManually = useRef(false)
 
-  // --- 🛰️ DYNAMIC ROUTING & INTERSECTION OBSERVER ---
   useEffect(() => {
     setMounted(true);
     fetchApproved();
@@ -61,7 +60,6 @@ export default function Home() {
     }
   }, []);
 
-  // --- 🔗 SHARABLE POST LOGIC ---
   useEffect(() => {
     if (items.length > 0) {
       const params = new URLSearchParams(window.location.search);
@@ -98,7 +96,6 @@ export default function Home() {
     setTimeout(() => { isScrollingManually.current = false; }, 1000);
   };
 
-  // --- RESTORED HANDLE NAV FILTER FUNCTION ---
   const handleNavFilter = (filterId: string) => {
     setView('home');
     setFilter(filterId);
@@ -129,118 +126,112 @@ export default function Home() {
   return (
     <div className="bg-[#0A2A5E] font-sans selection:bg-[#1FC8C8] selection:text-[#0A2A5E]">
       
-      {/* --- 🧭 NAVIGATION & VAULT SEARCH --- */}
+      {/* --- 🧭 NAVIGATION --- */}
       <nav className="fixed top-0 w-full z-[100] bg-[#0A2A5E] border-b border-white/10 px-6 py-5">
-        <div className="max-w-[1600px] mx-auto flex justify-between items-center text-white relative">
+        <div className="max-w-[1600px] mx-auto flex justify-between items-center text-white">
           <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => navigateTo('home')}>
             <div className="w-10 h-10 bg-[#1FC8C8] rounded-lg flex items-center justify-center font-black italic text-[#0A2A5E] text-[12px]">PC</div>
             <span className="text-lg font-black uppercase italic tracking-tighter">PRECEDE CONCEPTS</span>
           </div>
           
-          <div className="hidden xl:flex flex-col items-end gap-2">
-            <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.15em]">
-                <button onClick={() => navigateTo('home')} className="hover:text-[#1FC8C8] transition-colors">HOME</button>
-                <button onClick={() => navigateTo('about')} className="hover:text-[#1FC8C8] transition-colors">ABOUT</button>
-                <button onClick={() => navigateTo('services')} className="hover:text-[#1FC8C8] transition-colors">SERVICES</button>
-                <button onClick={() => handleNavFilter('training')} className="hover:text-[#1FC8C8] transition-colors">TRAINING & SEMINARS</button>
-                <button onClick={() => handleNavFilter('job')} className="hover:text-[#1FC8C8] transition-colors">JOBS</button>
-                <button onClick={() => handleNavFilter('event')} className="hover:text-[#1FC8C8] transition-colors">EVENTS</button>
-                <button onClick={() => handleNavFilter('place')} className="hover:text-[#1FC8C8] transition-colors">PLACES & SPACES</button>
-                <button onClick={() => { setView('marketplace'); window.scrollTo(0,0); }} className="hover:text-[#1FC8C8] transition-colors">MARKETPLACE</button>
-                <button onClick={() => navigateTo('contact')} className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2 rounded-full font-black ml-2 shadow-lg hover:bg-white transition-all">CONTACT</button>
-            </div>
-            {/* Integrated Search Vault */}
-            <div className="relative w-[400px]">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={14} />
-                <input 
-                    type="text" 
-                    placeholder="Search Precede Ecosystem..." 
-                    value={globalSearch}
-                    onChange={(e) => setGlobalSearch(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-white text-[10px] font-black uppercase italic outline-none focus:bg-white/10 transition-all"
-                />
-            </div>
+          <div className="hidden xl:flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.15em]">
+            <button onClick={() => navigateTo('home')} className="hover:text-[#1FC8C8]">HOME</button>
+            <button onClick={() => navigateTo('about')} className="hover:text-[#1FC8C8]">ABOUT</button>
+            <button onClick={() => navigateTo('services')} className="hover:text-[#1FC8C8]">SERVICES</button>
+            <button onClick={() => handleNavFilter('training')} className="hover:text-[#1FC8C8]">TRAINING</button>
+            <button onClick={() => handleNavFilter('job')} className="hover:text-[#1FC8C8]">JOBS</button>
+            <button onClick={() => handleNavFilter('event')} className="hover:text-[#1FC8C8]">EVENTS</button>
+            <button onClick={() => handleNavFilter('place')} className="hover:text-[#1FC8C8]">PLACES & SPACES</button>
+            <button onClick={() => { setView('marketplace'); window.scrollTo(0,0); }} className="hover:text-[#1FC8C8]">MARKETPLACE</button>
+            <button onClick={() => navigateTo('contact')} className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2 rounded-full font-black ml-2 shadow-lg">CONTACT</button>
           </div>
           <button className="xl:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}><Menu size={32} /></button>
         </div>
       </nav>
 
-      {/* --- ⬆️ BACK TO TOP --- */}
-      <AnimatePresence>
-        {showTopBtn && (
-          <motion.button 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => navigateTo('home')}
-            className="fixed bottom-8 right-10 z-[150] bg-[#1FC8C8] text-[#0A2A5E] p-4 rounded-2xl shadow-2xl border-4 border-[#0A2A5E]"
-          ><ArrowUp size={24} /></motion.button>
-        )}
-      </AnimatePresence>
+      {/* --- 🔍 FLOATING SEARCH VAULT (Under Nav) --- */}
+      <div className="fixed top-[95px] left-1/2 -translate-x-1/2 w-full max-w-2xl z-[90] px-6">
+        <div className="relative group overflow-hidden rounded-full border border-white/10 bg-[#0A2A5E]/40 backdrop-blur-xl shadow-2xl">
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={18} />
+          <input 
+            type="text" 
+            placeholder="Search entire Precede ecosystem..." 
+            value={globalSearch}
+            onChange={(e) => setGlobalSearch(e.target.value)}
+            className="w-full py-4 pl-16 pr-6 bg-transparent text-white text-[11px] font-black uppercase italic tracking-[0.2em] outline-none focus:bg-white/5 transition-all placeholder:text-white/30"
+          />
+        </div>
+      </div>
 
       <AnimatePresence mode="wait">
         {view === 'home' ? (
-          <motion.div key="home-view" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="pt-[140px]">
+          <motion.div key="home-view" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}>
             
-            {/* --- HERO SECTION (100vh) --- */}
-            <section id="home" className="h-screen flex flex-col items-center justify-center bg-[#0A2A5E] text-center px-6">
-              <motion.div initial={{opacity:0, y:40}} animate={{opacity:1, y:0}} transition={{ duration: 0.8 }}>
+            {/* --- HERO SECTION (Centered) --- */}
+            <section id="home" className="h-screen flex flex-col items-center justify-center bg-[#0A2A5E] text-center px-6 relative">
+              <motion.div key={heroKey} initial={{opacity:0, y:40}} animate={{opacity:1, y:0}} transition={{ duration: 0.8 }}>
                 <p className="text-[#1FC8C8] text-sm md:text-lg font-black uppercase tracking-[0.5em] mb-4 italic">Progress Simplified, Value Delivered.</p>
                 <h1 className="text-5xl md:text-[9rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
                 <p className="text-white/40 text-sm md:text-xl font-black uppercase tracking-[0.4em] mt-8 italic">Simplifying Progress, Delivering Value.</p>
               </motion.div>
             </section>
             
-            {/* --- ABOUT SECTION (100vh) --- */}
-            <section id="about" className="h-screen flex items-center justify-center bg-[#1FC8C8] px-6 overflow-hidden">
-              <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.8fr] gap-12 text-[#0A2A5E]">
-                <h2 className="text-[4rem] md:text-[6.5rem] font-black uppercase italic tracking-tighter leading-[0.8] text-left">BEYOND <br/><span className="text-white">A DIGITAL</span><br/>AGENCY.</h2>
-                <div className="flex flex-col justify-center text-left border-l-8 border-[#0A2A5E] pl-10">
+            {/* --- ABOUT SECTION (Restored sc 2.png Design) --- */}
+            <section id="about" className="h-screen flex items-center justify-center bg-[#1FC8C8] px-6">
+              <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.8fr] gap-12 text-[#0A2A5E] items-center">
+                <div className="flex flex-col text-left">
+                  <h2 className="text-[4rem] md:text-[6.5rem] font-black uppercase italic tracking-tighter leading-[0.8] mb-2">BEYOND <br/><span className="text-white">A DIGITAL</span><br/>AGENCY.</h2>
+                  <p className="font-black italic uppercase tracking-[0.2em] opacity-40 text-sm">Move Ahead, Stay Ahead.</p>
+                </div>
+                <div className="flex flex-col justify-center text-left border-l-[10px] border-[#0A2A5E] pl-12 h-full py-10">
                   <h2 className="text-2xl md:text-4xl font-black uppercase italic leading-tight mb-6">Built for Business. Designed for Impact.</h2>
-                  <h3 className="text-lg md:text-xl font-black uppercase italic leading-relaxed opacity-90">
+                  <h3 className="text-lg md:text-xl font-black uppercase italic leading-relaxed opacity-90 text-black">
                     We operate a dual-purpose ecosystem—delivering high-quality digital, administrative, and development services, while running a CSR hub that connects communities to vital resources and opportunities.
                   </h3>
                 </div>
               </div>
             </section>
 
-            {/* --- 🛠️ SERVICES SECTION --- */}
+            {/* --- 🛠️ SERVICES SECTION (Tightened) --- */}
             <section id="services" className="h-screen bg-white flex flex-col justify-center py-10">
               <div className="max-w-[1500px] mx-auto w-full px-6">
                 <h2 className="text-5xl md:text-6xl font-black uppercase italic mb-8 tracking-tighter text-left text-[#0A2A5E]">OUR SERVICES.</h2>
                 
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
                   {services.map((s, i) => (
-                    <div key={i} className="bg-slate-50 border-4 border-slate-100 rounded-[2rem] flex flex-col h-[400px] overflow-hidden group shadow-lg">
-                      <div className="bg-[#1FC8C8] p-5 flex items-center gap-3 border-b-4 border-[#0A2A5E]/10">
-                        <div className="bg-white p-2 rounded-lg text-[#0A2A5E]">{s.icon}</div>
-                        <h3 className="text-[12px] font-black uppercase italic text-black leading-tight">{s.title}</h3>
+                    <div key={i} className="bg-slate-50 border-4 border-[#1FC8C8] rounded-[2rem] flex flex-col h-[400px] overflow-hidden group shadow-lg transition-all hover:scale-105 hover:border-[#0A2A5E]">
+                      <div className="bg-[#1FC8C8] p-5 flex items-center gap-3 h-[80px]">
+                        <div className="bg-white p-2 rounded-lg text-[#0A2A5E] shrink-0">{s.icon}</div>
+                        <h3 className="text-[14px] font-black uppercase italic text-black leading-tight">{s.title}</h3>
                       </div>
-                      <div className="p-6 flex-1 flex flex-col justify-between">
-                         <ul className="space-y-1.5 text-left">
+                      <div className="p-6 flex-1 flex flex-col">
+                         <ul className="space-y-2 text-left mb-4">
                            {s.list.map((item, idx) => (
-                             <li key={idx} className="flex items-start gap-2 text-[10px] font-black uppercase italic text-black leading-tight">
-                               <ChevronRight size={12} className="shrink-0 text-[#1FC8C8]"/> {item}
+                             <li key={idx} className="flex items-start gap-2 text-[12px] font-black uppercase italic text-black leading-tight">
+                               <ChevronRight size={14} className="shrink-0 text-[#0A2A5E]"/> {item}
                              </li>
                            ))}
                          </ul>
-                         <button onClick={() => navigateTo('contact')} className="w-full py-4 rounded-xl text-[10px] font-black uppercase bg-[#0A2A5E] text-white hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all shadow-md">BOOK SERVICE</button>
+                         <button onClick={() => navigateTo('contact')} className="mt-auto w-full py-4 rounded-xl text-[11px] font-black uppercase bg-[#0A2A5E] text-white hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all tracking-widest shadow-md">BOOK SERVICE</button>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Trio Section (Tight to Grid) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
                    <div className="bg-[#0A2A5E] p-6 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#1FC8C8] transition-all h-[90px] shadow-2xl">
                       <div className="text-white group-hover:text-[#0A2A5E] text-left">
-                        <h3 className="text-lg font-black italic uppercase leading-none mb-1"><Ticket size={20} className="inline mr-2"/> TICKETING & PAYMENTS</h3>
-                        <p className="text-[10px] font-black uppercase tracking-[0.1em] opacity-60">Revenue and Logistics Vault</p>
+                        <h3 className="text-lg md:text-xl font-black italic uppercase leading-none mb-1"><Ticket size={24} className="inline mr-2"/> TICKETING & PAYMENTS</h3>
+                        <p className="text-[12px] font-black uppercase tracking-[0.1em] opacity-40 text-white group-hover:text-black">SECURE REVENUE AND EVENT LOGISTICS.</p>
                       </div>
                       <ArrowUpRight className="text-[#1FC8C8] group-hover:text-[#0A2A5E]" size={24}/>
                    </div>
-                   <div className="flex flex-col justify-center items-center h-[90px]"><h4 className="text-black font-black uppercase italic text-sm tracking-[0.4em]">AND MORE...</h4></div>
+                   <div className="flex flex-col justify-center items-center h-[90px]"><h4 className="text-black font-black uppercase italic text-lg tracking-[0.4em]">AND MORE...</h4></div>
                    <div className="bg-[#1FC8C8] p-6 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#0A2A5E] transition-all h-[90px] shadow-2xl">
                       <div className="text-[#0A2A5E] group-hover:text-white text-left">
-                        <h3 className="text-lg font-black italic uppercase leading-none mb-1"><FileText size={20} className="inline mr-2"/> CUSTOM ENQUIRY</h3>
-                        <p className="text-[10px] font-black uppercase tracking-[0.1em] opacity-60">Bespoke Agency Requests</p>
+                        <h3 className="text-lg md:text-xl font-black italic uppercase leading-none mb-1"><FileText size={24} className="inline mr-2"/> CUSTOM ENQUIRY</h3>
+                        <p className="text-[12px] font-black uppercase tracking-[0.1em] opacity-40 text-black group-hover:text-white">BESPOKE AGENCY AND TECHNICAL REQUESTS.</p>
                       </div>
                       <ArrowUpRight className="text-[#0A2A5E] group-hover:text-white" size={24}/>
                    </div>
@@ -250,90 +241,67 @@ export default function Home() {
 
             {/* --- OPPORTUNITY HUB --- */}
             <section id="hub" className="min-h-screen py-24 px-6 bg-[#0F4C81]">
-              <div className="max-w-[1500px] mx-auto text-left">
-                <h2 className="text-6xl md:text-[8rem] font-black uppercase italic text-white mb-16 tracking-tighter">OPPORTUNITY HUB.</h2>
-                <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-full border-2 border-white/10 mb-20 overflow-x-auto no-scrollbar">
-                    {['all', 'training', 'job', 'event', 'place'].map((f) => (
+              <div className="max-w-[1500px] mx-auto text-left text-white">
+                <h2 className="text-6xl md:text-[8rem] font-black uppercase italic mb-16 tracking-tighter">OPPORTUNITY HUB.</h2>
+                <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-full border-2 border-white/10 mb-20">
+                    {['all', 'training', 'job', 'event', 'place', 'marketplace'].map((f) => (
                       <button key={f} onClick={() => setFilter(f)} className={`px-10 py-3 rounded-full text-[11px] font-black uppercase transition-all whitespace-nowrap ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/40 hover:text-white'}`}>{f}</button>
                     ))}
                 </div>
                 <div className="space-y-24">
-                  <AnimatePresence>
-                    {expiredLink && (
-                      <motion.div initial={{opacity:0, y:-20}} animate={{opacity:1, y:0}} className="p-8 bg-red-500/10 border-4 border-red-500/30 rounded-[3rem] flex items-center justify-between backdrop-blur-md mb-10">
-                        <div className="flex items-center gap-6 text-white">
-                          <AlertTriangle className="text-red-500" size={32}/>
-                          <div><p className="text-[10px] font-black uppercase opacity-50 tracking-widest">ACCESS DENIED</p><h4 className="font-black uppercase italic text-xl">Scout Expiry: Content No Longer Available.</h4></div>
-                        </div>
-                        <button onClick={() => {setExpiredLink(false); window.history.replaceState(null, '', '/hub')}} className="px-10 py-4 bg-white/10 hover:bg-white text-white hover:text-red-500 rounded-2xl text-[11px] font-black uppercase transition-all">DISMISS</button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                   <div>
-                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><CheckCircle2 size={24}/> Precede Initiatives & Opportunities</h3>
+                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><CheckCircle2 size={24}/> Precede Initiatives</h3>
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
-                  </div>
-                  <div>
-                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><Sparkles size={24}/> Featured Picks</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
                   </div>
                 </div>
               </div>
             </section>
 
             {/* --- 🏁 CONTACT & FOOTER (100vh) --- */}
-            <footer id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-between px-6 py-10 text-white relative overflow-hidden">
-                <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-10 items-center flex-1">
-                    <motion.div initial={{ y: 80, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
-                        <h2 className="text-[4rem] md:text-[7rem] font-black italic uppercase leading-[0.8] mb-4 tracking-tighter text-left">MOVE <br/>AHEAD, <br/><span className="text-[#1FC8C8]">STAY <br/>AHEAD.</span></h2>
-                        <div className="mt-8 flex gap-6 text-white/20 italic font-black text-xs"><span>INSTAGRAM</span> <span>LINKEDIN</span> <span>WHATSAPP CHANNEL</span></div>
+            <footer id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-center px-6 pt-32 pb-10 text-white relative overflow-hidden">
+                <div className="max-w-[1600px] mx-auto w-full grid lg:grid-cols-2 gap-10 items-center flex-1">
+                    <motion.div initial={{ y: 150, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+                        <h2 className="text-[4rem] md:text-[8rem] font-black italic uppercase leading-[0.8] mb-4 tracking-tighter text-left">MOVE <br/>AHEAD, <br/><span className="text-[#1FC8C8]">STAY <br/>AHEAD.</span></h2>
+                        <div className="mt-8 flex gap-6 text-white/20 italic font-black text-xs uppercase tracking-widest"><span>Instagram</span> <span>LinkedIn</span> <span>WhatsApp Channel</span></div>
                     </motion.div>
 
-                    <div className="bg-white/5 p-10 rounded-[3rem] border-2 border-white/10 backdrop-blur-xl shadow-3xl text-left">
-                        <div className="space-y-8 mb-10 text-left">
-                            <div className="flex items-center gap-6 group">
-                                <div className="p-6 bg-[#1FC8C8]/10 rounded-2xl text-[#1FC8C8] shadow-lg"><Phone size={32}/></div>
-                                <div className="text-left">
-                                    <span className="text-[10px] font-black uppercase text-white/40 tracking-widest italic">VOICE CLEARANCE</span>
-                                    <p className="text-3xl md:text-5xl font-black italic mt-1 tracking-tighter">0591999544</p>
-                                </div>
+                    <div className="bg-white/5 p-12 rounded-[4rem] border-2 border-white/10 backdrop-blur-3xl shadow-3xl text-left">
+                        <div className="space-y-10 mb-10">
+                            <div className="flex items-center gap-6">
+                                <div className="p-6 bg-[#1FC8C8]/10 rounded-2xl text-[#1FC8C8]"><Phone size={32}/></div>
+                                <div><span className="text-[10px] font-black uppercase text-white/40 tracking-widest italic">VOICE LINE</span><p className="text-3xl md:text-6xl font-black italic mt-1 tracking-tighter">0591999544</p></div>
                             </div>
-                            <div className="flex items-center gap-6 group">
-                                <div className="p-6 bg-[#1FC8C8]/10 rounded-2xl text-[#1FC8C8] shadow-lg"><Mail size={32}/></div>
-                                <div className="text-left">
-                                    <span className="text-[10px] font-black uppercase text-white/40 tracking-widest italic">ENCRYPTED MAIL</span>
-                                    <p className="text-lg md:text-2xl font-black italic text-white/80">precedeconcepts@gmail.com</p>
-                                </div>
+                            <div className="flex items-center gap-6">
+                                <div className="p-6 bg-[#1FC8C8]/10 rounded-2xl text-[#1FC8C8]"><Mail size={32}/></div>
+                                <div><span className="text-[10px] font-black uppercase text-white/40 tracking-widest italic">DIGITAL MAIL</span><p className="text-xl md:text-2xl font-black italic text-white opacity-80">precedeconcepts@gmail.com</p></div>
                             </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-5 rounded-2xl font-black uppercase italic text-[11px] text-center flex justify-center items-center gap-2 shadow-xl hover:bg-[#1FC8C8] transition-all"><WhatsAppIcon size={18}/> WHATSAPP</a>
-                            <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-5 border-2 border-[#1FC8C8]/20 rounded-2xl font-black uppercase italic text-[11px] text-center hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all">CHANNEL</a>
-                            <button onClick={() => window.location.href='mailto:precedeconcepts@gmail.com'} className="bg-[#1FC8C8] text-[#0A2A5E] p-5 rounded-2xl font-black uppercase italic text-[11px] hover:bg-white transition-all shadow-xl">SEND EMAIL</button>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-6 rounded-2xl font-black uppercase italic text-[12px] text-center flex justify-center items-center gap-3 hover:bg-[#1FC8C8] transition-all"><WhatsAppIcon size={20}/> WHATSAPP CHAT</a>
+                            <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-6 border-2 border-[#1FC8C8]/20 rounded-2xl font-black uppercase italic text-[12px] text-center flex justify-center items-center gap-2">CHANNEL</a>
+                            <button onClick={() => window.location.href='mailto:precedeconcepts@gmail.com'} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 rounded-2xl font-black uppercase italic text-[12px] hover:bg-white transition-all">SEND EMAIL</button>
                         </div>
                     </div>
                 </div>
-                <div className="text-center pt-6 border-t-2 border-white/5 w-full"><p className="text-[#1FC8C8] font-black uppercase italic text-[10px] tracking-[0.8em]">PRECEDE CONCEPTS · ACCRA · © 2026</p></div>
+                <div className="text-center pt-10 border-t-2 border-white/5 w-full"><p className="text-[#1FC8C8] font-black uppercase italic text-[10px] tracking-[0.8em]">PRECEDE CONCEPTS · ACCRA GHANA · © 2026</p></div>
             </footer>
           </motion.div>
         ) : (
-          /* --- MARKETPLACE VIEW --- */
-          <motion.div key="marketplace-view" initial={{opacity:0, y:50}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="pt-[180px] h-screen bg-[#0A2A5E] px-6">
+          /* --- MARKETPLACE PAGE --- */
+          <motion.div key="marketplace-view" initial={{opacity:0, y:100}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="pt-[220px] h-screen bg-[#0A2A5E] px-6">
             <div className="max-w-[1500px] mx-auto text-left">
-               <div className="flex items-center justify-between mb-16">
-                  <h2 className="text-6xl md:text-[7rem] font-black uppercase italic text-white tracking-tighter">MARKETPLACE.</h2>
-                  <button onClick={() => setView('home')} className="bg-[#1FC8C8] text-[#0A2A5E] px-10 py-4 rounded-2xl font-black uppercase italic flex items-center gap-2">CLOSE <X size={24}/></button>
+               <div className="flex items-center justify-between mb-20">
+                  <h2 className="text-6xl md:text-[8rem] font-black uppercase italic text-white tracking-tighter">MARKETPLACE.</h2>
+                  <button onClick={() => setView('home')} className="bg-[#1FC8C8] text-[#0A2A5E] px-10 py-5 rounded-2xl font-black uppercase italic flex items-center gap-3">CLOSE <X size={24}/></button>
                </div>
-               <div className="grid md:grid-cols-3 gap-8">
-                  <div className="p-10 bg-white/5 border-4 border-white/10 rounded-[3rem]">
-                     <Users size={48} className="text-[#1FC8C8] mb-6"/><h3 className="text-2xl font-black text-white uppercase italic mb-2">Hire Pro Talent</h3>
-                     <p className="text-white/40 text-[10px] font-black uppercase mb-8 leading-loose italic">Access vetted professionals for your projects.</p>
-                     <button className="w-full p-4 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl font-black uppercase italic">HIRE TALENT</button>
+               <div className="grid md:grid-cols-2 gap-10 max-w-4xl">
+                  <div className="p-12 bg-white/5 border-4 border-white/10 rounded-[3rem] h-[300px] flex flex-col justify-between">
+                     <div><Users size={56} className="text-[#1FC8C8] mb-6"/><h3 className="text-4xl font-black text-white uppercase italic">Hire Talent</h3></div>
+                     <button className="w-full p-5 bg-[#1FC8C8] text-[#0A2A5E] rounded-2xl font-black uppercase italic tracking-widest shadow-xl">EXPLORE CHANNELS</button>
                   </div>
-                  <div className="p-10 bg-white/10 border-4 border-white/20 rounded-[3rem]">
-                     <Briefcase size={48} className="text-white mb-6"/><h3 className="text-2xl font-black text-white uppercase italic mb-2 text-[#1FC8C8]">Post Your Profile</h3>
-                     <p className="text-white/40 text-[10px] font-black uppercase mb-8 leading-loose italic">Monetize your skills within the Precede ecosystem.</p>
-                     <button className="w-full p-4 bg-white text-[#0A2A5E] rounded-2xl font-black uppercase italic shadow-xl">POST TALENT</button>
+                  <div className="p-12 bg-white/10 border-4 border-white/20 rounded-[3rem] h-[300px] flex flex-col justify-between">
+                     <div><Briefcase size={56} className="text-white mb-6"/><h3 className="text-4xl font-black text-white uppercase italic text-[#1FC8C8]">Post Talent</h3></div>
+                     <button className="w-full p-5 bg-white text-[#0A2A5E] rounded-2xl font-black uppercase italic tracking-widest">JOIN NETWORK</button>
                   </div>
                </div>
             </div>
@@ -352,22 +320,22 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
     e.preventDefault();
     const shareUrl = `${window.location.origin}/hub?id=${item.id}`;
     navigator.clipboard.writeText(shareUrl);
-    alert("Post Link Secured to Clipboard.");
+    alert("Post Link Secured.");
   };
 
   return (
-    <div id={`post-${item.id}`} className={`group bg-white rounded-[1.5rem] overflow-hidden flex flex-col shadow-2xl transition-all h-full ${isFeatured ? 'ring-8 ring-[#1FC8C8]' : ''}`}>
+    <div id={`post-${item.id}`} className={`group bg-white rounded-[1.5rem] md:rounded-[2rem] overflow-hidden flex flex-col shadow-2xl transition-all h-full ${isFeatured ? 'ring-8 ring-[#1FC8C8]' : ''}`}>
       <div className="h-28 bg-slate-900 relative overflow-hidden">
         {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-60 group-hover:scale-125 transition-transform duration-1000" />}
-        <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-3 py-1.5 rounded-md uppercase italic z-10 shadow-lg">{item.category}</span>
+        <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-3 py-1.5 rounded-md uppercase italic z-10">{item.category}</span>
       </div>
       <div className="p-5 flex flex-col flex-1 text-left text-black">
         <h4 className="font-black text-[12px] uppercase italic leading-tight mb-4 h-10">{item.title}</h4>
         <div className="mt-auto pt-4 border-t-2 border-slate-50 flex justify-between items-center">
           <p className="text-[9px] font-black uppercase text-slate-400 italic">{targetDate.toLocaleDateString('en-GB')}</p>
           <div className="flex gap-2">
-            <button onClick={handleShare} className="p-2 bg-slate-100 text-[#0A2A5E] rounded-lg shadow-sm hover:bg-[#1FC8C8] transition-colors"><Share2 size={14}/></button>
-            <a href={item.link} target="_blank" className="text-[10px] font-black uppercase bg-[#0A2A5E] text-white px-5 py-2.5 rounded-xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all">VIEW</a>
+            <button onClick={handleShare} className="p-2 bg-slate-100 text-[#0A2A5E] rounded-lg shadow-sm"><Share2 size={14}/></button>
+            <a href={item.link} target="_blank" className="text-[10px] font-black uppercase bg-[#0A2A5E] text-white px-5 py-2.5 rounded-xl">VIEW</a>
           </div>
         </div>
       </div>
