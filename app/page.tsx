@@ -29,7 +29,19 @@ export default function Home() {
   const [heroKey, setHeroKey] = useState(0)
   const isScrollingManually = useRef(false)
 
-  // --- 🛰️ DYNAMIC ROUTING & SCROLL LOGIC ---
+  // --- INITIAL LOAD URL ROUTING ---
+  useEffect(() => {
+    const path = window.location.pathname.replace('/', '');
+    if (path === 'marketplace') {
+      setView('marketplace');
+    } else if (['about', 'services', 'hub', 'contact'].includes(path)) {
+      setTimeout(() => {
+        document.getElementById(path)?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
+  }, []);
+
+  // --- 🛰️ DYNAMIC ROUTING & INTERSECTION OBSERVER ---
   useEffect(() => {
     setMounted(true);
     fetchApproved();
@@ -37,7 +49,7 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     
     const observer = new IntersectionObserver((entries) => {
-      if (isScrollingManually.current) return;
+      if (isScrollingManually.current || view === 'marketplace') return;
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const id = entry.target.id;
@@ -58,10 +70,11 @@ export default function Home() {
         observer.disconnect();
         window.removeEventListener('scroll', handleScroll);
     }
-  }, []);
+  }, [view]);
 
+  // --- 🔗 SHARABLE POST LOGIC ---
   useEffect(() => {
-    if (items.length > 0) {
+    if (items.length > 0 && view === 'home') {
       const params = new URLSearchParams(window.location.search);
       const postId = params.get('id');
       if (postId) {
@@ -77,7 +90,7 @@ export default function Home() {
         }
       }
     }
-  }, [items]);
+  }, [items, view]);
 
   async function fetchApproved() {
     const { data } = await supabase.from('jobs').select('*').eq('status', 'approved').order('created_at', { ascending: false })
@@ -101,6 +114,13 @@ export default function Home() {
     navigateTo('hub');
   };
 
+  const handleGlobalSearchEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setView('home');
+      navigateTo('hub');
+    }
+  };
+
   const filteredItems = items.filter(item => {
     const term = (globalSearch || searchQuery).toLowerCase();
     return (
@@ -111,11 +131,12 @@ export default function Home() {
 
   const featured = items.filter(i => i.is_featured);
   const initiatives = items.filter(i => i.is_official);
+  const generalPosts = filteredItems.filter(i => !i.is_official && !i.is_featured);
 
   const services = [
     { title: 'ACADEMIC', icon: <GraduationCap size={28}/>, list: ['WAEC Mock Logistics', 'Fidelity Exam Printing', 'Result Management', 'School IT Systems', 'Stationery Supply'] },
     { title: 'ADMIN', icon: <Briefcase size={28}/>, list: ['Business Registration', 'Statutory IDs', 'Document Logistics', 'Tax Prep & Filing', 'Corporate Concierge'] },
-    { title: 'DIGITAL OPS', icon: <Code2 size={28}/>, list: ['Web Development', 'IT Infrastructure', 'Brand Identity', 'UI/UX Design', 'Cloud Integration'] },
+    { title: 'DIGITAL OPS', icon: <Code2 size={28}/>, list: ['Web Development', 'IT Support', 'Brand Identity', 'UI/UX Design', 'Social Media Mgt'] },
     { title: 'LEARNING & DEV', icon: <Shield size={28}/>, list: ['Cadet Training', 'Masterclasses', 'Career Consulting', 'Digital Literacy', 'Leadership Coaching'] },
     { title: 'AGENCY OUTSOURCING', icon: <HeartHandshake size={28}/>, list: ['Talent Booking', 'Event Staffing', 'Fleet Leasing', 'White-Label Tech', 'B2B Execution'] },
   ];
@@ -141,23 +162,24 @@ export default function Home() {
             <button onClick={() => handleNavFilter('job')} className="hover:text-[#1FC8C8] transition-colors">JOBS</button>
             <button onClick={() => handleNavFilter('event')} className="hover:text-[#1FC8C8] transition-colors">EVENTS</button>
             <button onClick={() => handleNavFilter('place')} className="hover:text-[#1FC8C8] transition-colors">PLACES & SPACES</button>
-            <button onClick={() => { setView('marketplace'); window.scrollTo(0,0); }} className="hover:text-[#1FC8C8] transition-colors">MARKETPLACE</button>
+            <button onClick={() => { setView('marketplace'); window.history.pushState(null, '', '/marketplace'); window.scrollTo(0,0); }} className="hover:text-[#1FC8C8] transition-colors">MARKETPLACE</button>
             <button onClick={() => navigateTo('contact')} className="bg-[#1FC8C8] text-[#0A2A5E] px-6 py-2.5 rounded-full font-black ml-2 shadow-lg hover:bg-white transition-all transform hover:-translate-y-0.5">CONTACT</button>
           </div>
           <button className="xl:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}><Menu size={32} /></button>
         </div>
       </nav>
 
-      {/* --- 🔍 FLOATING SEARCH (Right Aligned, Under Nav) --- */}
-      <div className="fixed top-[95px] right-6 z-[90] w-full max-w-[350px]">
+      {/* --- 🔍 FLOATING SEARCH VAULT (Right Side) --- */}
+      <div className="fixed top-[100px] right-6 z-[90] w-full max-w-[320px] hidden md:block">
         <div className="relative group">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={16} />
           <input 
             type="text" 
-            placeholder="Search Ecosystem..." 
+            placeholder="Search Ecosystem & Press Enter..." 
             value={globalSearch}
             onChange={(e) => setGlobalSearch(e.target.value)}
-            className="w-full bg-[#0A2A5E]/70 backdrop-blur-xl border border-white/10 rounded-[1.5rem] py-3.5 pl-12 pr-6 text-white text-[10px] font-black uppercase italic tracking-[0.1em] outline-none focus:border-[#1FC8C8] focus:bg-[#0A2A5E]/90 transition-all shadow-2xl placeholder:text-white/40"
+            onKeyDown={handleGlobalSearchEnter}
+            className="w-full bg-[#0A2A5E]/60 backdrop-blur-xl border border-white/10 rounded-[1.5rem] py-3.5 pl-12 pr-6 text-white text-[10px] font-black uppercase italic tracking-[0.1em] outline-none focus:border-[#1FC8C8] focus:bg-[#0A2A5E]/90 transition-all shadow-2xl placeholder:text-white/40"
           />
         </div>
       </div>
@@ -178,7 +200,7 @@ export default function Home() {
           <motion.div key="home-view" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}>
             
             {/* --- HERO SECTION --- */}
-            <section id="home" className="h-screen flex flex-col items-center justify-center bg-[#0A2A5E] text-center px-6 pt-20">
+            <section id="home" className="h-screen flex flex-col items-center justify-center bg-[#0A2A5E] text-center px-6">
               <motion.div key={heroKey} initial={{opacity:0, y:40}} animate={{opacity:1, y:0}} transition={{ duration: 0.8 }}>
                 <p className="text-[#1FC8C8] text-sm md:text-lg font-black uppercase tracking-[0.5em] mb-4 italic">Progress Simplified, Value Delivered.</p>
                 <h1 className="text-5xl md:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] text-white">THE <span className="text-[#1FC8C8]">STANDARD</span> <br/> OF EXECUTION.</h1>
@@ -186,8 +208,8 @@ export default function Home() {
               </motion.div>
             </section>
             
-            {/* --- ABOUT SECTION (Exact Match to sc 2.png) --- */}
-            <section id="about" className="min-h-screen flex items-center justify-center bg-[#1FC8C8] px-6 py-24">
+            {/* --- ABOUT SECTION --- */}
+            <section id="about" className="h-screen flex items-center justify-center bg-[#1FC8C8] px-6">
               <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16 items-center w-full">
                 <div className="flex flex-col text-left">
                   <h2 className="text-[4.5rem] md:text-[7.5rem] font-black uppercase italic tracking-tighter leading-[0.85]">
@@ -214,19 +236,19 @@ export default function Home() {
             </section>
 
             {/* --- 🛠️ SERVICES SECTION --- */}
-            <section id="services" className="min-h-screen bg-white flex flex-col justify-center py-20 px-6">
+            <section id="services" className="h-screen bg-white flex flex-col justify-center py-10 px-6">
               <div className="max-w-[1500px] mx-auto w-full">
-                <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-16 tracking-tighter text-[#0A2A5E] text-left">OUR SERVICES.</h2>
+                <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-12 tracking-tighter text-[#0A2A5E] text-left">OUR SERVICES.</h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 items-start">
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-6 items-start">
                   {services.map((s, i) => (
-                    <div key={i} className="bg-slate-50 border-[4px] border-[#1FC8C8] rounded-[2rem] flex flex-col overflow-hidden group shadow-xl transition-all duration-300 hover:scale-[1.03] hover:border-[#0A2A5E]">
-                      <div className="bg-[#1FC8C8] p-6 flex items-center gap-4 transition-colors group-hover:bg-[#0A2A5E]">
+                    <div key={i} className="bg-slate-50 border-[4px] border-[#1FC8C8] rounded-[2rem] flex flex-col overflow-hidden group shadow-xl transition-all duration-300 hover:scale-[1.03] hover:border-[#0A2A5E] h-[450px]">
+                      <div className="bg-[#1FC8C8] p-6 flex items-center gap-4 transition-colors group-hover:bg-[#0A2A5E] h-[90px]">
                         <div className="bg-white p-2.5 rounded-xl text-[#0A2A5E] shrink-0">{s.icon}</div>
                         <h3 className="text-[14px] font-black uppercase italic text-[#0A2A5E] group-hover:text-white leading-tight">{s.title}</h3>
                       </div>
                       <div className="p-6 flex flex-col flex-1 bg-white">
-                         <ul className="space-y-4 text-left mb-8">
+                         <ul className="space-y-3.5 text-left mb-6">
                            {s.list.map((item, idx) => (
                              <li key={idx} className="flex items-start gap-3 text-[12px] font-black uppercase italic text-black leading-tight">
                                <ChevronRight size={16} className="shrink-0 text-[#0A2A5E] mt-0.5"/> {item}
@@ -242,8 +264,8 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                   <div className="bg-[#0A2A5E] p-8 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#1FC8C8] transition-all shadow-2xl">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                   <div onClick={() => navigateTo('contact')} className="bg-[#0A2A5E] p-8 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#1FC8C8] transition-all h-[100px] shadow-2xl">
                       <div className="text-white group-hover:text-[#0A2A5E] text-left">
                         <h3 className="text-xl md:text-2xl font-black italic uppercase leading-none mb-2"><Ticket size={28} className="inline mr-2 mb-1"/> TICKETING & PAYMENTS</h3>
                         <p className="text-[11px] font-black uppercase tracking-[0.1em] opacity-60 group-hover:text-black group-hover:opacity-100">Secure Revenue & Event Logistics.</p>
@@ -251,12 +273,12 @@ export default function Home() {
                       <ArrowUpRight className="text-[#1FC8C8] group-hover:text-[#0A2A5E]" size={28}/>
                    </div>
                    
-                   <div className="flex flex-col justify-center items-center p-4">
+                   <div className="flex flex-col justify-center items-center p-4 h-[100px]">
                       <Sparkles className="text-[#0A2A5E]/20 mb-2" size={32} />
                       <h4 className="text-black font-black uppercase italic text-lg tracking-[0.4em]">AND MORE...</h4>
                    </div>
 
-                   <div className="bg-[#1FC8C8] p-8 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#0A2A5E] transition-all shadow-2xl">
+                   <div onClick={() => navigateTo('contact')} className="bg-[#1FC8C8] p-8 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#0A2A5E] transition-all h-[100px] shadow-2xl">
                       <div className="text-[#0A2A5E] group-hover:text-white text-left">
                         <h3 className="text-xl md:text-2xl font-black italic uppercase leading-none mb-2"><FileText size={28} className="inline mr-2 mb-1"/> CUSTOM ENQUIRY</h3>
                         <p className="text-[11px] font-black uppercase tracking-[0.1em] opacity-60 text-black group-hover:text-white group-hover:opacity-100">Bespoke Agency & Technical Requests.</p>
@@ -270,27 +292,26 @@ export default function Home() {
             {/* --- OPPORTUNITY HUB --- */}
             <section id="hub" className="min-h-screen py-24 px-6 bg-[#0F4C81]">
               <div className="max-w-[1500px] mx-auto text-left text-white">
-                <h2 className="text-6xl md:text-[8rem] font-black uppercase italic mb-16 tracking-tighter">OPPORTUNITY HUB.</h2>
+                <h2 className="text-5xl md:text-[6.5rem] font-black uppercase italic mb-12 tracking-tighter">OPPORTUNITY HUB.</h2>
                 
-                <div className="flex flex-col mb-16 gap-8">
-                  {/* Search Bar First */}
-                  <div className="w-full max-w-3xl relative">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={24} />
-                    <input type="text" placeholder="Search the Hub..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-6 pl-16 bg-white/10 border-4 border-white/10 rounded-[2.5rem] text-white font-black uppercase text-sm italic outline-none focus:border-[#1FC8C8] shadow-3xl placeholder:text-white/30"/>
+                {/* Search & Filters Aligned Flex Row */}
+                <div className="flex flex-col lg:flex-row items-center gap-6 mb-16 w-full">
+                  <div className="w-full lg:w-[400px] relative">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={20} />
+                    <input type="text" placeholder="Search Hub..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-5 pl-14 bg-white/10 border-4 border-white/10 rounded-[2rem] text-white font-black uppercase text-sm italic outline-none focus:border-[#1FC8C8] shadow-3xl placeholder:text-white/30"/>
                   </div>
                   
-                  {/* Filters Second */}
-                  <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-full border-2 border-white/10 w-fit">
+                  <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-[2rem] border-2 border-white/10 w-full lg:w-auto">
                     {['all', 'training', 'job', 'event', 'place', 'marketplace'].map((f) => (
                       <button key={f} onClick={() => {
-                        if(f === 'marketplace') { setView('marketplace'); window.scrollTo(0,0); } 
+                        if(f === 'marketplace') { setView('marketplace'); window.history.pushState(null, '', '/marketplace'); window.scrollTo(0,0); } 
                         else setFilter(f);
                       }} className={`px-8 py-3 rounded-full text-[11px] font-black uppercase transition-all whitespace-nowrap ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/40 hover:text-white'}`}>{f}</button>
                     ))}
                   </div>
                 </div>
 
-                <div className="space-y-24">
+                <div className="space-y-20">
                   <AnimatePresence>
                     {expiredLink && (
                       <motion.div initial={{opacity:0, y:-20}} animate={{opacity:1, y:0}} className="p-8 bg-red-500/10 border-4 border-red-500/30 rounded-[3rem] flex items-center justify-between backdrop-blur-md mb-10">
@@ -303,27 +324,36 @@ export default function Home() {
                     )}
                   </AnimatePresence>
 
+                  {/* Section 1 */}
                   <div>
-                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><CheckCircle2 size={24}/> Precede Initiatives</h3>
+                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-8 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-4"><CheckCircle2 size={20}/> 1. Precede Initiatives & Opportunities</h3>
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
                   </div>
+
+                  {/* Section 2 */}
                   <div>
-                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><Sparkles size={24}/> Featured Picks</h3>
+                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-8 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-4"><Sparkles size={20}/> 2. Featured Picks</h3>
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
+                  </div>
+
+                  {/* Section 3 */}
+                  <div>
+                    <h3 className="flex items-center gap-3 text-white/40 mb-8 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/5 pb-4">3. All Posts</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{generalPosts.map(item => <ScoutCard key={item.id} item={item} />)}</div>
                   </div>
                 </div>
               </div>
             </section>
 
             {/* --- 🏁 CONTACT & FOOTER (100vh PC Screen Fit) --- */}
-            <footer id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-center px-6 pt-32 pb-10 text-white relative overflow-hidden">
+            <footer id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-center px-6 pt-20 pb-10 text-white relative overflow-hidden">
                 <div className="max-w-[1600px] mx-auto w-full grid lg:grid-cols-2 gap-10 items-center flex-1">
-                    <motion.div initial={{ y: 80, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+                    <motion.div initial={{ y: 150, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
                         <h2 className="text-[4.5rem] md:text-[8rem] font-black italic uppercase leading-[0.8] mb-4 tracking-tighter text-left">MOVE <br/>AHEAD, <br/><span className="text-[#1FC8C8]">STAY <br/>AHEAD.</span></h2>
                         <div className="mt-8 flex gap-8 text-white/20 italic font-black text-xs uppercase tracking-widest">
                             <span className="hover:text-[#1FC8C8] cursor-pointer transition-colors">Instagram</span> 
                             <span className="hover:text-[#1FC8C8] cursor-pointer transition-colors">LinkedIn</span> 
-                            <span className="hover:text-[#1FC8C8] cursor-pointer transition-colors">WhatsApp Channel</span>
+                            <span className="hover:text-[#1FC8C8] cursor-pointer transition-colors">Telegram</span>
                         </div>
                     </motion.div>
 
@@ -339,8 +369,8 @@ export default function Home() {
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-6 rounded-2xl font-black uppercase italic text-[12px] text-center flex justify-center items-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl"><WhatsAppIcon size={20}/> WHATSAPP</a>
-                            <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-6 border-2 border-[#1FC8C8]/20 rounded-2xl font-black uppercase italic text-[12px] text-center hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all shadow-xl">CHANNEL</a>
+                            <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-6 rounded-2xl font-black uppercase italic text-[12px] text-center flex justify-center items-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl"><WhatsAppIcon size={20}/> WHATSAPP CHAT</a>
+                            <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-6 border-2 border-[#1FC8C8]/20 rounded-2xl font-black uppercase italic text-[12px] text-center hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all shadow-xl">WHATSAPP CHANNEL</a>
                             <button onClick={() => window.location.href='mailto:precedeconcepts@gmail.com'} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 rounded-2xl font-black uppercase italic text-[12px] hover:bg-white transition-all shadow-xl">SEND EMAIL</button>
                         </div>
                     </div>
@@ -396,7 +426,7 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
   return (
     <div id={`post-${item.id}`} className={`group bg-white rounded-[1.5rem] overflow-hidden flex flex-col shadow-2xl transition-all h-full ${isFeatured ? 'ring-8 ring-[#1FC8C8]' : ''}`}>
       <div className="h-28 bg-slate-900 relative overflow-hidden">
-        {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-60 group-hover:scale-125 transition-transform duration-1000" />}
+        {item.image_url && <img src={item.image_url} className="w-full h-full object-cover opacity-60 group-hover:scale-125 transition-transform duration-1000" /> }
         <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-3 py-1.5 rounded-md uppercase italic z-10">{item.category}</span>
       </div>
       <div className="p-5 flex flex-col flex-1 text-left text-black">
