@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabase';
 import { 
   ArrowLeft, Plus, LayoutDashboard, CheckCircle2, Star,
-  Briefcase, GraduationCap, PartyPopper, Map as MapIcon, Building2, Search, ShieldCheck
+  Briefcase, GraduationCap, PartyPopper, Map as MapIcon, Building2, Search, ShieldCheck,
+  Globe
 } from 'lucide-react';
 
 export default function AdminAddEvent() {
@@ -205,7 +206,7 @@ export default function AdminAddEvent() {
               </div>
             </div>
 
-            {/* Pricing Section (Shows for all) */}
+            {/* Pricing Section */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>Time Category</label>
@@ -247,51 +248,51 @@ export default function AdminAddEvent() {
             </div>
           </div>
 
-          {/* 🛡️ MEDIA & PROMOTION (RBAC Enabled) */}
-          <div className="space-y-4">
-             {/* ONLY Super Admin sees Featured & Official toggles */}
-             {userRole === 'super_admin' && (
-               <div className="grid grid-cols-2 gap-4">
-                 <div 
-                   onClick={() => setFormData({...formData, is_featured: !formData.is_featured})}
-                   className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.is_featured ? 'bg-[#1FC8C8]/10 border-[#1FC8C8]' : 'bg-white border-slate-100 hover:border-slate-200'}`}
-                 >
-                   <div className="flex items-center gap-4 text-left leading-tight">
-                      <div className={`p-3 rounded-xl ${formData.is_featured ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-slate-100 text-slate-300'}`}>
-                         <Star size={18} fill={formData.is_featured ? "currentColor" : "none"} />
-                      </div>
-                      <div>
-                         <p className="text-[11px] font-black uppercase tracking-widest text-[#0A2A5E]">Promote to Our Picks</p>
-                      </div>
-                   </div>
-                 </div>
-
-                 <div 
-                   onClick={() => setFormData({...formData, is_official: !formData.is_official})}
-                   className={`p-5 rounded-3xl border-2 cursor-pointer transition-all flex items-center justify-between ${formData.is_official ? 'bg-[#0A2A5E] border-[#0A2A5E]' : 'bg-white border-slate-100 hover:border-slate-200'}`}
-                 >
-                   <div className="flex items-center gap-4 text-left leading-tight">
-                      <div className={`p-3 rounded-xl ${formData.is_official ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-slate-100 text-slate-300'}`}>
-                         <ShieldCheck size={18} />
-                      </div>
-                      <div>
-                         <p className={`text-[11px] font-black uppercase tracking-widest ${formData.is_official ? 'text-[#1FC8C8]' : 'text-[#0A2A5E]'}`}>Precede Official</p>
-                      </div>
-                   </div>
-                 </div>
-               </div>
-             )}
-
-             <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClass}>Flyer / Image URL</label>
-                  <input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} />
-                </div>
-                <div>
-                  <label className={labelClass}>Action Link (External)</label>
-                  <input className={inputClass} placeholder="https://..." value={formData.link} onChange={(e) => setFormData({...formData, link: e.target.value})} />
-                </div>
+          <div className="grid grid-cols-1 gap-4">
+             <div>
+               <label className={labelClass}>Flyer / Image URL</label>
+               <input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} />
              </div>
+             <div>
+               <label className={labelClass}>Action Link (External)</label>
+               <input className={inputClass} placeholder="https://..." value={formData.link} onChange={(e) => setFormData({...formData, link: e.target.value})} />
+             </div>
+          </div>
+
+          {/* 🛡️ HUB PLACEMENT SELECTOR (Available to all admins) */}
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-[2rem]">
+            <label className={`${labelClass} mb-4 text-[#0A2A5E]`}>Hub Placement</label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* Standard: Will ONLY show in "All Posts Archive" */}
+              <button 
+                type="button"
+                onClick={() => setFormData({...formData, is_featured: false, is_official: false})}
+                className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${!formData.is_featured && !formData.is_official ? 'bg-[#0A2A5E] border-[#0A2A5E] text-white shadow-xl' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}
+              >
+                <Globe size={20} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-center">Standard<br/>(All Posts)</span>
+              </button>
+              
+              {/* Featured: Will ONLY show in "Featured Picks" */}
+              <button 
+                type="button"
+                onClick={() => setFormData({...formData, is_featured: true, is_official: false})}
+                className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${formData.is_featured ? 'bg-[#1FC8C8] border-[#1FC8C8] text-[#0A2A5E] shadow-xl' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}
+              >
+                <Star size={20} fill={formData.is_featured ? "currentColor" : "none"} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-center">Featured Pick<br/>(Premium)</span>
+              </button>
+
+              {/* Official: Will ONLY show in "Precede Initiatives" */}
+              <button 
+                type="button"
+                onClick={() => setFormData({...formData, is_featured: false, is_official: true})}
+                className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${formData.is_official ? 'bg-[#0A2A5E] border-[#0A2A5E] text-[#1FC8C8] shadow-xl' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'}`}
+              >
+                <ShieldCheck size={20} />
+                <span className="text-[10px] font-black uppercase tracking-widest text-center">Initiative<br/>(Official)</span>
+              </button>
+            </div>
           </div>
 
           {/* ⚡ SUBMIT BUTTON SECTION (RBAC Enabled) */}
