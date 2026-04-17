@@ -4,7 +4,7 @@ import { supabase } from '@/app/lib/supabase';
 import { 
   ArrowLeft, Plus, LayoutDashboard, CheckCircle2, Star,
   Briefcase, GraduationCap, PartyPopper, Map as MapIcon, Building2, Search, ShieldCheck,
-  Globe
+  Globe, UploadCloud, X
 } from 'lucide-react';
 
 export default function AdminAddEvent() {
@@ -13,9 +13,13 @@ export default function AdminAddEvent() {
   const [isSalaryDisclosed, setIsSalaryDisclosed] = useState(true);
   const [isFree, setIsFree] = useState(false);
 
+  // 🖼️ IMAGE UPLOAD STATE
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   // 🛡️ SECURITY: Role State
   const [userRole, setUserRole] = useState<'super_admin' | 'staff'>('staff');
-  const [publishDirectly, setPublishDirectly] = useState(false); // Only Super Admin sees this
+  const [publishDirectly, setPublishDirectly] = useState(false); 
 
   const [formData, setFormData] = useState<any>({
     category: 'event', 
@@ -41,7 +45,6 @@ export default function AdminAddEvent() {
     parent_id: null 
   });
 
-  // Fetch the current user's role on load
   useEffect(() => {
     const fetchUserRole = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -52,18 +55,53 @@ export default function AdminAddEvent() {
     fetchUserRole();
   }, []);
 
+  // --- HANDLE IMAGE SELECTION ---
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setShowSuccess(false);
 
-    const finalData = { ...formData };
+    let finalImageUrl = formData.image_url;
+
+    // --- 🖼️ UPLOAD IMAGE TO SUPABASE IF FILE SELECTED ---
+    if (imageFile) {
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${Math.random()}-${Date.now()}.${fileExt}`;
+      const filePath = `uploads/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('flyers') // Ensure this bucket exists and is PUBLIC in Supabase
+        .upload(filePath, imageFile);
+
+      if (uploadError) {
+        alert("❌ Error uploading image: " + uploadError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Get the public URL of the uploaded image
+      const { data: publicUrlData } = supabase.storage
+        .from('flyers')
+        .getPublicUrl(filePath);
+
+      finalImageUrl = publicUrlData.publicUrl;
+    }
+
+    const finalData = { ...formData, image_url: finalImageUrl };
     
-    // 🛡️ RBAC LOGIC: If Super Admin toggled "Publish Directly", bypass the queue
+    // RBAC & Pricing Logic
     if (userRole === 'super_admin' && publishDirectly) {
       finalData.status = 'approved';
     } else {
-      finalData.status = 'queued'; // Force queue for staff submissions
+      finalData.status = 'queued';
     }
     
     if (formData.category === 'job' && !isSalaryDisclosed) {
@@ -73,6 +111,7 @@ export default function AdminAddEvent() {
       finalData.price = 'Free';
     }
 
+    // Insert into Database
     const { error } = await supabase.from('jobs').insert([finalData]);
 
     if (!error) {
@@ -85,6 +124,8 @@ export default function AdminAddEvent() {
         is_featured: false, is_official: false,
         parent_id: null
       });
+      setImageFile(null);
+      setImagePreview(null);
       setIsFree(false);
       setPublishDirectly(false);
       window.scrollTo(0, 0);
@@ -249,21 +290,63 @@ export default function AdminAddEvent() {
           </div>
 
           <div className="grid grid-cols-1 gap-4">
+             {/* 🖼️ NEW FILE UPLOAD UI */}
              <div>
-               <label className={labelClass}>Flyer / Image URL</label>
-               <input className={inputClass} placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} />
+                <label className={labelClass}>Flyer / Image Upload</label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-slate-300 rounded-2xl hover:border-[#1FC8C8] transition-colors relative bg-white">
+                  <div className="space-y-1 text-center">
+                    {imagePreview ? (
+                      <div className="relative inline-block">
+                        <img src={imagePreview} alt="Preview" className="mx-auto h-32 object-contain rounded-lg shadow-md" />
+                        <button 
+                          type="button" 
+                          onClick={() => { setImageFile(null); setImagePreview(null); }} 
+                          className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1.5 shadow-lg hover:bg-red-600 transition-colors"
+                        >
+                          <X size={14}/>
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <UploadCloud className="mx-auto h-10 w-10 text-slate-300 mb-2" />
+                        <div className="flex text-sm text-slate-600 justify-center">
+                          <label htmlFor="file-upload" className="relative cursor-pointer rounded-md font-black text-[#1FC8C8] hover:text-[#0A2A5E] focus-within:outline-none uppercase text-[11px] tracking-widest transition-colors">
+                            <span>Upload a file</span>
+                            <input id="file-upload" name="file-upload" type="file" accept="image/*" className="sr-only" onChange={handleImageChange} />
+                          </label>
+                          <p className="pl-1 text-[11px] uppercase font-bold text-slate-400 mt-0.5">or drag and drop</p>
+                        </div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-2">PNG, JPG, GIF up to 5MB</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Fallback URL Input */}
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="h-px bg-slate-200 flex-1"></div>
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">OR USE URL LINK</span>
+                  <div className="h-px bg-slate-200 flex-1"></div>
+                </div>
+                <input 
+                  className={`${inputClass} mt-4 disabled:opacity-50`} 
+                  placeholder="https://..." 
+                  value={formData.image_url} 
+                  onChange={(e) => setFormData({...formData, image_url: e.target.value})} 
+                  disabled={!!imageFile} // Disable if they selected a file
+                />
              </div>
+
              <div>
-               <label className={labelClass}>Action Link (External)</label>
+               <label className={labelClass}>Action Link (External Registration/Tickets)</label>
                <input className={inputClass} placeholder="https://..." value={formData.link} onChange={(e) => setFormData({...formData, link: e.target.value})} />
              </div>
           </div>
 
-          {/* 🛡️ HUB PLACEMENT SELECTOR (Available to all admins) */}
+          {/* 🛡️ HUB PLACEMENT SELECTOR */}
           <div className="p-6 bg-slate-50 border border-slate-200 rounded-[2rem]">
             <label className={`${labelClass} mb-4 text-[#0A2A5E]`}>Hub Placement</label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {/* Standard: Will ONLY show in "All Posts Archive" */}
               <button 
                 type="button"
                 onClick={() => setFormData({...formData, is_featured: false, is_official: false})}
@@ -273,7 +356,6 @@ export default function AdminAddEvent() {
                 <span className="text-[10px] font-black uppercase tracking-widest text-center">Standard<br/>(All Posts)</span>
               </button>
               
-              {/* Featured: Will ONLY show in "Featured Picks" */}
               <button 
                 type="button"
                 onClick={() => setFormData({...formData, is_featured: true, is_official: false})}
@@ -283,7 +365,6 @@ export default function AdminAddEvent() {
                 <span className="text-[10px] font-black uppercase tracking-widest text-center">Featured Pick<br/>(Premium)</span>
               </button>
 
-              {/* Official: Will ONLY show in "Precede Initiatives" */}
               <button 
                 type="button"
                 onClick={() => setFormData({...formData, is_featured: false, is_official: true})}
