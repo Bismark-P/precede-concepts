@@ -7,7 +7,7 @@ import {
   GraduationCap, Briefcase, Shield, HeartHandshake,
   Ticket, FileText, ChevronRight, ArrowUpRight, Share2, 
   AlertTriangle, MessageSquare, Instagram, Twitter, Linkedin, Facebook,
-  CheckCircle2, ArrowUp, Users 
+  CheckCircle2, ArrowUp, Users, MapPin, Calendar
 } from 'lucide-react'
 
 const WhatsAppIcon = ({ size = 20 }) => (
@@ -24,15 +24,18 @@ export default function Home() {
   const [filter, setFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [globalSearch, setGlobalSearch] = useState('')
+  const [hubLocation, setHubLocation] = useState('')
+  const [hubDate, setHubDate] = useState('all')
   const [expiredLink, setExpiredLink] = useState(false)
   const [showTopBtn, setShowTopBtn] = useState(false)
   const [heroKey, setHeroKey] = useState(0)
+  const [highlightedService, setHighlightedService] = useState<number | null>(null)
   const isScrollingManually = useRef(false)
 
   const services = [
     { title: 'ACADEMIC', icon: <GraduationCap size={28}/>, list: ['WAEC Mock Logistics', 'Fidelity Exam Printing', 'Result Management', 'School IT Systems', 'Stationery Supply'] },
-    { title: 'ADMIN', icon: <Briefcase size={28}/>, list: ['Business Registration', 'Statutory IDs', 'Document Logistics', 'Tax Prep & Filing', 'Corporate Concierge'] },
-    { title: 'DIGITAL OPS', icon: <Code2 size={28}/>, list: ['Web Development', 'IT Support', 'Brand Identity', 'UI/UX Design', 'Social Media Mgt'] },
+    { title: 'ADMIN', icon: <Briefcase size={28}/>, list: ['Business Registration', 'Statutory IDs', 'Document Logistics', 'Printing', 'Corporate Concierge'] },
+    { title: 'DIGITAL OPS', icon: <Code2 size={28}/>, list: ['Web Development', 'IT Support', 'Branding and Brand Identity', 'UI/UX Design', 'Social Media Mgt'] },
     { title: 'LEARNING & DEV', icon: <Shield size={28}/>, list: ['Cadet Training', 'Masterclasses', 'Career Consulting', 'Digital Literacy', 'Leadership Coaching'] },
     { title: 'AGENCY OUTSOURCING', icon: <HeartHandshake size={28}/>, list: ['Talent Booking', 'Event Staffing', 'Fleet Leasing', 'White-Label Tech', 'B2B Execution'] },
   ];
@@ -81,22 +84,23 @@ export default function Home() {
     }
   }, [view]);
 
-  // --- 🔗 SHARABLE POST LOGIC ---
+  // --- 🔗 DEEP LINKING FOR UNIQUE POSTS ---
   useEffect(() => {
     if (items.length > 0 && view === 'home') {
       const params = new URLSearchParams(window.location.search);
       const postId = params.get('id');
       if (postId) {
-        const element = document.getElementById(`post-${postId}`);
-        if (element) {
-          setTimeout(() => {
+        setTimeout(() => {
+          const element = document.getElementById(`post-${postId}`);
+          if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            element.classList.add('ring-8', 'ring-[#1FC8C8]');
-          }, 800);
-        } else {
-          setExpiredLink(true);
-          document.getElementById('hub')?.scrollIntoView({ behavior: 'smooth' });
-        }
+            element.classList.add('ring-8', 'ring-[#1FC8C8]', 'scale-[1.03]');
+            setTimeout(() => element.classList.remove('ring-8', 'ring-[#1FC8C8]', 'scale-[1.03]'), 3000);
+          } else {
+            setExpiredLink(true);
+            document.getElementById('hub')?.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 800);
       }
     }
   }, [items, view]);
@@ -123,23 +127,44 @@ export default function Home() {
     navigateTo('hub');
   };
 
-  // --- 🔍 SMART GLOBAL SEARCH LOGIC ---
+  // --- 🔍 SMART GLOBAL SEARCH & AUTO-HIGHLIGHTING ---
   const handleGlobalSearchEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      const term = globalSearch.toLowerCase();
+      const term = globalSearch.toLowerCase().trim();
       if (!term) return;
 
-      const isService = services.some(s => s.title.toLowerCase().includes(term) || s.list.some(l => l.toLowerCase().includes(term)));
-      if (isService || term.includes('brand') || term.includes('print')) {
+      // 1. Check if it matches a service card content
+      const serviceIndex = services.findIndex(s => 
+        s.title.toLowerCase().includes(term) || 
+        s.list.some(l => l.toLowerCase().includes(term))
+      );
+
+      if (serviceIndex !== -1 || term.includes('brand') || term.includes('print')) {
+        setView('home');
         navigateTo('services');
+        
+        // Auto-select correct card if standard term misses
+        let targetIndex = serviceIndex;
+        if(term.includes('print') && targetIndex === -1) targetIndex = 1; // Admin
+        if(term.includes('brand') && targetIndex === -1) targetIndex = 2; // Digital Ops
+        
+        // Apply visual highlight to the card
+        if (targetIndex !== -1) {
+          setTimeout(() => {
+            setHighlightedService(targetIndex);
+            setTimeout(() => setHighlightedService(null), 4000); // Remove after 4s
+          }, 800);
+        }
         return;
       }
       
+      // 2. Check About Section
       if (term.includes('about') || term.includes('mission') || term.includes('business')) {
         navigateTo('about');
         return;
       }
 
+      // 3. Fallback: Search Hub
       const hubMatch = items.some(i => i.title?.toLowerCase().includes(term) || i.category?.toLowerCase().includes(term));
       if (hubMatch) {
         setSearchQuery(globalSearch); 
@@ -150,57 +175,38 @@ export default function Home() {
     }
   };
 
-  // --- 🧠 SMART NATURAL LANGUAGE FILTERING LOGIC ---
+  // --- 🧠 HUB FILTERING ENGINE ---
   const filteredItems = items.filter(item => {
-    const term = (searchQuery || globalSearch).toLowerCase().trim();
+    const term = (searchQuery).toLowerCase().trim();
+    const locTerm = hubLocation.toLowerCase().trim();
 
-    // 1. Check Tabs First
+    const matchesText = !term || item.title?.toLowerCase().includes(term) || item.category?.toLowerCase().includes(term);
+    const matchesLoc = !locTerm || item.venue?.toLowerCase().includes(locTerm) || item.location?.toLowerCase().includes(locTerm) || item.region?.toLowerCase().includes(locTerm);
     const catMatch = filter === 'all' || item.category === filter;
-    if (!catMatch) return false;
-    if (!term) return true;
 
-    // 2. Setup Date Variables
-    const itemDate = item.event_date ? new Date(item.event_date) : null;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // 3. Detect Natural Language Date Keywords
-    let isDateSearch = false;
     let dateMatch = true;
+    if (hubDate !== 'all' && item.event_date) {
+      const eDate = new Date(item.event_date);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      
+      if (hubDate === 'today') {
+        dateMatch = eDate.toDateString() === today.toDateString();
+      } else if (hubDate === 'upcoming') {
+        dateMatch = eDate >= today;
+      } else if (hubDate === 'past') {
+        dateMatch = eDate < today;
+      }
+    }
 
+    // Natural Language Overrides in Search Bar
+    let nlDateMatch = true;
     if (term.includes('today')) {
-        isDateSearch = true;
-        dateMatch = itemDate ? itemDate.toDateString() === today.toDateString() : false;
-    } else if (term.includes('upcoming')) {
-        isDateSearch = true;
-        dateMatch = itemDate ? itemDate >= today : false;
-    } else if (term.includes('past')) {
-        isDateSearch = true;
-        dateMatch = itemDate ? itemDate < today : false;
+       const todayStr = new Date().toDateString();
+       nlDateMatch = item.event_date ? new Date(item.event_date).toDateString() === todayStr : false;
     }
 
-    // 4. Detect Text/Location Keywords
-    const cleanTerm = term.replace(/(today|upcoming|past)/g, '').trim();
-    let textMatch = true;
-    
-    if (cleanTerm) {
-        textMatch = (
-            item.title?.toLowerCase().includes(cleanTerm) ||
-            item.category?.toLowerCase().includes(cleanTerm) ||
-            item.venue?.toLowerCase().includes(cleanTerm) ||
-            item.location?.toLowerCase().includes(cleanTerm) ||
-            item.region?.toLowerCase().includes(cleanTerm)
-        );
-    }
-
-    // 5. Final Evaluation Engine
-    if (isDateSearch && cleanTerm) {
-        return dateMatch && textMatch; // Must match both date and text (e.g. "accra today")
-    } else if (isDateSearch) {
-        return dateMatch; // Only matching a date word
-    } else {
-        return textMatch; // Standard text search
-    }
+    return matchesText && matchesLoc && catMatch && dateMatch && nlDateMatch;
   });
 
   const featured = filteredItems.filter(i => i.is_featured);
@@ -250,6 +256,21 @@ export default function Home() {
         </div>
       </div>
 
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="fixed inset-0 z-[200] bg-[#0A2A5E] flex flex-col p-8 text-white uppercase italic font-black">
+             <div className="flex justify-between items-center mb-10 text-[#1FC8C8]">MENU <button onClick={() => setIsMenuOpen(false)}><X size={32}/></button></div>
+             <div className="flex flex-col gap-8 text-2xl">
+               <button onClick={() => navigateTo('home')}>HOME</button>
+               <button onClick={() => navigateTo('about')}>ABOUT</button>
+               <button onClick={() => navigateTo('services')}>SERVICES</button>
+               <button onClick={() => handleNavFilter('job')}>JOBS</button>
+               <button onClick={() => { setView('marketplace'); setIsMenuOpen(false); window.scrollTo(0,0); }}>MARKETPLACE</button>
+             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* --- ⬆️ BACK TO TOP --- */}
       <AnimatePresence>
         {showTopBtn && (
@@ -275,7 +296,7 @@ export default function Home() {
             </section>
             
             {/* --- ABOUT SECTION --- */}
-            <section id="about" className="h-screen flex items-center justify-center bg-[#1FC8C8] px-6 py-24">
+            <section id="about" className="h-screen flex items-center justify-center bg-[#1FC8C8] px-6">
               <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16 items-center w-full">
                 <div className="flex flex-col text-left">
                   <h2 className="text-[4.5rem] md:text-[7.5rem] font-black uppercase italic tracking-tighter leading-[0.85]">
@@ -295,7 +316,7 @@ export default function Home() {
                      <li><span className="opacity-70">BUSINESS GROWTH:</span> REGISTRATION, DEVELOPMENT, STRATEGIC CONSULTATION.</li>
                      <li><span className="opacity-70">IDENTITY & BRANDING:</span> GRAPHIC DESIGN, BRANDING, PROFESSIONAL PRINTING, BANNERS, STICKERS, LABELS.</li>
                      <li><span className="opacity-70">TECH & INNOVATION:</span> IT SUPPORT, WEB DEVELOPMENT, WEB AUDIT & GRADING, AI INTEGRATION.</li>
-                     <li><span className="opacity-70">CAPACITY BUILDING:</span> SPECIALIZED TRAINING, COMPUTING CONCEPTS.</li>
+                     <li><span className="opacity-70">CAPACITY BUILDING:</span> SPECIALIZED TRAINING, COMPUTING CONCEPTS, HOME TUITION.</li>
                   </ul>
                 </div>
               </div>
@@ -308,8 +329,8 @@ export default function Home() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 items-start">
                   {services.map((s, i) => (
-                    <div key={i} className="bg-slate-50 border-[4px] border-[#1FC8C8] rounded-[2rem] flex flex-col overflow-hidden group shadow-xl transition-all duration-300 hover:scale-[1.03] hover:border-[#0A2A5E]">
-                      <div className="bg-[#1FC8C8] p-6 flex items-center gap-4 transition-colors group-hover:bg-[#0A2A5E]">
+                    <div key={i} className={`bg-slate-50 border-[4px] rounded-[2rem] flex flex-col overflow-hidden group shadow-xl transition-all duration-300 hover:scale-[1.03] hover:border-[#0A2A5E] h-[450px] ${highlightedService === i ? 'ring-8 ring-[#1FC8C8] scale-[1.05] border-[#0A2A5E]' : 'border-[#1FC8C8]'}`}>
+                      <div className="bg-[#1FC8C8] p-6 flex items-center gap-4 transition-colors group-hover:bg-[#0A2A5E] h-[90px] shrink-0">
                         <div className="bg-white p-2.5 rounded-xl text-[#0A2A5E] shrink-0">{s.icon}</div>
                         <h3 className="text-[14px] font-black uppercase italic text-[#0A2A5E] group-hover:text-white leading-tight">{s.title}</h3>
                       </div>
@@ -324,14 +345,14 @@ export default function Home() {
                              <ChevronRight size={16} className="shrink-0 text-[#0A2A5E] mt-0.5"/> AND MORE...
                            </li>
                          </ul>
-                         <button onClick={() => navigateTo('contact')} className="w-full py-4 mt-auto rounded-xl text-[12px] font-black uppercase bg-[#0A2A5E] text-white hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all tracking-widest shadow-md">BOOK SERVICE</button>
+                         <button onClick={() => navigateTo('contact')} className="mt-auto w-full py-4 rounded-xl text-[12px] font-black uppercase bg-[#0A2A5E] text-white hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all tracking-widest shadow-md">BOOK SERVICE</button>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                   <div onClick={() => navigateTo('contact')} className="bg-[#0A2A5E] p-8 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#1FC8C8] transition-all shadow-2xl">
+                   <div onClick={() => navigateTo('contact')} className="bg-[#0A2A5E] p-8 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#1FC8C8] transition-all shadow-2xl h-[100px]">
                       <div className="text-white group-hover:text-[#0A2A5E] text-left">
                         <h3 className="text-xl md:text-2xl font-black italic uppercase leading-none mb-2"><Ticket size={28} className="inline mr-2 mb-1"/> TICKETING & PAYMENTS</h3>
                         <p className="text-[11px] font-black uppercase tracking-[0.1em] opacity-60 group-hover:text-black group-hover:opacity-100">Secure Revenue & Event Logistics.</p>
@@ -339,12 +360,12 @@ export default function Home() {
                       <ArrowUpRight className="text-[#1FC8C8] group-hover:text-[#0A2A5E]" size={28}/>
                    </div>
                    
-                   <div className="flex flex-col justify-center items-center p-4">
+                   <div className="flex flex-col justify-center items-center p-4 h-[100px]">
                       <Sparkles className="text-[#0A2A5E]/20 mb-2" size={32} />
                       <h4 className="text-black font-black uppercase italic text-lg tracking-[0.4em]">AND MORE...</h4>
                    </div>
 
-                   <div onClick={() => navigateTo('contact')} className="bg-[#1FC8C8] p-8 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#0A2A5E] transition-all shadow-2xl">
+                   <div onClick={() => navigateTo('contact')} className="bg-[#1FC8C8] p-8 rounded-[2rem] flex items-center justify-between group cursor-pointer hover:bg-[#0A2A5E] transition-all shadow-2xl h-[100px]">
                       <div className="text-[#0A2A5E] group-hover:text-white text-left">
                         <h3 className="text-xl md:text-2xl font-black italic uppercase leading-none mb-2"><FileText size={28} className="inline mr-2 mb-1"/> CUSTOM ENQUIRY</h3>
                         <p className="text-[11px] font-black uppercase tracking-[0.1em] opacity-60 text-black group-hover:text-white group-hover:opacity-100">Bespoke Agency & Technical Requests.</p>
@@ -360,24 +381,48 @@ export default function Home() {
               <div className="max-w-[1500px] mx-auto text-left text-white">
                 <h2 className="text-6xl md:text-[8rem] font-black uppercase italic mb-16 tracking-tighter">OPPORTUNITY HUB.</h2>
                 
-                {/* Search & Filters Aligned Flex Row */}
-                <div className="flex flex-col lg:flex-row items-center gap-6 mb-16 w-full">
-                  <div className="w-full lg:w-[400px] relative">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={20} />
-                    <input type="text" placeholder="Filter by keyword, location, or 'Today'..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-5 pl-14 bg-white/10 border-4 border-white/10 rounded-[2rem] text-white font-black uppercase text-sm italic outline-none focus:border-[#1FC8C8] shadow-3xl placeholder:text-white/30"/>
+                {/* Advanced Search & Filters */}
+                <div className="flex flex-col gap-6 mb-16 bg-white/5 border-4 border-white/10 p-8 rounded-[3rem] shadow-2xl">
+                  
+                  {/* Top Row: Search Input */}
+                  <div className="w-full relative">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={24} />
+                    <input type="text" placeholder="Search opportunities, roles, or keywords (e.g. 'Today')..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-6 pl-16 bg-black/20 border-2 border-white/10 rounded-[2rem] text-white font-black uppercase text-sm italic outline-none focus:border-[#1FC8C8] transition-all placeholder:text-white/30"/>
                   </div>
                   
-                  <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-[2rem] border-2 border-white/10 w-full lg:w-auto">
-                    {['all', 'training', 'job', 'event', 'place', 'marketplace'].map((f) => (
-                      <button key={f} onClick={() => {
-                        if(f === 'marketplace') { setView('marketplace'); window.location.hash='marketplace'; window.scrollTo(0,0); } 
-                        else setFilter(f);
-                      }} className={`px-8 py-3 rounded-full text-[11px] font-black uppercase transition-all whitespace-nowrap ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/40 hover:text-white'}`}>{f}</button>
-                    ))}
+                  {/* Bottom Row: Filters (Categories, Location, Date) */}
+                  <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between w-full">
+                    {/* Categories */}
+                    <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-[2rem] border-2 border-white/10">
+                      {['all', 'training', 'job', 'event', 'place', 'marketplace'].map((f) => (
+                        <button key={f} onClick={() => {
+                          if(f === 'marketplace') { setView('marketplace'); window.location.hash='marketplace'; window.scrollTo(0,0); } 
+                          else setFilter(f);
+                        }} className={`px-6 py-3 rounded-full text-[11px] font-black uppercase transition-all whitespace-nowrap ${filter === f ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'text-white/40 hover:text-white'}`}>{f}</button>
+                      ))}
+                    </div>
+
+                    {/* Location & Date Filters */}
+                    <div className="flex gap-4 w-full xl:w-auto">
+                      <div className="relative flex-1 xl:flex-none">
+                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={16} />
+                        <input type="text" placeholder="Location, Region, Near Me..." value={hubLocation} onChange={(e) => setHubLocation(e.target.value)} className="w-full xl:w-[220px] p-3 pl-10 bg-black/30 border-2 border-white/10 rounded-[1.5rem] text-white font-black uppercase text-[10px] italic outline-none focus:border-[#1FC8C8] placeholder:text-white/30"/>
+                      </div>
+                      <div className="relative flex-1 xl:flex-none">
+                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={16} />
+                        <select value={hubDate} onChange={(e) => setHubDate(e.target.value)} className="w-full xl:w-[160px] p-3 pl-10 bg-black/30 border-2 border-white/10 rounded-[1.5rem] text-white font-black uppercase text-[10px] italic outline-none focus:border-[#1FC8C8] appearance-none cursor-pointer">
+                          <option value="all">ANY DATE</option>
+                          <option value="today">TODAY</option>
+                          <option value="upcoming">UPCOMING</option>
+                          <option value="past">PAST EVENTS</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-20 min-h-[400px]">
+                {/* --- HUB CONTENT --- */}
+                <div className="space-y-24 min-h-[400px]">
                   <AnimatePresence>
                     {expiredLink && (
                       <motion.div initial={{opacity:0, y:-20}} animate={{opacity:1, y:0}} className="p-8 bg-red-500/10 border-4 border-red-500/30 rounded-[3rem] flex items-center justify-between backdrop-blur-md mb-10">
@@ -390,41 +435,35 @@ export default function Home() {
                     )}
                   </AnimatePresence>
 
-                  {/* EMPTY STATE */}
-                  {filteredItems.length === 0 ? (
-                    <div className="py-24 flex flex-col items-center text-center border-4 border-white/5 rounded-[3rem] bg-white/5 shadow-inner">
-                      <Search size={56} className="text-white/10 mb-6" />
-                      <h3 className="text-2xl md:text-3xl font-black text-white uppercase italic tracking-widest">Nothing to display right now.</h3>
-                      <p className="text-[#1FC8C8] text-sm font-black uppercase tracking-widest mt-2 opacity-80">Try adjusting your filters or check back later.</p>
-                      <button onClick={() => { setSearchQuery(''); setGlobalSearch(''); setFilter('all'); }} className="mt-8 px-10 py-4 bg-[#1FC8C8] text-[#0A2A5E] font-black uppercase italic rounded-2xl text-xs hover:bg-white transition-colors shadow-lg">CLEAR FILTERS</button>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Section 1 */}
-                      {initiatives.length > 0 && (
-                        <div>
-                          <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-8 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-4"><CheckCircle2 size={20}/> 1. Precede Initiatives & Opportunities</h3>
-                          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
-                        </div>
-                      )}
+                  {/* Section 1: Initiatives */}
+                  <div>
+                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><CheckCircle2 size={24}/> 1. Precede Initiatives & Opportunities</h3>
+                    {initiatives.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
+                    ) : (
+                      <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
+                    )}
+                  </div>
 
-                      {/* Section 2 */}
-                      {featured.length > 0 && (
-                        <div>
-                          <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-8 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-4"><Sparkles size={20}/> 2. Featured Picks</h3>
-                          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
-                        </div>
-                      )}
+                  {/* Section 2: Featured */}
+                  <div>
+                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><Sparkles size={24}/> 2. Featured Picks</h3>
+                    {featured.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
+                    ) : (
+                      <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
+                    )}
+                  </div>
 
-                      {/* Section 3 */}
-                      {generalPosts.length > 0 && (
-                        <div>
-                          <h3 className="flex items-center gap-3 text-white/40 mb-8 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/5 pb-4">3. All Posts</h3>
-                          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{generalPosts.map(item => <ScoutCard key={item.id} item={item} />)}</div>
-                        </div>
-                      )}
-                    </>
-                  )}
+                  {/* Section 3: All Posts */}
+                  <div>
+                    <h3 className="flex items-center gap-3 text-white/40 mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/5 pb-6">3. All Posts Archive</h3>
+                    {generalPosts.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{generalPosts.map(item => <ScoutCard key={item.id} item={item} />)}</div>
+                    ) : (
+                       <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
+                    )}
+                  </div>
                 </div>
               </div>
             </section>
@@ -502,7 +541,7 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
   const targetDate = new Date(item.event_date);
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
-    const shareUrl = `${window.location.origin}/#hub?id=${item.id}`;
+    const shareUrl = `${window.location.origin}/?id=${item.id}#hub`;
     navigator.clipboard.writeText(shareUrl);
     alert("Post Link Secured.");
   };
