@@ -13,11 +13,9 @@ export default function AdminAddEvent() {
   const [isSalaryDisclosed, setIsSalaryDisclosed] = useState(true);
   const [isFree, setIsFree] = useState(false);
 
-  // 🖼️ IMAGE UPLOAD STATE
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // 🛡️ SECURITY: Role State
   const [userRole, setUserRole] = useState<'super_admin' | 'staff'>('staff');
   const [publishDirectly, setPublishDirectly] = useState(false); 
 
@@ -25,6 +23,7 @@ export default function AdminAddEvent() {
     category: 'event', 
     sub_category: 'Conference',
     title: '',
+    description: '',
     price: '',
     time_category: 'Morning',
     duration: '',
@@ -46,16 +45,33 @@ export default function AdminAddEvent() {
   });
 
   useEffect(() => {
-    const fetchUserRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.user_metadata?.role === 'super_admin') {
-        setUserRole('super_admin');
+    const checkAdminAccess = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          const userEmail = session.user.email;
+          const userRole = session.user.user_metadata?.role;
+
+          // 🛡️ THE FAIL-SAFE: Hardcode your exact admin emails here
+          const adminEmails = [
+            'precedeconcepts@gmail.com', // Change this to your exact login email
+          ];
+
+          if (adminEmails.includes(userEmail || '') || userRole === 'super_admin') {
+            setUserRole('super_admin');
+          } else {
+            setUserRole('staff');
+          }
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
       }
     };
-    fetchUserRole();
+
+    checkAdminAccess();
   }, []);
 
-  // --- HANDLE IMAGE SELECTION ---
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -71,23 +87,21 @@ export default function AdminAddEvent() {
 
     let finalImageUrl = formData.image_url;
 
-    // --- 🖼️ UPLOAD IMAGE TO SUPABASE IF FILE SELECTED ---
     if (imageFile) {
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${Math.random()}-${Date.now()}.${fileExt}`;
       const filePath = `uploads/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('flyers') // Ensure this bucket exists and is PUBLIC in Supabase
+        .from('flyers') 
         .upload(filePath, imageFile);
 
       if (uploadError) {
-        alert("❌ Error uploading image: " + uploadError.message);
+        alert("❌ Error uploading image: " + uploadError.message + " (Check your Supabase Storage Policies!)");
         setLoading(false);
         return;
       }
 
-      // Get the public URL of the uploaded image
       const { data: publicUrlData } = supabase.storage
         .from('flyers')
         .getPublicUrl(filePath);
@@ -97,7 +111,6 @@ export default function AdminAddEvent() {
 
     const finalData = { ...formData, image_url: finalImageUrl };
     
-    // RBAC & Pricing Logic
     if (userRole === 'super_admin' && publishDirectly) {
       finalData.status = 'approved';
     } else {
@@ -111,14 +124,13 @@ export default function AdminAddEvent() {
       finalData.price = 'Free';
     }
 
-    // Insert into Database
     const { error } = await supabase.from('jobs').insert([finalData]);
 
     if (!error) {
       setShowSuccess(true);
       setFormData({
         ...formData,
-        title: '', price: '', venue: '', event_date: '', 
+        title: '', description: '', price: '', venue: '', event_date: '', 
         link: '', image_url: '', salary_range: '', 
         duration: '', organizer_body: '', recurring_day: '', map_query: '',
         is_featured: false, is_official: false,
@@ -144,7 +156,6 @@ export default function AdminAddEvent() {
     <div className="min-h-screen bg-slate-100 py-12 px-4 text-left font-sans">
       <div className="max-w-2xl mx-auto p-10 bg-white shadow-2xl rounded-[3rem] border border-slate-200">
         
-        {/* HEADER */}
         <div className="flex items-center justify-between mb-8">
           <a href="/admin" className="p-3 bg-slate-50 rounded-full text-slate-400 hover:text-[#0A2A5E] shadow-sm transition-all">
             <ArrowLeft size={20}/>
@@ -169,7 +180,6 @@ export default function AdminAddEvent() {
         
         <form onSubmit={handleSubmit} className="space-y-6">
           
-          {/* CATEGORY SWITCHER */}
           <div className="p-1.5 bg-slate-100 rounded-2xl flex gap-1 border border-slate-200">
             {[
               { id: 'event', label: 'Events', icon: <PartyPopper size={14}/> },
@@ -188,16 +198,34 @@ export default function AdminAddEvent() {
             ))}
           </div>
 
-          {/* BASIC SCOUT DATA */}
           <div className="space-y-4">
             <div>
               <label className={labelClass}>Main Title *</label>
               <input required className={inputClass} placeholder="e.g. Saturday Night Groove" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} />
             </div>
 
+            <div>
+              <label className={labelClass}>Description / Notes</label>
+              <textarea 
+                className={`${inputClass} min-h-[120px] resize-none`} 
+                placeholder="Add specific details, requirements, or a short summary about this post..." 
+                value={formData.description} 
+                onChange={(e) => setFormData({...formData, description: e.target.value})} 
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
                <div>
-                <label className={labelClass}>Organised by</label>
+                <div className="flex justify-between items-center mb-1.5 pr-1">
+                  <label className={`${labelClass} mb-0`}>Organised by</label>
+                  <button 
+                    type="button" 
+                    onClick={() => setFormData({...formData, organizer_body: 'Precede Concepts'})}
+                    className="text-[8px] font-black uppercase text-[#1FC8C8] hover:text-[#0A2A5E] transition-colors"
+                  >
+                    + Use Precede
+                  </button>
+                </div>
                 <div className="relative">
                   <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
                   <input className={`${inputClass} pl-12`} placeholder="e.g. AbrewaNana Pub" value={formData.organizer_body} onChange={(e) => setFormData({...formData, organizer_body: e.target.value})} />
@@ -215,7 +243,6 @@ export default function AdminAddEvent() {
             </div>
           </div>
 
-          {/* DYNAMIC CATEGORY FIELDS */}
           <div className="p-6 bg-slate-50 rounded-[2.5rem] space-y-4 border border-slate-100">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -247,12 +274,11 @@ export default function AdminAddEvent() {
               </div>
             </div>
 
-            {/* Pricing Section */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>Time Category</label>
                 <select className={inputClass} value={formData.time_category} onChange={(e) => setFormData({...formData, time_category: e.target.value})}>
-                  {['Morning', 'Afternoon', 'Evening', 'Night', 'Full-day', 'All-night'].map(t => <option key={t} value={t}>{t}</option>)}
+                  {['Morning', 'Afternoon', 'Evening', 'Night', 'Full-day', 'All-night', 'Varying Times'].map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div>
@@ -290,7 +316,6 @@ export default function AdminAddEvent() {
           </div>
 
           <div className="grid grid-cols-1 gap-4">
-             {/* 🖼️ NEW FILE UPLOAD UI */}
              <div>
                 <label className={labelClass}>Flyer / Image Upload</label>
                 <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-slate-300 rounded-2xl hover:border-[#1FC8C8] transition-colors relative bg-white">
@@ -322,7 +347,6 @@ export default function AdminAddEvent() {
                   </div>
                 </div>
                 
-                {/* Fallback URL Input */}
                 <div className="mt-4 flex items-center gap-3">
                   <div className="h-px bg-slate-200 flex-1"></div>
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">OR USE URL LINK</span>
@@ -333,7 +357,7 @@ export default function AdminAddEvent() {
                   placeholder="https://..." 
                   value={formData.image_url} 
                   onChange={(e) => setFormData({...formData, image_url: e.target.value})} 
-                  disabled={!!imageFile} // Disable if they selected a file
+                  disabled={!!imageFile} 
                 />
              </div>
 
@@ -343,9 +367,8 @@ export default function AdminAddEvent() {
              </div>
           </div>
 
-          {/* 🛡️ HUB PLACEMENT SELECTOR */}
           <div className="p-6 bg-slate-50 border border-slate-200 rounded-[2rem]">
-            <label className={`${labelClass} mb-4 text-[#0A2A5E]`}>Hub Placement</label>
+            <label className={`${labelClass} mb-4 text-[#0A2A5E]`}>Hub Placement (Hides from General feed if Featured/Official)</label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <button 
                 type="button"
@@ -376,7 +399,6 @@ export default function AdminAddEvent() {
             </div>
           </div>
 
-          {/* ⚡ SUBMIT BUTTON SECTION (RBAC Enabled) */}
           {userRole === 'super_admin' && (
             <div className="p-4 bg-orange-50 border border-orange-200 rounded-2xl flex items-center justify-between">
               <div>

@@ -6,8 +6,7 @@ import {
   Code2, Phone, Mail, Menu, X, Sparkles, Search, 
   GraduationCap, Briefcase, Shield, HeartHandshake,
   Ticket, FileText, ChevronRight, ArrowUpRight, Share2, 
-  AlertTriangle, MessageSquare, Instagram, Twitter, Linkedin, Facebook,
-  CheckCircle2, ArrowUp, Users, MapPin, Calendar
+  AlertTriangle, Users, MapPin, Calendar, Globe, CheckCircle2, ArrowUp
 } from 'lucide-react'
 
 const WhatsAppIcon = ({ size = 20 }) => (
@@ -133,7 +132,6 @@ export default function Home() {
       const term = globalSearch.toLowerCase().trim();
       if (!term) return;
 
-      // 1. Check if it matches a service card content
       const serviceIndex = services.findIndex(s => 
         s.title.toLowerCase().includes(term) || 
         s.list.some(l => l.toLowerCase().includes(term))
@@ -143,28 +141,24 @@ export default function Home() {
         setView('home');
         navigateTo('services');
         
-        // Auto-select correct card if standard term misses
         let targetIndex = serviceIndex;
-        if(term.includes('print') && targetIndex === -1) targetIndex = 1; // Admin
-        if(term.includes('brand') && targetIndex === -1) targetIndex = 2; // Digital Ops
+        if(term.includes('print') && targetIndex === -1) targetIndex = 1; 
+        if(term.includes('brand') && targetIndex === -1) targetIndex = 2; 
         
-        // Apply visual highlight to the card
         if (targetIndex !== -1) {
           setTimeout(() => {
             setHighlightedService(targetIndex);
-            setTimeout(() => setHighlightedService(null), 4000); // Remove after 4s
+            setTimeout(() => setHighlightedService(null), 4000); 
           }, 800);
         }
         return;
       }
       
-      // 2. Check About Section
       if (term.includes('about') || term.includes('mission') || term.includes('business')) {
         navigateTo('about');
         return;
       }
 
-      // 3. Fallback: Search Hub
       const hubMatch = items.some(i => i.title?.toLowerCase().includes(term) || i.category?.toLowerCase().includes(term));
       if (hubMatch) {
         setSearchQuery(globalSearch); 
@@ -180,7 +174,7 @@ export default function Home() {
     const term = (searchQuery).toLowerCase().trim();
     const locTerm = hubLocation.toLowerCase().trim();
 
-    const matchesText = !term || item.title?.toLowerCase().includes(term) || item.category?.toLowerCase().includes(term);
+    const matchesText = !term || item.title?.toLowerCase().includes(term) || item.category?.toLowerCase().includes(term) || item.description?.toLowerCase().includes(term);
     const matchesLoc = !locTerm || item.venue?.toLowerCase().includes(locTerm) || item.location?.toLowerCase().includes(locTerm) || item.region?.toLowerCase().includes(locTerm);
     const catMatch = filter === 'all' || item.category === filter;
 
@@ -199,7 +193,6 @@ export default function Home() {
       }
     }
 
-    // Natural Language Overrides in Search Bar
     let nlDateMatch = true;
     if (term.includes('today')) {
        const todayStr = new Date().toDateString();
@@ -296,7 +289,7 @@ export default function Home() {
             </section>
             
             {/* --- ABOUT SECTION --- */}
-            <section id="about" className="h-screen flex items-center justify-center bg-[#1FC8C8] px-6">
+            <section id="about" className="h-screen flex items-center justify-center bg-[#1FC8C8] px-6 py-24">
               <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16 items-center w-full">
                 <div className="flex flex-col text-left">
                   <h2 className="text-[4.5rem] md:text-[7.5rem] font-black uppercase italic tracking-tighter leading-[0.85]">
@@ -316,7 +309,7 @@ export default function Home() {
                      <li><span className="opacity-70">BUSINESS GROWTH:</span> REGISTRATION, DEVELOPMENT, STRATEGIC CONSULTATION.</li>
                      <li><span className="opacity-70">IDENTITY & BRANDING:</span> GRAPHIC DESIGN, BRANDING, PROFESSIONAL PRINTING, BANNERS, STICKERS, LABELS.</li>
                      <li><span className="opacity-70">TECH & INNOVATION:</span> IT SUPPORT, WEB DEVELOPMENT, WEB AUDIT & GRADING, AI INTEGRATION.</li>
-                     <li><span className="opacity-70">CAPACITY BUILDING:</span> SPECIALIZED TRAINING, COMPUTING CONCEPTS, HOME TUITION.</li>
+                     <li><span className="opacity-70">CAPACITY BUILDING:</span> SPECIALIZED TRAINING, COMPUTING CONCEPTS.</li>
                   </ul>
                 </div>
               </div>
@@ -384,15 +377,12 @@ export default function Home() {
                 {/* Advanced Search & Filters */}
                 <div className="flex flex-col gap-6 mb-16 bg-white/5 border-4 border-white/10 p-8 rounded-[3rem] shadow-2xl">
                   
-                  {/* Top Row: Search Input */}
                   <div className="w-full relative">
                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={24} />
                     <input type="text" placeholder="Search opportunities, roles, or keywords (e.g. 'Today')..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full p-6 pl-16 bg-black/20 border-2 border-white/10 rounded-[2rem] text-white font-black uppercase text-sm italic outline-none focus:border-[#1FC8C8] transition-all placeholder:text-white/30"/>
                   </div>
                   
-                  {/* Bottom Row: Filters (Categories, Location, Date) */}
                   <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between w-full">
-                    {/* Categories */}
                     <div className="flex flex-wrap gap-2 bg-black/30 p-2 rounded-[2rem] border-2 border-white/10">
                       {['all', 'training', 'job', 'event', 'place', 'marketplace'].map((f) => (
                         <button key={f} onClick={() => {
@@ -402,7 +392,6 @@ export default function Home() {
                       ))}
                     </div>
 
-                    {/* Location & Date Filters */}
                     <div className="flex gap-4 w-full xl:w-auto">
                       <div className="relative flex-1 xl:flex-none">
                         <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1FC8C8]" size={16} />
@@ -435,40 +424,48 @@ export default function Home() {
                     )}
                   </AnimatePresence>
 
-                  {/* Section 1: Initiatives */}
-                  <div>
-                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><CheckCircle2 size={24}/> 1. Precede Initiatives & Opportunities</h3>
-                    {initiatives.length > 0 ? (
-                      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
-                    ) : (
-                      <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
-                    )}
-                  </div>
+                  {filteredItems.length === 0 ? (
+                    <div className="py-24 flex flex-col items-center text-center border-4 border-white/5 rounded-[3rem] bg-white/5 shadow-inner">
+                      <Search size={56} className="text-white/10 mb-6" />
+                      <h3 className="text-2xl md:text-3xl font-black text-white uppercase italic tracking-widest">Nothing to display right now.</h3>
+                      <p className="text-[#1FC8C8] text-sm font-black uppercase tracking-widest mt-2 opacity-80">Try adjusting your filters or check back later.</p>
+                      <button onClick={() => { setSearchQuery(''); setGlobalSearch(''); setFilter('all'); setHubDate('all'); setHubLocation(''); }} className="mt-8 px-10 py-4 bg-[#1FC8C8] text-[#0A2A5E] font-black uppercase italic rounded-2xl text-xs hover:bg-white transition-colors shadow-lg">CLEAR FILTERS</button>
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><CheckCircle2 size={24}/> 1. Precede Initiatives & Opportunities</h3>
+                        {initiatives.length > 0 ? (
+                          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{initiatives.map(item => <ScoutCard key={item.id} item={item} />)}</div>
+                        ) : (
+                          <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
+                        )}
+                      </div>
 
-                  {/* Section 2: Featured */}
-                  <div>
-                    <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><Sparkles size={24}/> 2. Featured Picks</h3>
-                    {featured.length > 0 ? (
-                      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
-                    ) : (
-                      <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
-                    )}
-                  </div>
+                      <div>
+                        <h3 className="flex items-center gap-3 text-[#1FC8C8] mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/10 pb-6"><Sparkles size={24}/> 2. Featured Picks</h3>
+                        {featured.length > 0 ? (
+                          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{featured.map(item => <ScoutCard key={item.id} item={item} isFeatured />)}</div>
+                        ) : (
+                          <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
+                        )}
+                      </div>
 
-                  {/* Section 3: All Posts */}
-                  <div>
-                    <h3 className="flex items-center gap-3 text-white/40 mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/5 pb-6">3. All Posts Archive</h3>
-                    {generalPosts.length > 0 ? (
-                      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{generalPosts.map(item => <ScoutCard key={item.id} item={item} />)}</div>
-                    ) : (
-                       <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
-                    )}
-                  </div>
+                      <div>
+                        <h3 className="flex items-center gap-3 text-white/40 mb-12 font-black uppercase italic text-sm tracking-[0.4em] border-b-4 border-white/5 pb-6">3. All Posts Archive</h3>
+                        {generalPosts.length > 0 ? (
+                          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">{generalPosts.map(item => <ScoutCard key={item.id} item={item} />)}</div>
+                        ) : (
+                           <div className="p-8 border-2 border-white/5 bg-white/5 rounded-3xl text-center text-white/40 text-xs font-black uppercase tracking-widest italic">Nothing to show right now.</div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </section>
 
-            {/* --- 🏁 CONTACT & FOOTER (100vh PC Screen Fit) --- */}
+            {/* --- 🏁 CONTACT & FOOTER --- */}
             <footer id="contact" className="h-screen bg-[#0A2A5E] flex flex-col justify-center px-6 pt-32 pb-10 text-white relative overflow-hidden">
                 <div className="max-w-[1600px] mx-auto w-full grid lg:grid-cols-2 gap-10 items-center flex-1">
                     <motion.div initial={{ y: 80, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
@@ -492,8 +489,8 @@ export default function Home() {
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-6 rounded-2xl font-black uppercase italic text-[12px] text-center flex justify-center items-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl"><WhatsAppIcon size={20}/> WHATSAPP</a>
-                            <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-6 border-2 border-[#1FC8C8]/20 rounded-2xl font-black uppercase italic text-[12px] text-center hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all shadow-xl">CHANNEL</a>
+                            <a href="https://wa.me/233591999544" className="bg-white text-[#0A2A5E] p-6 rounded-2xl font-black uppercase italic text-[12px] text-center flex justify-center items-center gap-3 hover:bg-[#1FC8C8] transition-all shadow-xl"><WhatsAppIcon size={20}/> WHATSAPP CHAT</a>
+                            <a href="#" className="bg-[#1FC8C8]/10 text-[#1FC8C8] p-6 border-2 border-[#1FC8C8]/20 rounded-2xl font-black uppercase italic text-[12px] text-center hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all shadow-xl">WHATSAPP CHANNEL</a>
                             <button onClick={() => window.location.href='mailto:precedeconcepts@gmail.com'} className="bg-[#1FC8C8] text-[#0A2A5E] p-6 rounded-2xl font-black uppercase italic text-[12px] hover:bg-white transition-all shadow-xl">SEND EMAIL</button>
                         </div>
                     </div>
@@ -502,7 +499,7 @@ export default function Home() {
             </footer>
           </motion.div>
         ) : (
-          /* --- MARKETPLACE (SHORTER HEIGHT) --- */
+          /* --- MARKETPLACE VIEW --- */
           <motion.div key="marketplace-view" initial={{opacity:0, y:50}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="pt-[180px] h-screen bg-[#0A2A5E] px-6">
             <div className="max-w-[1500px] mx-auto text-left">
                <div className="flex items-center justify-between mb-16">
@@ -553,12 +550,18 @@ function ScoutCard({ item, isFeatured }: { item: any; isFeatured?: boolean }) {
         <span className="absolute top-3 left-3 text-[7px] font-black bg-[#1FC8C8] text-[#0A2A5E] px-3 py-1.5 rounded-md uppercase italic z-10">{item.category}</span>
       </div>
       <div className="p-5 flex flex-col flex-1 text-left text-black">
-        <h4 className="font-black text-[12px] uppercase italic leading-tight mb-4 h-10">{item.title}</h4>
+        <h4 className="font-black text-[12px] uppercase italic leading-tight mb-2 h-10 line-clamp-2">{item.title}</h4>
+        
+        {/* Added Description Snippet for Card UI */}
+        {item.description && (
+           <p className="text-[10px] text-slate-500 mb-4 line-clamp-2 opacity-80">{item.description}</p>
+        )}
+        
         <div className="mt-auto pt-4 border-t-2 border-slate-100 flex justify-between items-center">
           <p className="text-[9px] font-black uppercase text-slate-400 italic">{targetDate.toLocaleDateString('en-GB')}</p>
           <div className="flex gap-2">
             <button onClick={handleShare} className="p-2 bg-slate-100 text-[#0A2A5E] rounded-lg shadow-sm hover:bg-[#1FC8C8] transition-colors"><Share2 size={14}/></button>
-            <a href={item.link} target="_blank" className="text-[10px] font-black uppercase bg-[#0A2A5E] text-white px-5 py-2.5 rounded-xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all">VIEW</a>
+            <a href={item.link || '#'} target="_blank" className="text-[10px] font-black uppercase bg-[#0A2A5E] text-white px-5 py-2.5 rounded-xl hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all">VIEW</a>
           </div>
         </div>
       </div>
