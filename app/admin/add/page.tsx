@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { supabase } from '@/app/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { 
   ArrowLeft, Plus, LayoutDashboard, CheckCircle2, Star,
   Briefcase, GraduationCap, PartyPopper, Map as MapIcon, Building2, Search, ShieldCheck,

@@ -1,240 +1,180 @@
-"use client";
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link'; 
-import { supabase } from '@/app/lib/supabase';
-import { 
-  Plus, Check, X, LogOut, Pencil, Trash2, Star, RefreshCcw, BarChart3,
-  ShieldCheck, Users, ShieldAlert, Building2
-} from 'lucide-react';
+'use client'
 
-export default function AdminDashboard() {
-  const router = useRouter();
-  const [items, setItems] = useState<any[]>([]);
-  const [usersList, setUsersList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'queued' | 'approved' | 'past' | 'users'>('queued');
-  const [editingItem, setEditingItem] = useState<any | null>(null);
-  const [gradingItem, setGradingItem] = useState<any | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import { getApprovedOpportunities } from '@/lib/services/opportunity.service'
+import OpportunityCard from '@/components/opportunity/OpportunityCard'
 
-  // 🛡️ SECURITY: Role State
-  const [userRole, setUserRole] = useState<'super_admin' | 'staff'>('staff');
-
-  const handleLogout = async () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    await supabase.auth.signOut();
-    router.push('/admin/login'); 
-  };
-
-  const resetTimer = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(handleLogout, 5 * 60 * 1000);
-  };
+export default function Home() {
+  const [items, setItems] = useState<any[]>([])
+  const [mounted, setMounted] = useState(false)
+  const [filter, setFilter] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedItem, setSelectedItem] = useState<any>(null)
 
   useEffect(() => {
-    const fetchUserRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.user_metadata?.role === 'super_admin') {
-        setUserRole('super_admin');
-      }
-    };
-    fetchUserRole();
-  }, []);
+    setMounted(true)
+    fetchApproved()
+  }, [])
 
+  async function fetchApproved() {
+    const data = await getApprovedOpportunities()
+    setItems(data || [])
+  }
+
+  // 🔥 HANDLE URL OPEN (DEEP LINK)
   useEffect(() => {
-    if (activeTab === 'users') {
-      fetchUsers();
-    } else {
-      fetchItems();
-    }
-    resetTimer();
-    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
-    activityEvents.forEach(e => window.addEventListener(e, resetTimer));
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      activityEvents.forEach(e => window.removeEventListener(e, resetTimer));
-    };
-  }, [activeTab]);
+    if (!items.length) return
 
-  async function fetchItems() {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.from('jobs').select('*').eq('status', activeTab).order('created_at', { ascending: false });
-      if (error) throw error;
-      if (data) setItems(data);
-    } catch (err: any) {
-      console.error("Fetch error:", err);
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('id')
+
+    if (id) {
+      const found = items.find((item) => item.id === id)
+      if (found) setSelectedItem(found)
     }
-    setLoading(false);
+  }, [items])
+
+  // 🔥 UPDATE URL WHEN MODAL OPENS
+  function handleView(item: any) {
+    setSelectedItem(item)
+    window.history.pushState(null, '', `/?id=${item.id}`)
   }
 
-  // ⚡ SUPER ADMIN ONLY: Fetch Users via Secure RPC Bridge
-  async function fetchUsers() {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.rpc('get_managed_users');
-      if (error) throw error;
-      if (data) setUsersList(data);
-    } catch (err: any) {
-      console.error("User fetch error:", err);
-    }
-    setLoading(false);
+  // 🔥 CLOSE MODAL + RESET URL
+  function closeModal() {
+    setSelectedItem(null)
+    window.history.pushState(null, '', '/')
   }
 
-  // ⚡ SUPER ADMIN ONLY: Promote User to Staff
-  const promoteToStaff = async (email: string) => {
-    if (!confirm(`Are you sure you want to promote ${email} to Staff? They will have dashboard access.`)) return;
-    
-    try {
-      const { error } = await supabase.rpc('promote_user_to_staff', { target_email: email });
-      if (error) throw error;
-      alert("Successfully promoted to Staff!");
-      fetchUsers(); // Refresh the list
-    } catch (err: any) {
-      alert("Promotion failed. " + err.message);
-    }
-  }
+  const filteredItems = items.filter((item) => {
+    const term = searchQuery.toLowerCase()
 
-  const handleStatusChange = async (id: string, newStatus: string) => {
-    if (userRole === 'staff' && newStatus === 'approved') {
-      alert("UNAUTHORIZED: Only the Super Admin can push items to the Live Hub.");
-      return;
-    }
-    try {
-      const { error } = await supabase.from('jobs').update({ status: newStatus }).eq('id', id);
-      if (error) throw error;
-      setItems(items.filter(i => i.id !== id));
-    } catch (err: any) {
-      alert("Database Rejected Action: You lack Super Admin clearance.");
-    }
-  };
+    const matchesText =
+      !term ||
+      item.title?.toLowerCase().includes(term) ||
+      item.type?.toLowerCase().includes(term)
 
-  const handleDelete = async (id: string) => {
-    if (userRole === 'staff') {
-      alert("DELETE REQUEST LOGGED: The Super Admin has been notified.");
-      return;
-    }
-    if (confirm("Delete permanently? This action cannot be undone.")) {
-      try {
-        const { error } = await supabase.from('jobs').delete().eq('id', id);
-        if (error) throw error;
-        setItems(items.filter(i => i.id !== id));
-      } catch (err: any) {
-        alert("Unauthorized Action.");
-      }
-    }
-  };
+    const matchesCategory =
+      filter === 'all' || item.type === filter
 
-  // ... (Keep other handlers like saveEdit, saveGrading, handleRepost exactly the same) ...
+    return matchesText && matchesCategory
+  })
+
+  if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-slate-100 font-sans text-slate-900 pb-20 text-left">
-      <nav className="bg-[#0A2A5E] px-6 py-5 sticky top-0 z-[100] shadow-lg flex justify-between items-center text-white">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#1FC8C8] rounded-xl flex items-center justify-center font-black italic text-[#0A2A5E]">PC</div>
-          <span className="text-lg font-black uppercase italic tracking-tighter">Control Hub</span>
-          <span className={`ml-4 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${userRole === 'super_admin' ? 'bg-[#1FC8C8] text-[#0A2A5E]' : 'bg-orange-500 text-white'}`}>
-            {userRole === 'super_admin' ? 'Super Admin' : 'Staff Mode'}
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <Link href="/admin/add" className="bg-[#1FC8C8] text-[#0A2A5E] px-5 py-2.5 rounded-xl font-black text-[10px] uppercase flex items-center gap-2 hover:bg-white transition-all">
-            <Plus size={16} /> New Scout
-          </Link>
-          <button onClick={handleLogout} className="p-2.5 bg-white/10 hover:bg-red-500 rounded-xl transition-all"><LogOut size={18} /></button>
-        </div>
-      </nav>
+    <div className="bg-[#0A2A5E] text-white min-h-screen">
 
-      <div className="max-w-[1600px] mx-auto px-4 pt-10">
-        <div className="flex gap-4 mb-8 border-b border-slate-200 pb-4 overflow-x-auto">
-           <button onClick={() => setActiveTab('queued')} className={`text-[10px] font-black uppercase px-6 py-3 rounded-xl transition-all flex items-center gap-2 ${activeTab === 'queued' ? 'bg-[#0A2A5E] text-white shadow-xl' : 'bg-white text-slate-400'}`}>
-             Queue
-           </button>
-           <button onClick={() => setActiveTab('approved')} className={`text-[10px] font-black uppercase px-6 py-3 rounded-xl transition-all flex items-center gap-2 ${activeTab === 'approved' ? 'bg-[#1FC8C8] text-[#0A2A5E] shadow-xl' : 'bg-white text-slate-400'}`}>
-             Live Hub
-           </button>
-           <button onClick={() => setActiveTab('past')} className={`text-[10px] font-black uppercase px-6 py-3 rounded-xl transition-all flex items-center gap-2 ${activeTab === 'past' ? 'bg-slate-800 text-white shadow-xl' : 'bg-white text-slate-400'}`}>
-             Past / Analytics
-           </button>
+      {/* HERO */}
+      <motion.section
+        className="h-screen flex flex-col items-center justify-center text-center px-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <p className="text-cyan-400 text-sm tracking-[0.3em] mb-4 uppercase">
+            Progress Simplified, Value Delivered.
+          </p>
 
-           {/* ⚡ SUPER ADMIN ONLY: Users Tab */}
-           {userRole === 'super_admin' && (
-             <button onClick={() => setActiveTab('users')} className={`text-[10px] font-black uppercase px-6 py-3 rounded-xl transition-all flex items-center gap-2 ml-auto ${activeTab === 'users' ? 'bg-indigo-600 text-white shadow-xl' : 'bg-white text-indigo-400 border border-indigo-100'}`}>
-               <Users size={14} /> Team & Users
-             </button>
-           )}
+          <h1 className="text-5xl md:text-8xl font-black italic leading-tight">
+            THE <span className="text-cyan-400">STANDARD</span> <br />
+            OF EXECUTION.
+          </h1>
+        </motion.div>
+      </motion.section>
+
+      {/* HUB */}
+      <section className="px-6 py-16 max-w-6xl mx-auto">
+
+        <h2 className="text-3xl font-bold mb-8">
+          Opportunity Hub
+        </h2>
+
+        <input
+          placeholder="Search opportunities..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full mb-6 p-3 rounded-lg text-black"
+        />
+
+        <div className="flex gap-2 mb-8 flex-wrap">
+          {['all', 'job', 'event', 'training', 'place', 'marketplace'].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-2 rounded-full ${
+                filter === f ? 'bg-cyan-400 text-black' : 'bg-white/10'
+              }`}
+            >
+              {f}
+            </button>
+          ))}
         </div>
 
-        {/* ⚡ USERS MANAGEMENT VIEW */}
-        {activeTab === 'users' && userRole === 'super_admin' ? (
-          <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden max-w-4xl">
-            <div className="p-6 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
-              <ShieldCheck className="text-indigo-600" />
-              <div>
-                <h3 className="font-black text-[#0A2A5E] uppercase tracking-widest text-sm">Access Management</h3>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Promote registered companies/users to internal staff.</p>
-              </div>
-            </div>
-            <div className="divide-y divide-slate-100">
-              {usersList.map((u) => (
-                <div key={u.id} className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
-                      <Building2 size={16} className="text-slate-500" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm text-[#0A2A5E]">{u.email}</p>
-                      <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${u.current_role === 'super_admin' ? 'text-[#1FC8C8]' : u.current_role === 'staff' ? 'text-orange-500' : 'text-slate-400'}`}>
-                        Role: {u.current_role}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* Promotion Button (Only show if they are a company) */}
-                  {u.current_role === 'company' && (
-                    <button 
-                      onClick={() => promoteToStaff(u.email)}
-                      className="px-4 py-2 bg-[#0A2A5E] text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#1FC8C8] hover:text-[#0A2A5E] transition-all"
-                    >
-                      Promote to Staff
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredItems.map((item) => (
+            <OpportunityCard
+              key={item.id}
+              item={item}
+              onView={handleView}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* MODAL */}
+      {selectedItem && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-white text-black rounded-2xl max-w-2xl w-full p-6 relative">
+
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-2xl font-bold mb-4">
+              {selectedItem.title}
+            </h2>
+
+            <p className="text-sm text-gray-500 mb-2 uppercase">
+              {selectedItem.type}
+            </p>
+
+            {(selectedItem.data?.venue || selectedItem.location) && (
+              <p>📍 {selectedItem.data?.venue || selectedItem.location}</p>
+            )}
+
+            {selectedItem.deadline && (
+              <p className="text-red-500 mt-2">
+                Deadline: {new Date(selectedItem.deadline).toLocaleString()}
+              </p>
+            )}
+
+            {selectedItem.description && (
+              <p className="mt-4">{selectedItem.description}</p>
+            )}
+
+            {/* 🔥 SHARE BUTTON */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href)
+                alert('Link copied!')
+              }}
+              className="mt-6 bg-cyan-400 text-black px-4 py-2 rounded"
+            >
+              Copy Link
+            </button>
+
           </div>
-        ) : (
-          /* STANDARD EVENT CARDS VIEW */
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {items.map((item) => (
-              <div key={item.id} className="bg-white border border-slate-200 rounded-[2rem] overflow-hidden flex flex-col shadow-sm hover:shadow-xl transition-all relative">
-                {/* ... Keep your existing Card rendering UI exactly here ... */}
-                <div className="p-4 flex flex-col flex-1">
-                  <h4 className="font-black text-[10px] text-[#0A2A5E] uppercase mb-1 line-clamp-2 leading-tight h-8">{item.title}</h4>
-                  
-                  <div className="flex flex-col gap-1.5 pt-3 border-t border-slate-100 mt-auto">
-                    <button 
-                      onClick={() => handleStatusChange(item.id, activeTab === 'queued' ? 'approved' : 'past')} 
-                      className={`w-full py-2 rounded-lg text-[8px] font-black uppercase transition-all shadow-sm ${
-                        userRole === 'staff' && activeTab === 'queued' 
-                          ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
-                          : 'bg-[#1FC8C8] text-[#0A2A5E] hover:bg-[#0A2A5E] hover:text-white'
-                      }`}
-                    >
-                      {activeTab === 'queued' ? (userRole === 'staff' ? 'Awaiting Approval' : 'Approve to Live') : 'Archive (Move to Past)'}
-                    </button>
-                    <div className="flex gap-1.5">
-                      <button onClick={() => handleDelete(item.id)} className={`flex-1 py-2 rounded-lg flex justify-center transition-all ${userRole === 'staff' ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500 hover:bg-red-500 hover:text-white'}`}><Trash2 size={12} /></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
-  );
+  )
 }

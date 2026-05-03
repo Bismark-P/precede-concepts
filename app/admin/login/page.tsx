@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/app/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react'
 
 // ⚡ HARDCODED SUPER ADMIN EMAIL
