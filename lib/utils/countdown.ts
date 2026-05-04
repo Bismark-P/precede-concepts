@@ -1,3 +1,5 @@
+// /lib/utils/countdown.ts
+
 export function getCountdown(deadline: string) {
   const now = new Date().getTime()
   const target = new Date(deadline).getTime()

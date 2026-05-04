@@ -1,11 +1,15 @@
 'use client'
+
+console.log("LOGIN FILE LOADED")
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 import { Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react'
 
-// ⚡ HARDCODED SUPER ADMIN EMAIL
-const SUPER_ADMIN_EMAIL = 'precedeconcepts@gmail.com'; 
+// ⚡ FIXED ADMIN EMAIL (required for Supabase login)
+const SUPER_ADMIN_EMAIL = 'precedeconcepts@gmail.com'
+
 export default function AdminLogin() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,18 +21,28 @@ export default function AdminLogin() {
     setLoading(true)
     setError('')
 
-    // Attempt to sign in with the fixed email
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error: loginError } = await supabase.auth.signInWithPassword({
       email: SUPER_ADMIN_EMAIL,
       password,
     })
 
-    if (error) {
-      setError(error.message)
+    if (loginError) {
+      setError(loginError.message)
       setLoading(false)
-    } else {
-      router.push('/admin')
+      return
     }
+
+    // 🔐 VERIFY USER AFTER LOGIN (IMPORTANT)
+    const { data } = await supabase.auth.getUser()
+
+    if (!data.user || data.user.email !== SUPER_ADMIN_EMAIL) {
+      setError('Unauthorized access')
+      await supabase.auth.signOut()
+      setLoading(false)
+      return
+    }
+
+    router.push('/admin')
   }
 
   const inputClass = "w-full p-5 pl-14 bg-white/5 border-2 border-white/10 rounded-2xl font-bold text-white outline-none focus:border-[#1FC8C8] text-sm transition-all placeholder:text-white/30"
@@ -69,7 +83,7 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            {/* Active Password Field */}
+            {/* Password */}
             <div className="relative group">
               <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-[#1FC8C8] transition-colors" size={20} />
               <input 
